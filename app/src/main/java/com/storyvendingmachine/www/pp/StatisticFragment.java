@@ -43,7 +43,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 public class StatisticFragment extends Fragment {
     PieChart pieChart;
     TextView title_textView, second_title_textView, never_took_exam_textView;
-    LinearLayout statistic_exam_resul_container;
+    LinearLayout statistic_exam_result_container;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -88,7 +88,7 @@ public class StatisticFragment extends Fragment {
         title_textView = (TextView) rootview.findViewById(R.id.statistic_title_textView);
         second_title_textView = (TextView) rootview.findViewById(R.id.statistic_second_title_textView);
         never_took_exam_textView = (TextView) rootview.findViewById(R.id.never_took_exam_textView);
-        statistic_exam_resul_container = (LinearLayout) rootview.findViewById(R.id.statistic_exam_resul_container);
+        statistic_exam_result_container = (LinearLayout) rootview.findViewById(R.id.statistic_exam_result_container);
 
         String title_str = "현재 공부중인 시험 \n\""+exam_selection_name+"\"\n기출 시험 통계";
         title_textView.setText(title_str);
@@ -110,8 +110,6 @@ public class StatisticFragment extends Fragment {
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
                                 JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
                                 for(int i = 0 ; i <jsonArray.length(); i++){
-                                    View transcript_container = getLayoutInflater().inflate(R.layout.container_statistic_exam_result, null);
-
                                     String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
                                     String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
                                     String exam_placed_year = jsonArray.getJSONObject(i).getString("exam_placed_year");
@@ -124,12 +122,25 @@ public class StatisticFragment extends Fragment {
                                     String correct_count = jsonArray.getJSONObject(i).getJSONArray("total_score").getString(0);
                                     String total_question = jsonArray.getJSONObject(i).getJSONArray("total_score").getString(1);
 
+                                    View transcript_container = getLayoutInflater().inflate(R.layout.container_statistic_exam_result, null);
+                                    TextView transcript_title = (TextView)transcript_container.findViewById(R.id.title_textView);
+                                    LinearLayout transcript_subject_container = (LinearLayout) transcript_container.findViewById(R.id.subject_container);
+                                    TextView pass_textView = (TextView)transcript_container.findViewById(R.id.pass_textView);
+
+                                    transcript_title.setText(exam_name+" "+ exam_placed_year+" 년도 "+exam_placed_round + "회");
+                                    pass_textView.setText(pass);
+
                                     JSONArray subjectjsonArray = jsonArray.getJSONObject(i).getJSONArray("subject_score_json");
                                         for(int j = 0 ; j < subjectjsonArray.length(); j++){
                                             String subject_name = subjectjsonArray.getJSONObject(j).getString("subject");
                                             String subject_correct = subjectjsonArray.getJSONObject(j).getString("correct_count");
                                             String subject_total = subjectjsonArray.getJSONObject(j).getString("total_count");
+
+                                            TextView temp_tv = new TextView(getActivity());
+                                            temp_tv.setText(subject_name+" 점수" + subject_correct+"/"+subject_total);
+                                            transcript_subject_container.addView(temp_tv);
                                         }
+                                    statistic_exam_result_container.addView(transcript_container);
                                 }
 
                                 String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
@@ -144,7 +155,7 @@ public class StatisticFragment extends Fragment {
                                     //시험을 응시한적이 없을떄
                                     never_took_exam_textView.setVisibility(View.VISIBLE);
                                     pieChart.setVisibility(View.GONE);
-                                    statistic_exam_resul_container.setVisibility(View.GONE);
+                                    statistic_exam_result_container.setVisibility(View.GONE);
                                 }else{
                                     //한번이라도 시험을 응시했을때
                                     pieChart(rootview, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));

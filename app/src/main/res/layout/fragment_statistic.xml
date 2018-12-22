@@ -71,7 +71,7 @@
         </android.support.constraint.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/statistic_exam_resul_container"
+            android:id="@+id/statistic_exam_result_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorWhite"
