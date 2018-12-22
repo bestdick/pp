@@ -110,6 +110,8 @@ public class StatisticFragment extends Fragment {
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
                                 JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
                                 for(int i = 0 ; i <jsonArray.length(); i++){
+                                    View transcript_container = getLayoutInflater().inflate(R.layout.container_statistic_exam_result, null);
+
                                     String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
                                     String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
                                     String exam_placed_year = jsonArray.getJSONObject(i).getString("exam_placed_year");
