@@ -89,7 +89,7 @@
                 android:gravity="center"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
-                android:text="기출 응시횟수"
+                android:text="성적표\n기출 응시횟수"
                 android:textColor="@color/colorBlack"
                 android:textSize="16dp" />
 
