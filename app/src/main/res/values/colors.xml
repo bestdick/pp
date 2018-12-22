@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<color name="colorPrimaryLight">#b9db93</color>
+<color name="colorPrimary">#ffda69 </color>
+
+<color name="colorPrimaryDark">#ffc107</color>
+    <color name="colorAccent">#E3342F</color>
+<color name="colorComplementary">#ff754a</color>
+<color name="colorWhiteSmoke">#F5F5F5</color>
+<color name="colorWhite">#ffffff</color>
+<color name="colorBlack">#000000</color>
+<color name="colorRed">#E3342F</color>
+<color name="colorGreen">#8bc34a</color>
+<color name="colorGrey">#95A5A6</color>
+<color name="colorLightgrey">#D6DBDF</color>
+    <color name="colorUnderLineBlue">#5DADE2</color>
+
+
+
+    <color name="colorExamViewMain">#ffda69 </color>
+    <color name="colorExamViewMainDark">#ffc107  </color>
+    <color name="colorExamViewMainBrown">#6d4d41  </color>
+
+    </resources>

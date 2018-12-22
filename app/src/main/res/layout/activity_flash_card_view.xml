@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    android:id="@+id/outter_most_layout"
+    tools:context="com.storyvendingmachine.www.pp.FlashCardViewActivity">
+
+    <ProgressBar
+        android:id="@+id/flashcard_activity_progress_bar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="@color/colorWhite"
+        android:visibility="invisible"
+        android:elevation="5dp"
+        style="?android:attr/progressBarStyle"
+        />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/loggedin_toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorExamViewMain"
+        android:elevation="4dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/flashcard_titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="플래쉬카드"/>
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loggedin_toolBar"
+        app:layout_constraintVertical_bias="0.0">
+
+
+        <ScrollView
+            android:id="@+id/scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/scrollviewLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/flashcard_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:background="@color/colorWhiteSmoke"
+                    app:layout_constraintBottom_toTopOf="@+id/flashcard_comment_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+
+                </android.support.v4.view.ViewPager>
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/like_scrap_hit_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorWhite"
+                    android:elevation="3dp">
+
+                    <TextView
+                        android:id="@+id/flashcard_author_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="16dp"
+                        android:padding="8dp"
+                        android:text="작성자"
+                        app:layout_constraintEnd_toStartOf="@+id/flashcard_written_date_textView"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/flashcard_written_date_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:padding="8dp"
+                        android:text="0000-00-00"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/flashcard_author_textView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/flashcard_author_textView" />
+
+
+                    <TextView
+                        android:id="@+id/like_count_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:layout_marginTop="16dp"
+                        android:padding="8dp"
+                        android:text="좋아요"
+                        android:background="@drawable/gray_cornered_outline"
+                        app:layout_constraintBottom_toTopOf="@+id/comment_write_textView"
+                        app:layout_constraintEnd_toStartOf="@+id/scrap_count_textView"
+                        app:layout_constraintTop_toBottomOf="@+id/flashcard_author_textView" />
+
+                    <TextView
+                        android:id="@+id/scrap_count_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="스크랩"
+                        android:background="@drawable/gray_cornered_outline"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/like_count_textView"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent" />
+
+                    <TextView
+                        android:id="@+id/hit_count_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:padding="8dp"
+                        android:text="조회수"
+                        android:background="@drawable/gray_cornered_outline"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/scrap_count_textView"
+                        app:layout_constraintStart_toEndOf="@+id/scrap_count_textView" />
+
+                    <TextView
+                        android:id="@+id/comment_write_textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:background="@color/colorAccent"
+                        android:textColor="@color/colorWhite"
+                        android:textStyle="bold"
+                        android:text="댓글 달기"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                </android.support.constraint.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/flashcard_comment_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@color/colorWhiteSmoke"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/flashcard_solo_container">
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="right">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/scrap_folder_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                </LinearLayout>
+
+
+            </ScrollView>
+
+
+        </android.support.design.widget.NavigationView>
+
+    </android.support.v4.widget.DrawerLayout>
+
+    <!--<com.melnykov.fab.FloatingActionButton-->
+        <!--android:id="@+id/floating_action_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_marginBottom="32dp"-->
+        <!--android:layout_marginRight="32dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--app:fabSize="normal"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--/>-->
+
+        <!--app:fab_colorNormal="@color/colorMainFront"-->
+        <!--app:fab_colorPressed="@color/colorMainBack"-->
+        <!--app:fab_colorRipple="@color/colorMainBack"/>-->
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/exam_note_sheet"
+        android:title="exam_not_sheet"
+        android:icon="@drawable/answer_sheet_icon"
+        app:showAsAction="ifRoom">
+
+    </item>
+
+</menu>
