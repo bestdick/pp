@@ -258,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
 
         PackageInfo info;
         try {
-            info = getPackageManager().getPackageInfo("com.storyvendingmachine.www.svm", PackageManager.GET_SIGNATURES);
+            info = getPackageManager().getPackageInfo("com.storyvendingmachine.www.pp", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md;
                 md = MessageDigest.getInstance("SHA");

@@ -43,7 +43,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 public class StatisticFragment extends Fragment {
     PieChart pieChart;
     TextView title_textView, second_title_textView, never_took_exam_textView;
-    LinearLayout statistic_exam_result_container;
+    LinearLayout statistic_exam_result_container, subject_result_container;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -89,6 +89,7 @@ public class StatisticFragment extends Fragment {
         second_title_textView = (TextView) rootview.findViewById(R.id.statistic_second_title_textView);
         never_took_exam_textView = (TextView) rootview.findViewById(R.id.never_took_exam_textView);
         statistic_exam_result_container = (LinearLayout) rootview.findViewById(R.id.statistic_exam_result_container);
+        subject_result_container = (LinearLayout) rootview.findViewById(R.id.subject_result_container);
 
         String title_str = "현재 공부중인 시험 \n\""+exam_selection_name+"\"\n기출 시험 통계";
         title_textView.setText(title_str);
@@ -124,11 +125,23 @@ public class StatisticFragment extends Fragment {
 
                                     View transcript_container = getLayoutInflater().inflate(R.layout.container_statistic_exam_result, null);
                                     TextView transcript_title = (TextView)transcript_container.findViewById(R.id.title_textView);
+                                    TextView exam_took_date_textView = (TextView) transcript_container.findViewById(R.id.exam_took_date_textView);
                                     LinearLayout transcript_subject_container = (LinearLayout) transcript_container.findViewById(R.id.subject_container);
                                     TextView pass_textView = (TextView)transcript_container.findViewById(R.id.pass_textView);
 
+
                                     transcript_title.setText(exam_name+" "+ exam_placed_year+" 년도 "+exam_placed_round + "회");
-                                    pass_textView.setText(pass);
+                                    exam_took_date_textView.setText(date_user_took_exam+" "+time_user_took_exam);
+                                    if(pass.equals("fail")){
+                                        pass_textView.setBackground(getResources().getDrawable(R.drawable.outline_cornered_red));
+                                        pass_textView.setText("불합격");
+                                    }else{
+                                        pass_textView.setBackground(getResources().getDrawable(R.drawable.outline_cornered_green));
+                                        pass_textView.setText("합격");
+                                    }
+
+
+                                    statistic_exam_result_container.addView(transcript_container);
 
                                     JSONArray subjectjsonArray = jsonArray.getJSONObject(i).getJSONArray("subject_score_json");
                                         for(int j = 0 ; j < subjectjsonArray.length(); j++){
@@ -136,15 +149,20 @@ public class StatisticFragment extends Fragment {
                                             String subject_correct = subjectjsonArray.getJSONObject(j).getString("correct_count");
                                             String subject_total = subjectjsonArray.getJSONObject(j).getString("total_count");
 
-                                            TextView temp_tv = new TextView(getActivity());
-                                            temp_tv.setText(subject_name+" 점수" + subject_correct+"/"+subject_total);
-                                            transcript_subject_container.addView(temp_tv);
+                                            View subject_container = getLayoutInflater().inflate(R.layout.inner_container_statistic_exam_result_element, null);
+                                            TextView subjectname_textView  = (TextView) subject_container.findViewById(R.id.subject_name_textView);
+                                            TextView subjectscore_textView  = (TextView) subject_container.findViewById(R.id.subject_score_textView);
+
+                                            subjectname_textView.setText(subject_name);
+                                            subjectscore_textView.setText(subject_correct+"/"+subject_total);
+                                            transcript_subject_container.addView(subject_container);
                                         }
-                                    statistic_exam_result_container.addView(transcript_container);
                                 }
 
+
+
                                 String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
-                                String second_title_str = exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
+                                String second_title_str = "성적표\n"+exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
                                 second_title_textView.setText(second_title_str);
                                 String pass = jsonObject_for_pie.getString("pass");
                                 String fail = jsonObject_for_pie.getString("fail");
@@ -156,6 +174,7 @@ public class StatisticFragment extends Fragment {
                                     never_took_exam_textView.setVisibility(View.VISIBLE);
                                     pieChart.setVisibility(View.GONE);
                                     statistic_exam_result_container.setVisibility(View.GONE);
+                                    subject_result_container.setVisibility(View.GONE);
                                 }else{
                                     //한번이라도 시험을 응시했을때
                                     pieChart(rootview, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
