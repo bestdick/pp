@@ -110,6 +110,7 @@ public class StatisticFragment extends Fragment {
                             if(access_token.equals("valid")){
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
                                 JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
+                                JSONArray jsonArray_for_subject_pie = jsonObject.getJSONArray("response_for_subjectpiechart");
                                 for(int i = 0 ; i <jsonArray.length(); i++){
                                     String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
                                     String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
@@ -156,11 +157,34 @@ public class StatisticFragment extends Fragment {
                                             subjectname_textView.setText(subject_name);
                                             subjectscore_textView.setText(subject_correct+"/"+subject_total);
                                             transcript_subject_container.addView(subject_container);
+
+
                                         }
+                                }
+//subject pie chart
+                                for(int i = 0 ; i<jsonArray_for_subject_pie.length(); i++){
+                                    String pie_subject_name = jsonArray_for_subject_pie.getJSONObject(i).getString("subject_name");
+                                    String pie_pass_count = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_count");
+                                    String pass_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_percent");
+                                    String fail_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("fail_percent");
+
+                                    Log.e("percent", "pass ::" +pass_percent+ "/// fail ::"+fail_percent);
+
+                                    View subject_pieView = getLayoutInflater().inflate(R.layout.container_subject_pie_chart, null);
+                                    TextView subject_title_textView = (TextView) subject_pieView.findViewById(R.id.subject_title_textView);
+                                    PieChart subject_pieChart = (PieChart) subject_pieView.findViewById(R.id.subject_piechart);
+                                    pieChart_subject(subject_pieChart, Integer.parseInt(pass_percent),Integer.parseInt(fail_percent));//casting pie chart for subject
+                                    subject_title_textView.setText(pie_subject_name);
+
+                                    subject_result_container.addView(subject_pieView);
+
                                 }
 
 
 
+
+
+// 성적표
                                 String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
                                 String second_title_str = "성적표\n"+exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
                                 second_title_textView.setText(second_title_str);
@@ -217,6 +241,36 @@ public class StatisticFragment extends Fragment {
     }
 
 
+    public void pieChart_subject(PieChart subject_pieChart, int pass, int fail ){
+        subject_pieChart.setTouchEnabled(false);
+
+        subject_pieChart.setUsePercentValues(true);
+        subject_pieChart.getDescription().setEnabled(false);
+        subject_pieChart.setExtraOffsets(5,5,5,5);
+
+//        pieChart.setDragDecelerationFrictionCoef(0.95f);
+
+        subject_pieChart.setDrawHoleEnabled(false);
+        subject_pieChart.setHoleColor(Color.WHITE);
+        subject_pieChart.setTransparentCircleRadius(61f);
+
+        ArrayList<PieEntry> yValues = new ArrayList<PieEntry>();
+        yValues.add(new PieEntry(pass,"통과"));
+        yValues.add(new PieEntry(fail,"과락"));
+
+//        pieChart.animateY(1000, Easing.EasingOption.EaseInOutCubic); //애니메이션
+
+        PieDataSet dataSet = new PieDataSet(yValues,"");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+        dataSet.setColors(COLOR_EUGENE);
+
+        PieData data = new PieData((dataSet));
+        data.setValueTextSize(12f);
+        data.setValueTextColor(Color.WHITE);
+
+        subject_pieChart.setData(data);
+    }
     public void pieChart(View rootview, int pass, int fail){
         pieChart.setTouchEnabled(false);
 

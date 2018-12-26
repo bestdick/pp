@@ -27,7 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorWhite"
-        android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -70,7 +69,7 @@
             android:layout_marginStart="48dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/thumbnail_outline"
-            android:src="@drawable/user_thumbnail_icon"
+            android:src="@drawable/icon_empty_thumbnail"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

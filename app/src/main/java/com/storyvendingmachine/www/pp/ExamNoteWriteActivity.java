@@ -1,14 +1,18 @@
 package com.storyvendingmachine.www.pp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -34,6 +38,7 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
     EditText note_editText;
     String type, exam_code, exam_name, exam_placed_year, exam_placed_round;
     int note_number;
+    ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,7 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
             String title = exam_placed_year+" 년도 "+exam_placed_round + " 회 " + exam_name +" "+ (note_number+1) +" 번";
             toolbar(title);
         }else if(type.equals("flashcard_comment")){
+            pb = (ProgressBar) findViewById(R.id.exam_note_progressbar);
             String flashcard_exam_name = intent.getStringExtra("flashcard_exam_name");
             String flashcard_subject_name = intent.getStringExtra("flashcard_subject_name");
             String flashcard_title = intent.getStringExtra("flashcard_title");
@@ -81,11 +87,49 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
         comment_uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadCommentProcess(flashcard_db_id, comment_editText);
+                String message = "댓글을 등록하시겠습니까?";
+                String positive_message = "네";
+                String negative_message = " 아니요";
+                notifier_positive_negative_uploadCommentProcess(message, positive_message, negative_message, flashcard_db_id, comment_editText);
+
             }
         });
     }
 
+    public void notifier_positive_negative_uploadCommentProcess(String message, String positive_message, String negative_message, final String flashcard_db_id, final EditText comment_editText){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        progressbar_visible();
+                        uploadCommentProcess(flashcard_db_id, comment_editText);
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+    public void notifier_confirm_uploadCommentProcess(String message, String positive_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("upload_status", "success");
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
+                    }
+                })
+                .create()
+                .show();
+    }
     public void uploadCommentProcess(final String flashcard_db_id, final EditText comment_editText){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadFlashCardComment.php";
@@ -98,13 +142,13 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
+                                progressbar_invisible();
                                 String result = jsonObject.getString("response");
                                 if(result.equals("upload_success")){
                                     //성공시
-                                    Intent resultIntent = new Intent();
-                                    resultIntent.putExtra("upload_status", "success");
-                                    setResult(RESULT_OK, resultIntent);
-                                    finish();
+                                    String message = "댓글을 성공적으로 업로드 하였습니다.";
+                                    String positive_message = "확인";
+                                    notifier_confirm_uploadCommentProcess(message, positive_message);
                                 }
                             }else if(access_token.equals("invalid")){
 
@@ -241,5 +285,15 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
         super.onBackPressed();
+    }
+
+
+    public void progressbar_visible(){
+        pb.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+    public void progressbar_invisible(){
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        pb.setVisibility(View.INVISIBLE);
     }
 }

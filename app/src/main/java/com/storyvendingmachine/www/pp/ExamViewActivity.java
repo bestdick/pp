@@ -58,8 +58,8 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     String exam_name, exam_code, published_year, published_round;
     static String navi_selection;
     static List<Integer> answer;
-    private ExamViewActivityViewPagerAdaper eViewPagerAdapter;
-    private ViewPager eviewPager;
+    static ExamViewActivityViewPagerAdaper eViewPagerAdapter;
+    static ViewPager eviewPager;
 
 
     JSONArray resultJSONarray;
@@ -622,14 +622,16 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                         String subject_code = jsonObject.getString("subject_code");
                         String subject_name = jsonObject.getString("subject_name");
                         String question_number = jsonObject.getString("question_number");
-                        String question_question = jsonObject.getString("question_question").replace("\"","");
-                        String question_answer = jsonObject.getString("question_answer").replace("\"","");
+                        String question_question = jsonObject.getString("question_question").replace("\"","").replace("\n","<br>");
+                        String question_answer = jsonObject.getString("question_answer").replace("\"","").replace("\n","<br>");
                         String correct_answer = jsonObject.getString("correct_answer");
                         String question_Q_image = jsonObject.getString("question_Q_image");
                         String question_A_image = jsonObject.getString("question_A_image");
+                        String example_exist = jsonObject.getString("example_exist");
                         // from try to this line, this is objects from ----
 
                         JSONObject savejsonObject = new JSONObject();
+                        savejsonObject.put("subject_code", subject_code);
                         savejsonObject.put("subject_name", subject_name);
                         savejsonObject.put("correct_answer", correct_answer);
                         savejsonObject.put("user_answer", answer.get(i));
@@ -638,8 +640,13 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                         }else{
                             savejsonObject.put("compared", "incorrect");
                         }
+                        savejsonObject.put("question_number", question_number);
                         savejsonObject.put("question", question_question);
                         savejsonObject.put("answer", question_answer);
+                        savejsonObject.put("question_image", question_Q_image);
+                        savejsonObject.put("answer_image", question_A_image);
+                        savejsonObject.put("example_exist", example_exist);
+
 
 
                         savejsonArray.put(savejsonObject);

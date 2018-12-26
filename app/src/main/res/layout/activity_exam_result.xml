@@ -20,7 +20,7 @@
         style="?android:attr/progressBarStyle" />
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/loggedin_toolBar"
+        android:id="@+id/exam_result_toolbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorExamViewMain"
@@ -37,21 +37,43 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loggedin_toolBar">
+        app:layout_constraintTop_toBottomOf="@+id/exam_result_toolbar">
 
         <LinearLayout
             android:id="@+id/exam_result_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/colorWhiteSmoke"
             android:orientation="vertical">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:layout_marginBottom="1dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/outline_round_gray"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="시험 결과"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
 
             <LinearLayout
                 android:id="@+id/exam_result_inner_container"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:elevation="5dp"
                 android:background="@color/colorWhite">
                 <TextView
                     android:id="@+id/title_textView"
@@ -60,8 +82,34 @@
                     android:layout_height="wrap_content"
                     android:textSize="20dp"
                     android:textStyle="bold"
+                    android:text="시험 제목"
                     android:textColor="@color/colorBlack"/>
             </LinearLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/outline_round_gray"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="틀린 문제"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
 
             <LinearLayout
                 android:id="@+id/exam_result_inner_second_container"

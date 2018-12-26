@@ -46,6 +46,7 @@ import java.util.Map;
 
 import static com.storyvendingmachine.www.pp.Allurl.url_getExamList;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
+import static com.storyvendingmachine.www.pp.ExamViewActivity.eviewPager;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.navi_selection;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
@@ -444,6 +445,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 1);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });
@@ -456,6 +458,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 2);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
 
             }
@@ -469,7 +472,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 3);
-
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });
@@ -482,6 +485,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
                 answer.set(page, 4);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });
@@ -495,6 +499,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 1);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });
@@ -507,6 +512,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 2);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
 
             }
@@ -520,7 +526,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 answer.set(page, 3);
-
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });
@@ -533,6 +539,7 @@ public class ExamViewFragment extends Fragment {
                 three.setBackground(getResources().getDrawable(R.drawable.answer_unselected_container));
                 four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
                 answer.set(page, 4);
+                eviewPager.setCurrentItem(page+1);
                 Log.e("answer", String.valueOf(answer.get(page)));
             }
         });

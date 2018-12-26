@@ -124,7 +124,7 @@ public class LoggedInActivity extends AppCompatActivity {
     }
     public void getThumbnailImageForAuthor(ImageView imageView, String url){
         if(url.equals("null") || url.length() <=0){
-            imageView.setImageResource(R.drawable.user_thumbnail_icon);
+            imageView.setImageResource(R.drawable.icon_empty_thumbnail);
         }else{
             Picasso.with(this)
                     .load(url)
