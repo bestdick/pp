@@ -186,6 +186,8 @@ public class ExamViewFragment extends Fragment {
                                               String correct_answer, final String exam_code, final String exam_name, final String published_round, final String published_year){
         if(navi_selection.equals("1")){
             imageAnswerChoice(answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout);
+            ConstraintLayout  ad_banner_layout = (ConstraintLayout) rootView.findViewById(R.id.ad_banner_layout);
+            ad_banner_layout.setVisibility(View.INVISIBLE);
             LinearLayout commentlayout = (LinearLayout) rootView.findViewById(R.id.comment_layout);
             commentlayout.setVisibility(View.INVISIBLE);
             ConstraintLayout note_menu_layout = (ConstraintLayout) rootView.findViewById(R.id.note_menu_layout);
@@ -240,6 +242,8 @@ public class ExamViewFragment extends Fragment {
                                         String correct_answer, final String exam_code, final String exam_name, final String published_round, final String published_year){
         if(navi_selection.equals("1")){
             answerChoice(rootView, answer_1_textView, answer_2_textView, answer_3_textView, answer_4_textView);
+            ConstraintLayout  ad_banner_layout = (ConstraintLayout) rootView.findViewById(R.id.ad_banner_layout);
+            ad_banner_layout.setVisibility(View.INVISIBLE);
             LinearLayout commentlayout = (LinearLayout) rootView.findViewById(R.id.comment_layout);
             commentlayout.setVisibility(View.INVISIBLE);
             ConstraintLayout note_menu_layout = (ConstraintLayout) rootView.findViewById(R.id.note_menu_layout);

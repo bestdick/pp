@@ -54,6 +54,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     LinearLayout answer_sheet_element_layout;
 
     ProgressBar progressBar;
+    LinearLayout progressBarBackground;
 
     String exam_name, exam_code, published_year, published_round;
     static String navi_selection;
@@ -89,6 +90,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
         progressBar = (ProgressBar) findViewById(R.id.read_progress_bar);
+        progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
         progressbar_visible();
         new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
             @Override
@@ -578,29 +580,50 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
     public void makeAnswerSheet(){// 기출 시험에만 적용되는것
+        int size = answer.size();
+        for(int i = 0; i<size; i++){
+            View v = findViewById(i);
+            TextView one = (TextView) v.findViewById(R.id.answerChoice_1_textView);
+            TextView two = (TextView) v.findViewById(R.id.answerChoice_2_textView);
+            TextView three = (TextView) v.findViewById(R.id.answerChoice_3_textView);
+            TextView four = (TextView) v.findViewById(R.id.answerChoice_4_textView);
 
-    int size = answer.size();
-    for(int i = 0; i<size; i++){
-        View v = findViewById(i);
-        TextView one = (TextView) v.findViewById(R.id.answerChoice_1_textView);
-        TextView two = (TextView) v.findViewById(R.id.answerChoice_2_textView);
-        TextView three = (TextView) v.findViewById(R.id.answerChoice_3_textView);
-        TextView four = (TextView) v.findViewById(R.id.answerChoice_4_textView);
+            int answer1 = answer.get(i);
 
-        int answer1 = answer.get(i);
-
-        if(answer1 ==1){
-            one.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
-        }else if(answer1==2){
-            two.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
-        }else if(answer1==3){
-            three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
-        }else if(answer1==4){
-            four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+            if(answer1 ==1){
+                one.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+            }else if(answer1==2){
+                two.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+            }else if(answer1==3){
+                three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+            }else if(answer1==4){
+                four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+            }
         }
     }
-}
 
+    public void notifier_examSubmitButtonProcess(String message, String positive_message, String negative_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ExamViewActivity.this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //positive button
+                        temp();
+                        drawer.closeDrawer(Gravity.RIGHT);
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //negative button
+
+                        drawer.closeDrawer(Gravity.RIGHT);
+                    }
+                })
+                .create()
+                .show();
+    }
     public void examSubmitButtonProcess(Button submitButton){// 기출 시험에만 적용되는것
         submitButton.setText("시험 종료 및 체점");
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -608,88 +631,112 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         submitButton.setLayoutParams(params);
         submitButton.setBackground(getResources().getDrawable(R.drawable.solid_round_orange));
         submitButton.setOnClickListener(new View.OnClickListener() {
-
-        @Override
-        public void onClick(View view) {
-                JSONArray savejsonArray = new JSONArray();
-                for(int i = 0 ; i < resultJSONarray.length(); i++){
-                    try {
-                        JSONObject jsonObject = resultJSONarray.getJSONObject(i);
-                        String exam_code = jsonObject.getString("exam_code");
-                        String exam_name = jsonObject.getString("exam_name");
-                        String published_year = jsonObject.getString("published_year");
-                        String published_round = jsonObject.getString("published_round");
-                        String subject_code = jsonObject.getString("subject_code");
-                        String subject_name = jsonObject.getString("subject_name");
-                        String question_number = jsonObject.getString("question_number");
-                        String question_question = jsonObject.getString("question_question").replace("\"","").replace("\n","<br>");
-                        String question_answer = jsonObject.getString("question_answer").replace("\"","").replace("\n","<br>");
-                        String correct_answer = jsonObject.getString("correct_answer");
-                        String question_Q_image = jsonObject.getString("question_Q_image");
-                        String question_A_image = jsonObject.getString("question_A_image");
-                        String example_exist = jsonObject.getString("example_exist");
-                        // from try to this line, this is objects from ----
-
-                        JSONObject savejsonObject = new JSONObject();
-                        savejsonObject.put("subject_code", subject_code);
-                        savejsonObject.put("subject_name", subject_name);
-                        savejsonObject.put("correct_answer", correct_answer);
-                        savejsonObject.put("user_answer", answer.get(i));
-                        if(correct_answer.equals(String.valueOf(answer.get(i)))){
-                            savejsonObject.put("compared", "correct");
-                        }else{
-                            savejsonObject.put("compared", "incorrect");
-                        }
-                        savejsonObject.put("question_number", question_number);
-                        savejsonObject.put("question", question_question);
-                        savejsonObject.put("answer", question_answer);
-                        savejsonObject.put("question_image", question_Q_image);
-                        savejsonObject.put("answer_image", question_A_image);
-                        savejsonObject.put("example_exist", example_exist);
-
-
-
-                        savejsonArray.put(savejsonObject);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-
-            //upload process and result below
-                if(LoginType.equals("kakao") || LoginType.equals("normal")){
-                    progressbar_visible();
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd/HH/mm/ss");
-                    Date date = new Date();
-                    upLoadSubmittedExamData(savejsonArray, dateFormat.format(date));
-
-                    Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
-                    intent.putExtra("ExamResult", savejsonArray.toString());
-                    intent.putExtra("exam_code", exam_code);
-                    intent.putExtra("exam_name", exam_name);
-                    intent.putExtra("published_year", published_year);
-                    intent.putExtra("published_round", published_round);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
-                    finish();
+            @Override
+            public void onClick(View view) {
+                boolean is = checkifAllAnswersAreSelected();
+                if(is){
+                    String message = "채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    notifier_examSubmitButtonProcess(message, pos_message, neg_message);
                 }else{
-                    Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
-                    intent.putExtra("ExamResult", savejsonArray.toString());
-                    intent.putExtra("exam_code", exam_code);
-                    intent.putExtra("exam_name", exam_name);
-                    intent.putExtra("published_year", published_year);
-                    intent.putExtra("published_round", published_round);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
-                    finish();
+                    String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    notifier_examSubmitButtonProcess(message, pos_message, neg_message);
                 }
-
             }
         });
 
     }
 
+    public boolean checkifAllAnswersAreSelected(){
+        boolean isEverythingSelected = true;
+        for(int l = 0 ; l <answer.size(); l++){
+            int user_selected_answer_choice = answer.get(l);
+            if(user_selected_answer_choice==-1){
+//                Toast.makeText(ExamViewActivity.this, String.valueOf(l)+"번 미싱", Toast.LENGTH_SHORT).show();
+                isEverythingSelected = false;
+            }
+        }
+        return isEverythingSelected;
+    }
+
+    public void temp(){
+        JSONArray savejsonArray = new JSONArray();
+        for(int i = 0 ; i < resultJSONarray.length(); i++){
+            try {
+                JSONObject jsonObject = resultJSONarray.getJSONObject(i);
+                String exam_code = jsonObject.getString("exam_code");
+                String exam_name = jsonObject.getString("exam_name");
+                String published_year = jsonObject.getString("published_year");
+                String published_round = jsonObject.getString("published_round");
+                String subject_code = jsonObject.getString("subject_code");
+                String subject_name = jsonObject.getString("subject_name");
+                String question_number = jsonObject.getString("question_number");
+                String question_question = jsonObject.getString("question_question").replace("\"","").replace("\n","<br>");
+                String question_answer = jsonObject.getString("question_answer").replace("\"","").replace("\n","<br>");
+                String correct_answer = jsonObject.getString("correct_answer");
+                String question_Q_image = jsonObject.getString("question_Q_image");
+                String question_A_image = jsonObject.getString("question_A_image");
+                String example_exist = jsonObject.getString("example_exist");
+                // from try to this line, this is objects from ----
+
+                JSONObject savejsonObject = new JSONObject();
+                savejsonObject.put("subject_code", subject_code);
+                savejsonObject.put("subject_name", subject_name);
+                savejsonObject.put("correct_answer", correct_answer);
+                savejsonObject.put("user_answer", answer.get(i));
+                if(correct_answer.equals(String.valueOf(answer.get(i)))){
+                    savejsonObject.put("compared", "correct");
+                }else{
+                    savejsonObject.put("compared", "incorrect");
+                }
+                savejsonObject.put("question_number", question_number);
+                savejsonObject.put("question", question_question);
+                savejsonObject.put("answer", question_answer);
+                savejsonObject.put("question_image", question_Q_image);
+                savejsonObject.put("answer_image", question_A_image);
+                savejsonObject.put("example_exist", example_exist);
+
+
+
+                savejsonArray.put(savejsonObject);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        //upload process and result below
+        if(LoginType.equals("kakao") || LoginType.equals("normal")){
+            progressbar_visible();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd/HH/mm/ss");
+            Date date = new Date();
+            upLoadSubmittedExamData(savejsonArray, dateFormat.format(date));
+
+            Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
+            intent.putExtra("ExamResult", savejsonArray.toString());
+            intent.putExtra("exam_code", exam_code);
+            intent.putExtra("exam_name", exam_name);
+            intent.putExtra("published_year", published_year);
+            intent.putExtra("published_round", published_round);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+            finish();
+        }else{
+            Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
+            intent.putExtra("ExamResult", savejsonArray.toString());
+            intent.putExtra("exam_code", exam_code);
+            intent.putExtra("exam_name", exam_name);
+            intent.putExtra("published_year", published_year);
+            intent.putExtra("published_round", published_round);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+            finish();
+        }
+    }
     private void upLoadSubmittedExamData(final JSONArray jsonArray, final String today_date){
         RequestQueue queue = Volley.newRequestQueue(ExamViewActivity.this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadUserExamData.php";
@@ -751,11 +798,13 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
     public void progressbar_visible(){
         progressBar.setVisibility(View.VISIBLE);
+        progressBarBackground.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
     public void progressbar_invisible(){
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        progressBar.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
+        progressBarBackground.setVisibility(View.GONE);
     }
 
     public static int getScreenWidth() {

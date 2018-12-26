@@ -15,11 +15,13 @@
 <color name="colorGrey">#95A5A6</color>
 <color name="colorLightgrey">#D6DBDF</color>
     <color name="colorUnderLineBlue">#5DADE2</color>
-
+<color name="colorProgressBar_background">#4D95A5A6</color>
 
 
     <color name="colorExamViewMain">#ffda69 </color>
     <color name="colorExamViewMainDark">#ffc107  </color>
     <color name="colorExamViewMainBrown">#6d4d41  </color>
+
+
 
     </resources>

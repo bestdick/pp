@@ -68,7 +68,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
 
             if(navi_selection.equals("1")){
                 //1 눌러졌을때   == > 기출시험 시험보기
-                String text = exam_name + "   "+ published_year +"  년도  "+published_num+" 회차 기출 문제 풀이";
+                String text = "기출 시험 문제 풀이\n"+exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
                 ExamEachNameTextView.setText(text);
 
                 v.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +87,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
             }else {
                 // 1외의 다른 번호가 눌러졌을떄 ( 현재는 1외는 2밖에없다 )
                 // 기출시험공부 하는 페이지가 불려온다
-                String text = exam_name + "   "+ published_year +"  년도  "+published_num+" 회차 기출 공부";
+                String text = "기출 시험 시험지 공부\n"+ exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
                 ExamEachNameTextView.setText(text);
 
                 v.setOnClickListener(new View.OnClickListener() {

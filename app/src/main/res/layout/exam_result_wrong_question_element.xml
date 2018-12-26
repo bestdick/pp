@@ -179,6 +179,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/answer_1_imageView"
                 android:layout_width="80dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="16dp"

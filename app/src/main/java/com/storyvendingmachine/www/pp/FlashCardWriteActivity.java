@@ -192,17 +192,13 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                     String confirm_button = "확인";
                     confirm_notifier(message, confirm_button);
                 }else{
-                    JSONArray jsonArray = new JSONArray();
-                    for(int i = 0; i < flashcardwriteList.size(); i++){
-                        JSONObject jsonObject = new JSONObject();
-                        String term = flashcardwriteList.get(i).getTerm();
-                        String def = flashcardwriteList.get(i).getDef();
-                        if(term.length() <=0 || def.length() <=0){
-                            String message = "내용이 없는 플래시카드가 존재합니다. 내용을 입력해주세요.";
-                            String confirm_button = "확인";
-                            confirm_notifier( message,  confirm_button);
-                            break;
-                        }else{
+                    if(checkifmissingcontainer()){
+                        //모든 플래시카드 컨테이너들에 내용이 들어가있다.
+                        JSONArray jsonArray = new JSONArray();
+                        for(int i = 0; i < flashcardwriteList.size(); i++){
+                            JSONObject jsonObject = new JSONObject();
+                            String term = flashcardwriteList.get(i).getTerm();
+                            String def = flashcardwriteList.get(i).getDef();
                             try {
                                 jsonObject.put("term", changeLineTransform(term));
                                 jsonObject.put("definition", changeLineTransform(def));
@@ -210,17 +206,22 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                             jsonArray.put(jsonObject);
-                            try {
-                                jsonObjectTotal.put("title", changeLineTransform(flashcard_title_editText.getText().toString()));
-                                jsonObjectTotal.put("exam_code", selected_exam_code);
-                                jsonObjectTotal.put("subject_number", subject_number);
-                                jsonObjectTotal.put("flashcards", jsonArray);
-
-                                uploadWrittenFlashCard(jsonObjectTotal);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
                         }
+                        try {
+                            jsonObjectTotal.put("title", changeLineTransform(flashcard_title_editText.getText().toString()));
+                            jsonObjectTotal.put("exam_code", selected_exam_code);
+                            jsonObjectTotal.put("subject_number", subject_number);
+                            jsonObjectTotal.put("flashcards", jsonArray);
+
+                            uploadWrittenFlashCard(jsonObjectTotal);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        //플래시카드 컨테이너에 "빈" 곳이있다.
+                        String message = "내용이 없는 플래시카드가 존재합니다. 내용을 입력해주세요.";
+                        String confirm_button = "확인";
+                        confirm_notifier( message,  confirm_button);
                     }
                 }
             }
@@ -239,7 +240,17 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                     .create()
                     .show();
     }
-
+    public boolean checkifmissingcontainer(){
+        boolean isNotEmpty = true;
+        for(int i = 0; i < flashcardwriteList.size(); i++){
+            String term = flashcardwriteList.get(i).getTerm();
+            String def = flashcardwriteList.get(i).getDef();
+            if(term.length() <=0 || def.length() <=0){
+                isNotEmpty = false;
+            }
+        }
+        return isNotEmpty;
+    }
     public void uploadWrittenFlashCard(final JSONObject jsonObject){
         final String jsonObject_str = jsonObject.toString();
         RequestQueue queue = Volley.newRequestQueue(FlashCardWriteActivity.this);

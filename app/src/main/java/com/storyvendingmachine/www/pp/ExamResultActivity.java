@@ -43,6 +43,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 public class ExamResultActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
+    LinearLayout progressBarBackground;
 //    LinearLayout linearLayout;//ExamResultActivity total container ::: must add in here at the end
     LinearLayout linearLayout_inner; // ExamResultActivity inner container :::
     LinearLayout linearLayout_inner_second;
@@ -54,6 +55,7 @@ public class ExamResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_exam_result);
         toolbar();
         progressBar = (ProgressBar) findViewById(R.id.exam_result_progress_bar);
+        progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
         linearLayout_inner = (LinearLayout) findViewById(R.id.exam_result_inner_container);
         linearLayout_inner_second = (LinearLayout) findViewById(R.id.exam_result_inner_second_container);
 
@@ -207,14 +209,6 @@ public class ExamResultActivity extends AppCompatActivity {
                                                 ConstraintLayout answer_3_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_3_conLayout);
                                                 ConstraintLayout answer_4_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_4_conLayout);
 
-                                                ImageView answer_1_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_1_imageView);
-                                                answer_1_imageView.setTag(1);
-                                                ImageView answer_2_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_2_imageView);
-                                                answer_2_imageView.setTag(2);
-                                                ImageView answer_3_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_3_imageView);
-                                                answer_3_imageView.setTag(3);
-                                                ImageView answer_4_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_4_imageView);
-                                                answer_4_imageView.setTag(4);
 
 
                                                 if(example_exist.getString(j).equals("true")){
@@ -245,9 +239,19 @@ public class ExamResultActivity extends AppCompatActivity {
                                                     answer_2_conLayout.setVisibility(View.VISIBLE);
                                                     answer_3_conLayout.setVisibility(View.VISIBLE);
                                                     answer_4_conLayout.setVisibility(View.VISIBLE);
+
+                                                    ImageView answer_1_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_1_imageView);
+                                                    answer_1_imageView.setTag(1);
+                                                    ImageView answer_2_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_2_imageView);
+                                                    answer_2_imageView.setTag(2);
+                                                    ImageView answer_3_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_3_imageView);
+                                                    answer_3_imageView.setTag(3);
+                                                    ImageView answer_4_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_4_imageView);
+                                                    answer_4_imageView.setTag(4);
+
                                                     for(int k = 1; k<=4; k++){
-                                                        String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+"_a_"+i+".PNG";
-                                                        ImageView imageView = (ImageView) view_incorrect.findViewWithTag(i);
+                                                        String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+"_a_"+k+".PNG";
+                                                        ImageView imageView = (ImageView) view_incorrect.findViewWithTag(k);
                                                         getAnswerImage(imageView, url);
                                                     }
                                                     higlight_user_and_correct_answer_image(answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout, c_answer_int, u_answer_int);
@@ -398,27 +402,33 @@ public class ExamResultActivity extends AppCompatActivity {
                 });
     }
     public void getAnswerImage(ImageView imageView, String url){
-        Picasso.with(ExamResultActivity.this)
-                .load(url)
-                .into(imageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
+        if(url.length() <=0 || url == null || url.isEmpty()){
 
-                    }
-                    @Override
-                    public void onError() {
-                        Log.e("load image", "fail to load answer images ");
-                    }
-                });
+        }else{
+            Picasso.with(ExamResultActivity.this)
+                    .load(url)
+                    .into(imageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+                        @Override
+                        public void onError() {
+                            Log.e("load image", "fail to load answer images ");
+                        }
+                    });
+        }
     }
 
     public void progressbar_visible(){
         progressBar.setVisibility(View.VISIBLE);
+        progressBarBackground.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
     public void progressbar_invisible(){
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.INVISIBLE);
+        progressBarBackground.setVisibility(View.GONE);
     }
 
     public void calculateExamResult(String ExamResult){

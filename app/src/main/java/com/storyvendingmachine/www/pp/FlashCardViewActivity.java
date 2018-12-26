@@ -48,6 +48,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
     NavigationView navigationView;
 
     ProgressBar pb;
+    LinearLayout progressBarBackground;
 
     LinearLayout scrap_folder_layout;
     LinearLayout comment_layout;
@@ -79,6 +80,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
             flashcard_db_id = intent.getStringExtra("flashcard_db_id");
 
             pb = findViewById(R.id.flashcard_activity_progress_bar);
+            progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
             progressbar_visible();
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
@@ -799,11 +801,13 @@ public class FlashCardViewActivity extends AppCompatActivity {
     }
     public void progressbar_visible(){
         pb.setVisibility(View.VISIBLE);
+        progressBarBackground.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
     public void progressbar_invisible(){
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         pb.setVisibility(View.INVISIBLE);
+        progressBarBackground.setVisibility(View.GONE);
     }
 //    static com.melnykov.fab.FloatingActionButton fab;
 //    public void floatingbutton(){
