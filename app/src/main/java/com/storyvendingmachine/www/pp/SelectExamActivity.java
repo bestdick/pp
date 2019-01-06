@@ -122,7 +122,8 @@ public class SelectExamActivity extends AppCompatActivity {
                 resultIntent.putExtra("exam_name", exam_name);
                 resultIntent.putExtra("exam_code", exam_code);
                 setResult(RESULT_OK, resultIntent);
-                finish();
+//                finish();
+                onBackPressed();
             }
         });
 
@@ -336,7 +337,7 @@ public class SelectExamActivity extends AppCompatActivity {
         super.onBackPressed();
         setResult(RESULT_CANCELED);
         finish();
-//        overridePendingTransition(0,R.anim.slide_down);// first entering // second exiting
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
     public void progressbar_visible(){
         progressBar.setVisibility(View.VISIBLE);

@@ -7,17 +7,21 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -31,6 +35,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.inthecheesefactory.thecheeselibrary.fragment.bus.ActivityResultBus;
+import com.inthecheesefactory.thecheeselibrary.fragment.bus.ActivityResultEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,11 +53,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 
 public class ExamViewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener  {
 
+    final int NOTE_REQUEST_CODE = 40002;
     DrawerLayout drawer;
     NavigationView navigationView;
     LinearLayout answer_sheet_element_layout;
@@ -73,10 +85,16 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     static ArrayList<String> note_array_list;
 
 
+    String refresh_upload_prevent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_view);
+
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        Date date = new Date();
+        refresh_upload_prevent = dateFormat.format(date);
 
         Intent getIntent =getIntent();
         navi_selection = getIntent.getStringExtra("navi_selection");
@@ -101,11 +119,11 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 //         2초후에 progressbar 없애기
 
         if(navi_selection.equals("1")){// 1 일때는 기출시험 문제 풀이
-
+            //기출시험 문제 풀이
             drawer = (DrawerLayout) findViewById(R.id.drawer);
-
             //handling navigation view item event
             navigationView = (NavigationView) findViewById(R.id.nav_view);
+
             navigationView.setNavigationItemSelectedListener(this);
             answer_sheet_element_layout = (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
 
@@ -116,11 +134,19 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
         }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
+            //기출 시험 공부
             drawer = (DrawerLayout) findViewById(R.id.drawer);
 
-
-
             navigationView = (NavigationView) findViewById(R.id.nav_view);
+//navigation drawer size
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) navigationView.getLayoutParams();
+//            params.width = metrics.widthPixels;  // full size of drawer
+            params.width = (int) (metrics.widthPixels*0.9);
+            navigationView.setLayoutParams(params);
+//navigation drawer size
+
             navigationView.setNavigationItemSelectedListener(this);
             answer_sheet_element_layout = (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
 
@@ -160,8 +186,9 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed(){
-    finish();
     super.onBackPressed();
+    finish();
+    overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
 
     @Override
@@ -211,7 +238,11 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                     //로그인 한 상태
                     progressbar_visible();
                     answer_sheet_element_layout.removeAllViews();
-                    makeUserPersonalNoteSheet_renew();
+                    try {
+                        makeUserPersonalNoteSheet_renew();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -256,6 +287,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                                 eviewPager = (ViewPager) findViewById(R.id.container);
                                 eviewPager.setAdapter(eViewPagerAdapter);
                                 eviewPager.setOffscreenPageLimit(count);
+                                eviewPager.setPageMargin(8);
 
 
                                 if(navi_selection.equals("1")){
@@ -362,15 +394,14 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
+//                                examNoteJSONArray.put(jsonObject.getJSONObject("user_personal_note"));
                                 examNoteJSONArray = jsonObject.getJSONArray("response");
                                 if(LoginType.equals("kakao") || LoginType.equals("normal")){
-                                    userPersonalNoteArray = jsonObject.getJSONArray("user_personal_note");
+                                    userPersonalNoteArray = jsonObject.getJSONObject("user_personal_note").getJSONArray("note");
 
                                 }else{
 
                                 }
-
-
                                 getSelectedExam();
                             }else if(access_token.equals("invalid")){
 
@@ -439,27 +470,28 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
     }
-
-
     public void notifier_slider_move_write_revise_note(String message, String positive_message, String negative_message, final int note_number){
         AlertDialog.Builder builder = new AlertDialog.Builder(ExamViewActivity.this);
         builder.setMessage(message)
-                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //positive button
-                        int page = note_number - 10001;// 10000을 빼주면 page 가 나온다
-                        Intent intent = new Intent(ExamViewActivity.this, ExamNoteWriteActivity.class);
-                        intent.putExtra("type", "note_write");
-                        intent.putExtra("exam_code", exam_code);
-                        intent.putExtra("exam_name", exam_name);
-                        intent.putExtra("exam_placed_round", published_round);
-                        intent.putExtra("exam_placed_year", published_year);
-                        intent.putExtra("note_number", String.valueOf(page));
-                        startActivity(intent);
-                        drawer.closeDrawer(Gravity.RIGHT);
-                    }
-                })
+//                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        //positive button
+//                        drawer.closeDrawer(Gravity.RIGHT);
+//                        int page = note_number - 10001;// 10000을 빼주면 page 가 나온다
+//                        Intent intent = new Intent(ExamViewActivity.this, ExamNoteWriteActivity.class);
+//                        intent.putExtra("type", "note_write");
+//                        intent.putExtra("exam_code", exam_code);
+//                        intent.putExtra("exam_name", exam_name);
+//                        intent.putExtra("exam_placed_round", published_round);
+//                        intent.putExtra("exam_placed_year", published_year);
+//                        intent.putExtra("note_number", String.valueOf(page));
+////                        startActivityForResult(intent, NOTE_REQUEST_CODE);
+//                        startActivity(intent);
+//                        slide_left_and_slide_in();
+//
+//                    }
+//                })
                 .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -472,29 +504,45 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 .create()
                 .show();
     }
+    public void makeUserPersonalNoteSheet_renew() throws JSONException{ // 일단 이 매소드만 생각하면 된다  renew 말고는 일단 필요없음
 
-    public void makeUserPersonalNoteSheet_renew(){
-        TextView title_textView = new TextView(this);
-        title_textView.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0,0,0,16);
+        TextView title_textView = new TextView(ExamViewActivity.this);
+        title_textView.setBackground(getResources().getDrawable(R.drawable.outline_round_orange));
         title_textView.setGravity(Gravity.CENTER);
+        title_textView.setLayoutParams(params);
         title_textView.setText("시험 노트");
         answer_sheet_element_layout.addView(title_textView);
+
         for(int i = 0 ; i< note_array.length; i++){
+//            String question = resultJSONarray.getJSONObject(i).getString("question_question");
+//            String answers = resultJSONarray.getJSONObject(i).getString("question_answer");
+//            String correct_answer = resultJSONarray.getJSONObject(i).getString("correct_answer");
+//            String question_Q_image_exist = resultJSONarray.getJSONObject(i).getString("question_Q_image");
+//            String question_A_image_exist = resultJSONarray.getJSONObject(i).getString("question_A_image");
+//            String example_exist = resultJSONarray.getJSONObject(i).getString("example_exist");
+
             final View personal_note_view = getLayoutInflater().inflate(R.layout.examview_exam_note_personal_container, null);
             personal_note_view.setId(10000+(i+1));// slider 로 나오는 노트의 아이디는 100000 으로시작한다
+            TextView personal_note_number = (TextView) personal_note_view.findViewById(R.id.question_number_textView);
             TextView personal_note = (TextView) personal_note_view.findViewById(R.id.user_personal_note_textView);
+
             String note = note_array[i];
             if(note.equals("null") || note.length() <=0){
-                personal_note.setText("["+(i+1) +"] \n 작성되 노트가 없습니다.");
+                personal_note_number.setText("노트 ["+(i+1) +"]");
+                personal_note.setText("작성되 노트가 없습니다.");
             }else{
-                personal_note.setText("["+(i+1) +"] \n" + note_array[i]);
+                personal_note_number.setText("노트 ["+(i+1) +"]");
+                personal_note.setText(note_array[i]);
             }
 
             personal_note_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int id = view.getId();
-                    String message = "해당 번호로 이동하시겠습니까? \n 아니면, 노트작성 및 수정 하시겠습니까?";
+//                    String message = "해당 번호로 이동하시겠습니까? \n 아니면, 노트작성 및 수정 하시겠습니까?";
+                    String message = "해당 번호로 이동하시겠습니까?";
                     String positive_message = "노트 작성 및 수정";
                     String negative_message = "이동";
                     notifier_slider_move_write_revise_note(message, positive_message, negative_message, id);
@@ -506,13 +554,12 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         }
         progressbar_invisible();
     }
-
     public void makeUserPersonalNoteSheet() throws JSONException {
-    TextView title_textView = new TextView(this);
-    title_textView.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
-    title_textView.setGravity(Gravity.CENTER);
-    title_textView.setText("시험 노트");
-    answer_sheet_element_layout.addView(title_textView);
+        TextView title_textView = new TextView(ExamViewActivity.this);
+        title_textView.setBackground(getResources().getDrawable(R.drawable.outline_round_orange));
+        title_textView.setGravity(Gravity.CENTER);
+        title_textView.setText("시험 노트");
+        answer_sheet_element_layout.addView(title_textView);
 
 //    int size = answer.size();
 //    note_array = new String[size];
@@ -576,9 +623,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
 }
-
-
-
     public void makeAnswerSheet(){// 기출 시험에만 적용되는것
         int size = answer.size();
         for(int i = 0; i<size; i++){
@@ -601,7 +645,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             }
         }
     }
-
     public void notifier_examSubmitButtonProcess(String message, String positive_message, String negative_message){
         AlertDialog.Builder builder = new AlertDialog.Builder(ExamViewActivity.this);
         builder.setMessage(message)
@@ -649,7 +692,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         });
 
     }
-
     public boolean checkifAllAnswersAreSelected(){
         boolean isEverythingSelected = true;
         for(int l = 0 ; l <answer.size(); l++){
@@ -661,7 +703,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         }
         return isEverythingSelected;
     }
-
     public void temp(){
         JSONArray savejsonArray = new JSONArray();
         for(int i = 0 ; i < resultJSONarray.length(); i++){
@@ -712,19 +753,22 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         //upload process and result below
         if(LoginType.equals("kakao") || LoginType.equals("normal")){
             progressbar_visible();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd/HH/mm/ss");
-            Date date = new Date();
-            upLoadSubmittedExamData(savejsonArray, dateFormat.format(date));
+
+            upLoadSubmittedExamData(savejsonArray, refresh_upload_prevent);
 
             Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
+            intent.putExtra("from", "ExamViewActivity");
             intent.putExtra("ExamResult", savejsonArray.toString());
             intent.putExtra("exam_code", exam_code);
             intent.putExtra("exam_name", exam_name);
             intent.putExtra("published_year", published_year);
             intent.putExtra("published_round", published_round);
+            intent.putExtra("refresh_upload_prevent", refresh_upload_prevent);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+//            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
             finish();
+            slide_left_and_slide_in();
+//            onBackPressed();
         }else{
             Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
             intent.putExtra("ExamResult", savejsonArray.toString());
@@ -732,9 +776,12 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             intent.putExtra("exam_name", exam_name);
             intent.putExtra("published_year", published_year);
             intent.putExtra("published_round", published_round);
+            intent.putExtra("refresh_upload_prevent", refresh_upload_prevent);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+//            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
             finish();
+            slide_left_and_slide_in();
+//            onBackPressed();
         }
     }
     private void upLoadSubmittedExamData(final JSONArray jsonArray, final String today_date){
@@ -789,7 +836,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 params.put("exam_duration", "0");
                 params.put("current_time", today_date);
 
-                params.put("user_json_data", jsonArray.toString());
+                params.put("user_json_data", TextUtils.htmlEncode(jsonArray.toString()));
                 return params;
             }
         };
@@ -806,11 +853,27 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         progressBar.setVisibility(View.GONE);
         progressBarBackground.setVisibility(View.GONE);
     }
-
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("activity request", "activity request");
+        ActivityResultBus.getInstance().postQueue(
+                new ActivityResultEvent(requestCode, resultCode, data));
+//        if(requestCode == NOTE_REQUEST_CODE){
+//            if(resultCode==RESULT_OK){
+//                eViewPagerAdapter.getItem(0).onActivityResult(40001, resultCode, data);
+//            }
+//        }
     }
 }

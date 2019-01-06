@@ -1,5 +1,6 @@
 package com.storyvendingmachine.www.pp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -86,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         Button joinButton = (Button) findViewById(R.id.join_button);
 
         loginButtonFunction(loginButton);
+        joinButtonClicked(joinButton);
 
         toolbar();
     }
@@ -106,6 +108,18 @@ public class LoginActivity extends AppCompatActivity {
         int id = item.getItemId();
         onBackPressed();
         return true;
+    }
+
+    public void joinButtonClicked(Button joinButton){
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, JoinActivity.class);
+                startActivity(intent);
+                slide_left_and_slide_in();
+
+            }
+        });
     }
 
     public void loginButtonFunction(Button loginButton){
@@ -179,8 +193,8 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
                                 intent.putExtra("user_selected_last_exam_name", user_selected_last_exam_name);
                                 setResult(RESULT_OK, intent);
-                                finish();
-
+//                                finish();
+                                onBackPressed();
 //                                LoginType = "normal";
 //                                G_user_id = user_email;
 //                                G_user_nickname=user_nickname;
@@ -202,7 +216,12 @@ public class LoginActivity extends AppCompatActivity {
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                 builder.setMessage("존재하지 않는 사용자 입니다. \n 이메일과 비밀번호를 다시 확인해 주세요")
-                                        .setNegativeButton("다시시도", null)
+                                        .setPositiveButton("다시 시도", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            }
+                                        })
                                         .create()
                                         .show();
 
@@ -212,7 +231,12 @@ public class LoginActivity extends AppCompatActivity {
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                 builder.setMessage("이메일 인증이 완료되지 않았습니다. \n 인증 후 다시 시도해주세요")
-                                        .setNegativeButton("다시시도", null)
+                                        .setPositiveButton("다시 시도", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            }
+                                        })
                                         .create()
                                         .show();
 
@@ -249,7 +273,12 @@ public class LoginActivity extends AppCompatActivity {
     public void notifier_retry(String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setMessage(message)
-                .setNegativeButton("다시시도", null)
+                .setPositiveButton("다시 시도", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
                 .create()
                 .show();
     }
@@ -279,5 +308,10 @@ public class LoginActivity extends AppCompatActivity {
     public void onBackPressed() {
 //        Session.getCurrentSession().removeCallback(callback);
         super.onBackPressed();  // optional depending on your needs
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

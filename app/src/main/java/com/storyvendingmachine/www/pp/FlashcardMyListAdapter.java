@@ -52,8 +52,8 @@ public class FlashcardMyListAdapter extends BaseAdapter {
             TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
             TextView flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
 
-            folder_name_textView.setText("가입을 하시면 폴더 메뉴를 사용할수 있습니다.");
-            flashcard_length_textView.setText("0");
+            folder_name_textView.setText("회원 가입 및 로그인을 하시면 폴더 메뉴를 사용할수 있습니다.");
+            flashcard_length_textView.setText("");
             return v;
         }else {
             TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
@@ -72,9 +72,14 @@ public class FlashcardMyListAdapter extends BaseAdapter {
                     intent.putExtra("folder_code", folder_code);
                     intent.putExtra("flashcard_length", flashcard_length);
                     context.startActivity(intent);
+                    slide_left_and_slide_in();
                 }
             });
             return v;
         }
+    }
+
+    public void slide_left_and_slide_in(){
+        ((MainActivity) context).overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

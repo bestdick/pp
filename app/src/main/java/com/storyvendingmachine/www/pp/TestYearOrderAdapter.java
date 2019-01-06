@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +55,12 @@ public class TestYearOrderAdapter extends BaseAdapter {
         final String published_num = list.get(i).getPublished_num();
         final String navi_selection = list.get(i).getNavi_selection();
 
-        if(published_num.equals("empty")){
+        String total = list.get(i).getTotal_taker();
+        String pass = list.get(i).getPass_count();
+        String fail = list.get(i).getFail_count();
+        String percent = list.get(i).getPercent();
+
+        if(published_num.equals("empty") || total.equals("empty")|| pass.equals("empty")|| fail.equals("empty")||percent.equals("empty")){
 
             String text = published_year +"  년도  "+exam_name;
             TextView ExamEachNameTextView =(TextView) v2.findViewById(R.id.exam_year_textView);
@@ -64,12 +72,16 @@ public class TestYearOrderAdapter extends BaseAdapter {
 
             TextView ExamEachNameTextView =(TextView) v.findViewById(R.id.ExamEachListTextView);
 
+            TextView total_textView = (TextView) v.findViewById(R.id.total_taker_textView);
+            TextView percent_textView = (TextView) v.findViewById(R.id.percent_textView);
 
 
             if(navi_selection.equals("1")){
                 //1 눌러졌을때   == > 기출시험 시험보기
                 String text = "기출 시험 문제 풀이\n"+exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
                 ExamEachNameTextView.setText(text);
+                total_textView.setText("응시횟수 : "+total+" 회");
+                percent_textView.setText("합격률 : "+percent+" %");
 
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -81,7 +93,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
                         intent.putExtra("published_year",published_year);
                         intent.putExtra("published_round", published_num);
                         context.startActivity(intent);
-                        Toast.makeText(context, Integer.toString(i)+"adapter", Toast.LENGTH_SHORT).show();
+                        slide_left_and_slide_in();
                     }
                 });
             }else {
@@ -89,6 +101,8 @@ public class TestYearOrderAdapter extends BaseAdapter {
                 // 기출시험공부 하는 페이지가 불려온다
                 String text = "기출 시험 시험지 공부\n"+ exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
                 ExamEachNameTextView.setText(text);
+                total_textView.setText("응시횟수 : "+total+" 회");
+                percent_textView.setText("합격률 : "+percent+" %");
 
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -100,7 +114,8 @@ public class TestYearOrderAdapter extends BaseAdapter {
                         intent.putExtra("published_year",published_year);
                         intent.putExtra("published_round", published_num);
                         context.startActivity(intent);
-                        Toast.makeText(context, "exam study", Toast.LENGTH_SHORT).show();
+                        slide_left_and_slide_in();
+
                     }
                 });
 
@@ -114,5 +129,10 @@ public class TestYearOrderAdapter extends BaseAdapter {
 
 
 //        return v;
+    }
+
+
+    public void slide_left_and_slide_in(){
+        ((MainActivity) context).overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

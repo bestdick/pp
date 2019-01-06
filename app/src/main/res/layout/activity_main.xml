@@ -24,7 +24,9 @@
                 android:id="@+id/MainToolBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+                >
+                <!--app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"-->
+                <!--위의 app 을 툴바에다 넣으면 -->
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -111,20 +113,20 @@
         </android.support.design.widget.AppBarLayout>
     <!--</android.support.design.widget.CollapsingToolbarLayout>-->
 
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
 
-
-    </android.support.v4.view.ViewPager>
+        </android.support.v4.view.ViewPager>
 
 
     </android.support.v4.widget.NestedScrollView>
@@ -145,6 +147,7 @@
         app:fab_colorNormal="@color/colorExamViewMainDark"
         app:fab_colorPressed="@color/colorExamViewMain"
         app:fab_colorRipple="@color/colorExamViewMain"/>
+
 
 
 </android.support.design.widget.CoordinatorLayout>

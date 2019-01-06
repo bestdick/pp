@@ -5,135 +5,196 @@
     android:layout_height="match_parent"
     tools:context="com.storyvendingmachine.www.pp.StatisticFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:nestedScrollingEnabled="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/guest_notifier"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:padding="16dp"
+            android:text="시험 통계 및 성적표"
+            android:background="@drawable/outline_question_example"
+            android:textSize="20sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@color/colorWhite">
-
-
-                <TextView
-                    android:id="@+id/statistic_title_textView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/outline_round_gray"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="현재 공부중인 시험\n0000\n기출 시험 통계"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/piechart"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/statistic_title_textView">
-
-                </com.github.mikephil.charting.charts.PieChart>
-
-                <TextView
-                    android:id="@+id/never_took_exam_textView"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center"
-                    android:lineSpacingExtra="1.5dp"
-                    android:text="한번도 시험을 응시 하지 않았습니다"
-                    android:textColor="@color/colorExamViewMainDark"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/statistic_title_textView" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:scrollbars="none"
-                    android:background="@color/colorWhiteSmoke"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/piechart">
-
-                    <LinearLayout
-                        android:id="@+id/subject_result_container"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-
-                    </LinearLayout>
-                </HorizontalScrollView>
+        <TextView
+            android:id="@+id/guest_notifer_textView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/outline_question_example"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/statistic_notice_string"
+            android:textColor="@color/colorBlack"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView20" />
+    </android.support.constraint.ConstraintLayout>
 
 
-            </android.support.constraint.ConstraintLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiper_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ScrollView
+            android:id="@+id/statistic_scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:nestedScrollingEnabled="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorWhite"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/statistic_second_title_textView"
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/outline_round_gray"
-                    android:gravity="center"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:text="성적표\n기출 응시횟수"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="16dp" />
+                    android:background="@color/colorWhite">
+
+
+                    <TextView
+                        android:id="@+id/statistic_title_textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/outline_round_gray"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="현재 공부중인 시험\n0000\n기출 시험 통계"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="20dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/piechart"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/statistic_title_textView">
+
+                    </com.github.mikephil.charting.charts.PieChart>
+
+                    <TextView
+                        android:id="@+id/never_took_exam_textView"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center"
+                        android:lineSpacingExtra="1.5dp"
+                        android:text="한번도 시험을 응시 하지 않았습니다"
+                        android:textColor="@color/colorExamViewMainDark"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/statistic_title_textView" />
+
+                    <HorizontalScrollView
+                        android:id="@+id/subject_pie_horizontalscrollView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/colorWhiteSmoke"
+                        android:scrollbars="none"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/piechart">
+
+                        <LinearLayout
+                            android:id="@+id/subject_result_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+
+                </android.support.constraint.ConstraintLayout>
+
+
 
                 <LinearLayout
-                    android:id="@+id/statistic_exam_result_container"
-                    android:background="@color/colorWhiteSmoke"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorWhite"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/statistic_second_title_textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/outline_round_gray"
+                        android:gravity="center"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="성적표\n기출 응시횟수"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="16dp" />
+                    <LinearLayout
+                        android:id="@+id/statistic_exam_result_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorWhiteSmoke"
+                        android:orientation="vertical">
+                    </LinearLayout>
+
 
                 </LinearLayout>
-
-
             </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>

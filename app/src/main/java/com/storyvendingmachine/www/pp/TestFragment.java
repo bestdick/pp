@@ -80,21 +80,7 @@ public class TestFragment extends Fragment {
 
         FragmentTestListView = (ListView) rootView.findViewById(R.id.FragmentTestListView);
         adaptListView();
-//        getExamList(navi_selection);
         swiper(rootView);
-
-
-//            if(exam_selection_code == "null"){
-//                 FragmentTestListView.removeAllViews();
-//
-//                 Toast.makeText(getActivity(), "exam empty 1", Toast.LENGTH_LONG).show();
-//            }else{
-//                FragmentTestListView.removeAllViews();
-//                getExamList(navi_selection);
-//                Toast.makeText(getActivity(), "not null", Toast.LENGTH_LONG).show();
-//
-//        }
-
 
         testYearOrderList.clear();
         getExamList(navi_selection);
@@ -173,19 +159,34 @@ public class TestFragment extends Fragment {
                                     String published_year = jsonArray.getJSONObject(i).getString("published_year");
 
 
-                                        String published_num_empty = "empty";
-                                        TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, published_num_empty, String.valueOf(navi_selection));
-                                        testYearOrderList.add(element_outer);
 
-                                    JSONArray jsonArray1 = jsonArray.getJSONObject(i).getJSONArray("published_num");
-                                    for(int j =0 ; j<jsonArray1.length(); j++){
-                                        String published_num = jsonArray1.get(j).toString();
 
-                                        TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_num, String.valueOf(navi_selection));
+
+
+                                    String empty = "empty";
+                                    TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, empty, String.valueOf(navi_selection), empty,empty,empty,empty);
+                                    testYearOrderList.add(element_outer);
+
+                                    JSONArray statistic_jsonArray = jsonArray.getJSONObject(i).getJSONArray("published_data_by_round");
+                                    for(int k = 0 ; k <statistic_jsonArray.length(); k++){
+                                        String published_round = statistic_jsonArray.getJSONObject(k).getString("published_round");
+                                        String total = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("total");
+                                        String pass = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("pass");
+                                        String fail = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("fail");
+                                        String percent = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("percent");
+
+                                        TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_round, String.valueOf(navi_selection), total, pass, fail, percent);
                                         testYearOrderList.add(element);
-
-
                                     }
+//                                    JSONArray jsonArray1 = jsonArray.getJSONObject(i).getJSONArray("published_num");
+//                                    for(int j =0 ; j<jsonArray1.length(); j++){
+//                                        String published_num = jsonArray1.get(j).toString();
+//
+//                                        TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_num, String.valueOf(navi_selection));
+//                                        testYearOrderList.add(element);
+//
+//
+//                                    }
 
                                 }
 
@@ -219,12 +220,12 @@ public class TestFragment extends Fragment {
 
                         }
 
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.e("exam list error ", error.toString()+"// 에러에러");
                         //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
 //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
 //                        toast(message);

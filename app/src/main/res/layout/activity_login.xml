@@ -34,7 +34,7 @@
     </android.support.v7.widget.Toolbar>
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,10 +53,10 @@
                     android:id="@+id/textView12"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="32dp"
-                    android:background="@drawable/outline_question_example"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/colorWhiteSmoke"
                     android:lineSpacingMultiplier="1.5"
                     android:padding="15dp"
                     android:text="@string/greeting_login"
@@ -92,8 +92,8 @@
                         android:id="@+id/user_id"
                         android:layout_width="0dp"
                         android:layout_height="50dp"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginStart="32dp"
+                        android:layout_marginEnd="16dp"
                         android:ems="10"
                         android:hint="email"
                         android:inputType="textEmailAddress"
@@ -106,9 +106,9 @@
                         android:id="@+id/textView14"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="32dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="32dp"
+                        android:layout_marginBottom="32dp"
                         android:text="비밀번호"
 
                         android:textColor="@color/colorBlack"
@@ -120,8 +120,8 @@
                         android:id="@+id/user_password"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginStart="32dp"
+                        android:layout_marginEnd="16dp"
                         android:ems="10"
                         android:hint="password"
                         android:inputType="textPassword"
@@ -135,9 +135,9 @@
                     android:id="@+id/login_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@color/colorPrimaryDark"
                     android:text="로그인"
                     android:textColor="@color/colorWhite"
@@ -150,9 +150,9 @@
                     android:id="@+id/join_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     android:background="@color/colorPrimaryDark"
                     android:text="회원가입"
                     android:textColor="@color/colorWhite"
@@ -167,9 +167,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
 
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -177,6 +177,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/join_button" />
 
+                <TextView
+                    android:id="@+id/textView21"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="@string/footer_string"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/resend_verification_code_textView" />
                 <TextView
                     android:id="@+id/textView15"
                     android:layout_width="0dp"
@@ -189,13 +201,36 @@
                     android:textColor="@color/colorBlack"
                     android:textSize="25dp"
                     android:textStyle="bold"
-                    android:typeface="monospace"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/LoginActivityToolbar" />
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/resend_verification_code_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/outline_question_example"
+                    android:padding="8dp"
+                    android:text="인증코드 재발송"
+                    app:layout_constraintEnd_toStartOf="@+id/password_find_textView"
+                    app:layout_constraintTop_toBottomOf="@+id/kakao_login" />
+
+                <TextView
+                    android:id="@+id/password_find_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/outline_question_example"
+                    android:padding="8dp"
+                    android:text="비밀번호 찾기"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/kakao_login" />
             </android.support.constraint.ConstraintLayout>
         </LinearLayout>
     </ScrollView>

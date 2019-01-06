@@ -20,7 +20,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:support-core-ui:27.1.1'
 
@@ -54,4 +54,10 @@ dependencies {
     //https://github.com/PhilJay/MPAndroidChart/wiki/Interaction-with-the-Chart
     compile 'com.github.PhilJay:MpAndroidChart:v3.0.2'
 
+    //admob
+    implementation 'com.google.android.gms:play-services-ads:17.1.1'
+
+    //프레그먼트에서 보낸 intent를 다 시 fragment 에서 받을수 있게해주는 것
+//    compile 'com.inthecheesefactory.thecheeselibraray:stated-fragment-support-v4:0.9.3'
+    compile 'com.inthecheesefactory.thecheeselibrary:stated-fragment:0.9.3'
 }

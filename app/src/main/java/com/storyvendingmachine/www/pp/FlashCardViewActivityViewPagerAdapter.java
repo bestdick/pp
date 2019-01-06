@@ -28,8 +28,9 @@ public class FlashCardViewActivityViewPagerAdapter extends FragmentStatePagerAda
 
     @Override
     public Fragment getItem(int position) {
+        int length_of_flashcard = flashcard_array.size();
         String temr_and_def = flashcard_array.get(position);
-            return FlashCardViewFragment.newInstance(position, temr_and_def, exam_name, subject_name, solo_page, flashcard_or_folder);
+            return FlashCardViewFragment.newInstance(position, temr_and_def, exam_name, subject_name, solo_page, flashcard_or_folder, length_of_flashcard);
 
     }
 

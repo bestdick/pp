@@ -52,15 +52,21 @@ public class ExamViewActivityViewPagerAdaper extends FragmentStatePagerAdapter {
 
         for(int i = 0 ; i<examNoteJSONArray.length(); i++){
             try {
+
                 String string = examNoteJSONArray.getJSONObject(i).getJSONArray("note").get(position).toString();// note
+                String author_id = examNoteJSONArray.getJSONObject(i).getString("author_id"); //author;
                 String author = examNoteJSONArray.getJSONObject(i).getString("author"); //author;
+                String upload_date =examNoteJSONArray.getJSONObject(i).getString("upload_date");
+                String upload_time =examNoteJSONArray.getJSONObject(i).getString("upload_time");
+                String author_thumbnail =examNoteJSONArray.getJSONObject(i).getString("author_thumbnail");
+
 //                JSONArray temp = examNoteJSONArray.getJSONArray(i);
 //                String string = temp.getString(position);
 //                Log.e("from adapter", string);
                 if(string.equals("null") || string.trim().length() <= 0){
                     string_array[i] = "null";
                 }else{
-                    string_array[i] = author+"/////"+string;
+                    string_array[i] = author+"/////"+author_thumbnail+"/////"+upload_date+"/////"+upload_time+"/////"+string+"/////"+author_id;
                 }
             } catch (JSONException e) {
 //                e.printStackTrace();

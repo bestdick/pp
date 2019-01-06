@@ -73,10 +73,13 @@ public class MainActivity extends AppCompatActivity{
     TextView logintype_textView;
     TextView exam_selection_textView;
     ImageView user_thumbnail;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
@@ -97,6 +100,8 @@ public class MainActivity extends AppCompatActivity{
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setPageMargin(16);
+
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -120,6 +125,7 @@ public class MainActivity extends AppCompatActivity{
                                 }else{
                                     Intent intent = new Intent(MainActivity.this, FlashCardWriteActivity.class);
                                     startActivityForResult(intent, requestCode_flashcardwrite);
+                                    slide_left_and_slide_in();
                                 }
                             }
                         });
@@ -150,7 +156,7 @@ public class MainActivity extends AppCompatActivity{
             exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
             logintype_textView.setText(LoginType);
-            exam_selection_textView.setText(exam_selection_name);
+
 
             getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
             user_thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -158,8 +164,14 @@ public class MainActivity extends AppCompatActivity{
                 public void onClick(View view) {
                     Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
                     startActivityForResult(intent, 10003);
+                    slide_left_and_slide_in();
                 }
             });
+            if(exam_selection_code.equals("null")){
+                exam_selection_textView.setText("시험 선택");
+            }else{
+                exam_selection_textView.setText(exam_selection_name);
+            }
 
         }else if(LT.equals("normal")){
             Intent getIntent = getIntent();
@@ -172,14 +184,20 @@ public class MainActivity extends AppCompatActivity{
             exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
             logintype_textView.setText("passpop");
-            exam_selection_textView.setText(exam_selection_name);
+
             user_thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
                     startActivityForResult(intent, 10003);
+                    slide_left_and_slide_in();
                 }
             });
+            if(exam_selection_code.equals("null")){
+                exam_selection_textView.setText("시험 선택");
+            }else{
+                exam_selection_textView.setText(exam_selection_name);
+            }
         }else{
             LoginType = "null";
             G_user_id = "null";
@@ -197,6 +215,7 @@ public class MainActivity extends AppCompatActivity{
                 public void onClick(View view) {
                     Intent intent =new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
+                    slide_left_and_slide_in();
                 }
             });
         }
@@ -325,6 +344,7 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(MainActivity.this, SelectExamActivity.class);
             intent.putExtra("from", "main_activity");
             startActivityForResult(intent, 10001);
+            slide_left_and_slide_in();
         }
 
 
@@ -400,6 +420,7 @@ public class MainActivity extends AppCompatActivity{
                         public void onClick(View view) {
                             Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
                             startActivityForResult(intent, 10003);
+                            slide_left_and_slide_in();
                         }
                     });
 
@@ -431,6 +452,7 @@ public class MainActivity extends AppCompatActivity{
                     public void onClick(View view) {
                         Intent intent =new Intent(MainActivity.this, LoginActivity.class);
                         startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
+                        slide_left_and_slide_in();
                     }
                 });
 
@@ -548,5 +570,9 @@ public class MainActivity extends AppCompatActivity{
     }
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
+    }
+
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

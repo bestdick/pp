@@ -30,7 +30,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary" tools:targetApi="23">@color/colorWhite</item>
         <item name="colorPrimaryDark">@color/colorWhiteSmoke</item>
-        <item name="colorAccent">@color/colorWhite</item>
+        <item name="colorAccent">@color/colorBlack</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
     </style>
 </resources>

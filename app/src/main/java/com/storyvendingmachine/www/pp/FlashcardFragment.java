@@ -1,18 +1,26 @@
 package com.storyvendingmachine.www.pp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.android.volley.Request;
@@ -158,32 +166,46 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
         menu_three.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 폴더
-                menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
-                menu_two.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
-                menu_three.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button));
-                flashcard_menu=2;//나의 폴더
-                total_query_count=0;
-                page = 0;
-                flashcard_list.clear();
-//                flashcard_my_list.clear();
-//                flashcardListView.removeAllViews();
-
-                flashcard_my_list =new ArrayList<FlashCardMyList>();
-                flashcard_my_list_adapter = new FlashcardMyListAdapter(getActivity(), flashcard_my_list);
-                flashcardListView.setAdapter(flashcard_my_list_adapter);
-                flashcardListView.removeFooterView(listview_footer);
-
-                see_more_textView.setText("더 보기");
-                getFlashcardMyList();
-
-                Log.e("log in type", LoginType+"//"+G_user_id);
-
                 if(LoginType.equals("null")){
+                    menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
+                    menu_two.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
+                    menu_three.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button));
+                    flashcard_menu=2;//나의 폴더
+                    total_query_count=0;
+                    page = 0;
+                    flashcard_list.clear();
+
+                    flashcard_my_list =new ArrayList<FlashCardMyList>();
+                    flashcard_my_list_adapter = new FlashcardMyListAdapter(getActivity(), flashcard_my_list);
+                    flashcardListView.setAdapter(flashcard_my_list_adapter);
+                    flashcardListView.removeFooterView(listview_footer);
+
                     TextView textView =  new TextView(getContext());
                     textView.setText("로그인하시면 폴더 기능을 사용할 수 있습니다.\n폴더에 플래쉬카드를 저장하여 공부 할 수 있습니다.");
                     FlashCardMyList elements = new FlashCardMyList("null", "null", "null");
                     flashcard_my_list.add(elements);
+                }else{
+                    // 폴더 로그인 했을떄
+                    menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
+                    menu_two.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
+                    menu_three.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button));
+                    flashcard_menu=2;//나의 폴더
+                    total_query_count=0;
+                    page = 0;
+                    flashcard_list.clear();
+//                flashcard_my_list.clear();
+//                flashcardListView.removeAllViews();
+
+                    flashcard_my_list =new ArrayList<FlashCardMyList>();
+                    flashcard_my_list_adapter = new FlashcardMyListAdapter(getActivity(), flashcard_my_list);
+                    flashcardListView.setAdapter(flashcard_my_list_adapter);
+                    flashcardListView.removeFooterView(listview_footer);
+                    ListViewFooterControl(rootView);
+
+                    see_more_textView.setText(" 폴더 추가 + ");
+                    getFlashcardMyList();
+
+                    Log.e("log in type", LoginType+"//"+G_user_id);
                 }
             }
         });
@@ -197,23 +219,41 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
         listview_footer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //                flashcard_menu = 0;// flashcard menu 0 은 기분  1 은 , 2는 , 3은 /..
+                if(flashcard_menu== 0 || flashcard_menu==1){
 
-//                flashcard_menu = 0;// flashcard menu 0 은 기분  1 은 , 2는 , 3은 /..
-                if((page+15) >= total_query_count){
-                    see_more_textView.setText("마지막 페이지");
+                    if((page+15) >= total_query_count){
+                        see_more_textView.setText("마지막 페이지");
+                    }else{
+                        see_more_textView.setText("더 보기");
+                        page += 15;
+                        see_more_pb.setVisibility(View.VISIBLE);
+                        new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                            @Override
+                            public void run() {
+                                getFlashcardList(exam_selection_code);
+                            }
+                        }, 800);
+                    }
                 }else{
-                    see_more_textView.setText("더 보기");
-                    page += 15;
-                    see_more_pb.setVisibility(View.VISIBLE);
-                    new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
-                        @Override
-                        public void run() {
-                            getFlashcardList(exam_selection_code);
-                        }
-                    }, 800);
-
+//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//                    params.setMargins(32,32,32,32); // left top right bottom
+//                    Button create_folder = new Button(getActivity());
+//                    create_folder.setTag(9938);//9938 footer tage
+//                    create_folder.setText("폴더 추가 + ");
+//                    create_folder.setPadding(25, 15,25,15);
+//                    create_folder.setGravity(Gravity.CENTER);
+//                    create_folder.setLayoutParams(params);
+//                    create_folder.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+                            folder_create_editable_alertDialog();
+//                        }
+//                    });
+////                    if(flashcardListView.getFooterViewsCount() == 0){
+////                        flashcardListView.addFooterView(create_folder);
+////                    }
                 }
-
             }
         });
 
@@ -231,8 +271,12 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                         flashcard_list.clear();
                         getFlashcardList(exam_selection_code);// 플레쉬카드
                     }else{
-                        flashcard_my_list.clear();
-                        getFlashcardMyList();
+                        if(LoginType.equals("null")){
+
+                        }else{
+                            flashcard_my_list.clear();
+                            getFlashcardMyList();
+                        }
                     }
                 }else{
                     if(flashcard_menu == 0 || flashcard_menu == 1){
@@ -240,8 +284,12 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                         flashcard_list.clear();
                         getFlashcardList(exam_selection_code);// 플레쉬카드
                     }else{
-                        flashcard_my_list.clear();
-                        getFlashcardMyList();
+                        if(LoginType.equals("null")){
+
+                        }else{
+                            flashcard_my_list.clear();
+                            getFlashcardMyList();
+                        }
                     }
 
                 }
@@ -249,6 +297,123 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 
             }
         });
+    }
+
+    public void toast(String message){
+        Toast toast = new Toast(getActivity());
+        toast.setGravity(Gravity.CENTER, 0,0);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(32,32,32,32); // left top right bottom
+        TextView tv = new TextView(getActivity());
+//        tv.setBackgroundColor(getResources().getColor(R.color.colorExamViewMain));
+        tv.setBackground(getResources().getDrawable(R.drawable.toast_background));
+        tv.setPadding(16,16,16,16);
+        tv.setLayoutParams(params);
+        tv.setTextSize(16);
+        tv.setText(message);
+        toast.setView(tv);
+        toast.show();
+    }
+    private void folder_create_editable_alertDialog(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setTitle("폴더 추가");
+        ad.setMessage("폴더 이름을 적어주세요");
+        LinearLayout linearLayout = new LinearLayout(getActivity());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setPadding(16,0,16,0);
+
+        final EditText editText = new EditText(getActivity());
+        final TextView count_textView = new TextView(getActivity());
+        count_textView.setGravity(Gravity.RIGHT);
+        count_textView.setText("0/80");
+
+        linearLayout.addView(editText);
+        linearLayout.addView(count_textView);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                count_textView.setText(charSequence.length()+"/80");
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        ad.setView(linearLayout);
+        ad.setPositiveButton("추가", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String input_folder_name = editText.getText().toString();
+                uploadNewlyCreatedFolder(input_folder_name);
+            }
+        });
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        ad.show();
+    }
+    private void uploadNewlyCreatedFolder(final String folder_name){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadNewlyCreatedFolder.php";
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("Newly Created Folder", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                String result = jsonObject.getString("response");
+                                if(result.equals("success")){
+                                    //성공적으로 업로드
+                                    String message = "폴더를 만들었습니다.";
+                                    toast(message);
+                                    flashcard_my_list.clear();
+                                    getFlashcardMyList();
+                                }else{
+                                    //업로드 실패
+                                }
+                            }else {
+                                //token invalid
+
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                params.put("folder_name", folder_name);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
     public void getFlashcardMyList(){
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getFlashCardMyList.php";
@@ -271,12 +436,9 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                                         String folder_code = jsonArray.getJSONObject(i).getString("folder_code");
                                         String folder_length = jsonArray.getJSONObject(i).getString("length");
 
-
-
                                         FlashCardMyList elements = new FlashCardMyList(folder_name, folder_code, folder_length);
                                         flashcard_my_list.add(elements);
                                     }
-
 
                                 flashcard_my_list_adapter.notifyDataSetChanged();
                             }else{

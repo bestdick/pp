@@ -28,7 +28,7 @@ public class FlashcardSoloViewActivity extends AppCompatActivity {
         close_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                onBackPressed();
             }
         });
         Intent intent = getIntent();
@@ -102,6 +102,13 @@ public class FlashcardSoloViewActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
 
 }

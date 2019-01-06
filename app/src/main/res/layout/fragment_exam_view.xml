@@ -334,17 +334,17 @@
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/ad_banner_layout"
                 android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:adjustViewBounds="false"
-                    android:src="@drawable/banner_svm"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <!--<ImageView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:adjustViewBounds="false"-->
+                    <!--android:src="@drawable/banner_svm"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
             </android.support.constraint.ConstraintLayout>
 
             <android.support.constraint.ConstraintLayout

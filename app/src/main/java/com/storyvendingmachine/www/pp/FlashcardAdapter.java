@@ -63,6 +63,7 @@ public class FlashcardAdapter extends BaseAdapter {
 
 
         TextView title_textView = (TextView) v.findViewById(R.id.flashcard_title_textView);
+        TextView exam_name_textView = (TextView) v.findViewById(R.id.flashcard_exam_name_textView);
         TextView exam_name_subject_textView = (TextView) v.findViewById(R.id.flashcard_subject_textView);
         TextView author_textView = (TextView) v.findViewById(R.id.flashcard_author_textView);
         TextView hit_textView = (TextView) v.findViewById(R.id.flashcard_hit_textView);
@@ -79,7 +80,8 @@ public class FlashcardAdapter extends BaseAdapter {
         }
 
         title_textView.setText(flashcard_title+ " ( "+flashcard_count+" ) ");
-        exam_name_subject_textView.setText(exam_name + " "+ subject);
+        exam_name_textView.setText(exam_name);
+        exam_name_subject_textView.setText(subject);
         author_textView.setText("작성자  " +author);
         hit_textView.setText("조회수 "+hit);
         like_textView.setText("좋아요 "+like);
@@ -99,6 +101,7 @@ public class FlashcardAdapter extends BaseAdapter {
                 intent.putExtra("flashcard_title", flashcard_title);
                 intent.putExtra("flashcard_db_id", flashcard_db_id);
                 context.startActivity(intent);
+                slide_left_and_slide_in();
             }
         });
 
@@ -134,5 +137,8 @@ public class FlashcardAdapter extends BaseAdapter {
             return false;
         }
 
+    }
+    public void slide_left_and_slide_in(){
+        ((MainActivity) context).overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

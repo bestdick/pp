@@ -21,6 +21,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.kakao.auth.Session;
 import com.squareup.picasso.Picasso;
 
@@ -44,11 +48,55 @@ public class LoggedInActivity extends AppCompatActivity {
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
 
+    public void ad(){
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//                .addTestDevice("C646CB521B367AC2D90D66C8B4A3EECE")
+//                .build();
+        // 내 애뮬의 test device id 이다
+        //12-27 05:38:09.561 14026-14026/com.storyvendingmachine.www.pp I/Ads: Use AdRequest.Builder.addTestDevice("C646CB521B367AC2D90D66C8B4A3EECE") to get test ads on this device.
+
+
+        mAdView.loadAd(adRequest);
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+                Log.e("ad load fail", String.valueOf(errorCode));
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_in);
 
+        ad();
         ImageView user_thumbnail_imageView = (ImageView) findViewById(R.id.user_thumbnail_imageView);
         TextView login_type_textView = (TextView) findViewById(R.id.login_type_textView);
         TextView user_nickname_textView = (TextView) findViewById(R.id.user_nickname_textView);
@@ -179,9 +227,11 @@ public class LoggedInActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(LoggedInActivity.this, MainActivity.class);
                 setResult(RESULT_OK, intent);
-                finish();
+//                finish();
+                onBackPressed();
             }
         });
+
     }
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -197,5 +247,7 @@ public class LoggedInActivity extends AppCompatActivity {
     public void onBackPressed() {
 //        Session.getCurrentSession().removeCallback(callback);
         super.onBackPressed();  // optional depending on your needs
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

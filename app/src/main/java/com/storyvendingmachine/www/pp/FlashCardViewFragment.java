@@ -9,6 +9,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,13 +46,13 @@ import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 
 public class FlashCardViewFragment extends Fragment {
 
-    int page;
+    int page, total_length;
     String term_and_def, flashcard_exam_name, flashcard_subject_name, flashcard_or_folder;
     boolean solo_page;
 
 
 
-    public static FlashCardViewFragment newInstance(int count, String term_and_def, String exam_name, String subject_name, boolean solo_page, String flashcard_or_folder) {
+    public static FlashCardViewFragment newInstance(int count, String term_and_def, String exam_name, String subject_name, boolean solo_page, String flashcard_or_folder, int total_length) {
         FlashCardViewFragment fragment = new FlashCardViewFragment();
         Bundle args = new Bundle();
         args.putInt("page", count);
@@ -60,6 +61,7 @@ public class FlashCardViewFragment extends Fragment {
         args.putString("flashcard_subject_name", subject_name);
         args.putBoolean("solo_page", solo_page);
         args.putString("flashcard_or_folder", flashcard_or_folder);
+        args.putInt("total_length", total_length);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,6 +75,7 @@ public class FlashCardViewFragment extends Fragment {
          flashcard_subject_name = getArguments().getString("flashcard_subject_name");
          solo_page = getArguments().getBoolean("solo_page");
          flashcard_or_folder = getArguments().getString("flashcard_or_folder");
+         total_length = getArguments().getInt("total_length");
     }
 
     @Override
@@ -87,8 +90,9 @@ public class FlashCardViewFragment extends Fragment {
             TextView page_textView = (TextView) rootView.findViewById(R.id.flashcard_page_textView);
             TextView exam_name_textView = (TextView) rootView.findViewById(R.id.exam_name_textView);
 
-            page_textView.setText(String.valueOf((page/2)+1));
-            term_and_def_textView.setText(term_and_def);
+            page_textView.setText(String.valueOf((page/2)+1)+" / "+(total_length/2));
+            term_and_def_textView.setGravity(Gravity.CENTER);
+            term_and_def_textView.setText(term_and_def.replace("<br>", "\n"));
             exam_name_textView.setText(flashcard_exam_name + " "+ flashcard_subject_name);
 
             onLongPress(outer_container_layout);
@@ -99,7 +103,9 @@ public class FlashCardViewFragment extends Fragment {
 
             ConstraintLayout outer_container_layout = (ConstraintLayout) rootView.findViewById(R.id.outer_container_layout);
             TextView term_and_def_textView = (TextView) rootView.findViewById(R.id.term_and_def_textView);
-            term_and_def_textView.setText(term_and_def);
+
+            term_and_def_textView.setGravity(Gravity.LEFT);
+            term_and_def_textView.setText(term_and_def.replace("<br>", "\n"));
 
             onLongPress(outer_container_layout);
             return rootView;
@@ -119,6 +125,7 @@ public class FlashCardViewFragment extends Fragment {
                         intent.putExtra("solo_page", solo_page);
                         intent.putExtra("flashcard_or_folder", flashcard_or_folder);
                         startActivity(intent);
+                        slide_left_and_slide_in();
                         return false;
                     }
                 });
@@ -133,6 +140,7 @@ public class FlashCardViewFragment extends Fragment {
                         intent.putExtra("solo_page", solo_page);
                         intent.putExtra("flashcard_or_folder", flashcard_or_folder);
                         startActivity(intent);
+                        slide_left_and_slide_in();
                         return false;
                     }
                 });
@@ -142,6 +150,9 @@ public class FlashCardViewFragment extends Fragment {
     }
 
 
+    public void slide_left_and_slide_in(){//opening new activity
+        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
     @Override
     public void onResume(){
         super.onResume();

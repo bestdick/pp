@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.MobileAds;
 import com.kakao.auth.Session;
 
 import org.json.JSONArray;
@@ -38,6 +39,12 @@ public class EnteranceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enterance);
+//아래가 나의 !!것
+//        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+//        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+
         //full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -73,17 +80,17 @@ public class EnteranceActivity extends AppCompatActivity {
                 public void run() {
                     LoginRemember();
                 }
-            }, 1500);
+            }, 1000);
         }else{
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
                     Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
                     startActivity(intent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                     finish();
                 }
-            }, 1500);
+            }, 1000);
         }
 
 

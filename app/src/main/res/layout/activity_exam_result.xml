@@ -21,17 +21,16 @@
 
     <LinearLayout
         android:id="@+id/progress_bar_background"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/colorProgressBar_background"
         android:elevation="10dp"
+        android:orientation="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="@+id/scrollView2"></LinearLayout>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/exam_result_toolbar"
@@ -114,7 +113,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:padding="16dp"
-                    android:text="*회원 가입을 하시고 로그인 하시면 시험 결과 통계를 제공받을수 잇습니다."
+                    android:text="*회원 가입을 하시고 로그인 하시면 시험 결과 통계를 제공받을수 있습니다.\n회원 가입을 하시고 더 많은 혜택을 받으세요.\n*틀린 문제를 보기 위해서는 광고를 시청 해주셔야 합니다."
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -129,6 +128,7 @@
                 android:background="@color/colorWhite">
 
                 <TextView
+                    android:id="@+id/wrong_question_textView"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:layout_marginStart="16dp"
@@ -144,12 +144,47 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/correct_color_textView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/exam_result_correct_answer_choice"
+                    android:paddingLeft="16dp"
+                    android:visibility="gone"
+                    android:text="정답"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/incorrect_color_textView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/wrong_question_textView" />
+
+                <TextView
+                    android:id="@+id/incorrect_color_textView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/exam_result_user_answer_choice"
+                    android:paddingLeft="16dp"
+                    android:visibility="gone"
+                    android:text="오답"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/correct_color_textView"
+                    app:layout_constraintTop_toBottomOf="@+id/wrong_question_textView" />
             </android.support.constraint.ConstraintLayout>
 
             <LinearLayout
                 android:id="@+id/exam_result_inner_second_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:orientation="vertical">
                 <!--android:layout_margin="8dp"-->
                 <!--android:elevation="5dp"-->

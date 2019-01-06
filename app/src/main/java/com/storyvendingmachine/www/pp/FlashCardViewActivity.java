@@ -6,18 +6,24 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -118,6 +124,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                         intent.putExtra("flashcard_db_id", flashcard_db_id);
 //                        startActivity(intent);
                         startActivityForResult(intent, 20001);//20001 mean flashcard comment change result.
+                        slide_left_and_slide_in();
                     }
                 });
             }else{
@@ -223,20 +230,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 20001){
-            if (resultCode == RESULT_OK) {
-                comment_layout.removeAllViews();
-                getSelectedFlashCardComments_And_Others();
-            }else if(resultCode == RESULT_CANCELED){
-
-            }
-        }else{
-        }
-    }
     private void toolbar(String title_message){
         Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
         tb.setElevation(5);
@@ -258,7 +251,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
             }
         });
     }
-
     public void notifierAddToFlashCardFolder(String message, String positive_message, String negative_message, final String folder_code, final TextView textView){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
@@ -342,6 +334,104 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+    private void folder_create_editable_alertDialog(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(FlashCardViewActivity.this);
+        ad.setTitle("폴더 추가");
+        ad.setMessage("폴더 이름을 적어주세요");
+        LinearLayout linearLayout = new LinearLayout(FlashCardViewActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setPadding(16,0,16,0);
+
+        final EditText editText = new EditText(FlashCardViewActivity.this);
+        final TextView count_textView = new TextView(FlashCardViewActivity.this);
+        count_textView.setGravity(Gravity.RIGHT);
+        count_textView.setText("0/80");
+
+        linearLayout.addView(editText);
+        linearLayout.addView(count_textView);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                count_textView.setText(charSequence.length()+"/80");
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        ad.setView(linearLayout);
+        ad.setPositiveButton("추가", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String input_folder_name = editText.getText().toString();
+                uploadNewlyCreatedFolder(input_folder_name);
+            }
+        });
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        ad.show();
+    }
+    private void uploadNewlyCreatedFolder(final String folder_name){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadNewlyCreatedFolder.php";
+        RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("Newly Created Folder", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                String result = jsonObject.getString("response");
+                                if(result.equals("success")){
+                                    //성공적으로 업로드
+
+                                }else{
+                                    //업로드 실패
+                                }
+                            }else {
+                                //token invalid
+
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                params.put("folder_name", folder_name);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
     public void getScrapFolderName(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getScrapFolderName.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
@@ -358,15 +448,40 @@ public class FlashCardViewActivity extends AppCompatActivity {
                             if(access_token.equals("valid")){
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
 //                              기본 폴더 세팅
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                params.setMargins(0,16,0,16); // left top right bottom
                                 TextView name_of_folder_textView = new TextView(FlashCardViewActivity.this);
                                 name_of_folder_textView.setText("폴더 리스트");
                                 name_of_folder_textView.setPadding(25, 25,25,25);
+                                name_of_folder_textView.setLayoutParams(params);
                                 name_of_folder_textView.setGravity(Gravity.CENTER);
-                                name_of_folder_textView.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+                                name_of_folder_textView.setBackground(getResources().getDrawable(R.drawable.outline_solid_round_orange));
                                 scrap_folder_layout.addView(name_of_folder_textView);
-                                if(jsonArray.length() != 0) {
 
+
+                                if(jsonArray.length() != 0) {
 //                              기본 폴더 세팅
+                                    String basic_folder_count = jsonObject.getString("basic_folder_flashcard_count");
+                                    View folder_container_basic = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
+                                    final TextView folder_name_textView_basic = folder_container_basic.findViewById(R.id.scrap_folder_textView);
+                                    final TextView scrap_count_textView_basic = folder_container_basic.findViewById(R.id.scrap_count_textView);
+
+                                    folder_name_textView_basic.setText("기본 폴더");
+                                    scrap_count_textView_basic.setText("( " + basic_folder_count + " ) ");
+                                    scrap_folder_layout.addView(folder_container_basic);
+
+                                    folder_container_basic.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+//                                        Toast.makeText(FlashCardViewActivity.this, "기본 폴더", Toast.LENGTH_SHORT).show();
+                                            String message = "기본 폴더에 해당 플래쉬 카드를 넣으시겠습니까?";
+                                            String positive_message = "네";
+                                            String negative_message = "아니요";
+                                            notifierAddToFlashCardFolder(message, positive_message, negative_message, "0", scrap_count_textView_basic);
+                                        }
+                                    });
+
+
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
                                         final TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
@@ -415,13 +530,24 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
-                            }else if(access_token.equals("invalid")){
 
-                            }else{
+                                Button create_folder = new Button(FlashCardViewActivity.this);
+                                create_folder.setText("폴더 추가 + ");
+                                create_folder.setPadding(25, 15,25,15);
+                                create_folder.setLayoutParams(params);
+                                create_folder.setGravity(Gravity.CENTER);
+                                create_folder.setBackground(getResources().getDrawable(R.drawable.outline_round_gray));
+                                create_folder.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        folder_create_editable_alertDialog();
+                                    }
+                                });
+                                scrap_folder_layout.addView(create_folder);
 
+                            }else {
+                                //access invalid
                             }
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -520,7 +646,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("flashcard comment and other::", response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
@@ -533,6 +658,8 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                     comment_layout.addView(comment_container);
                                 }else{
                                     for(int i = 0 ; i < jsonArray.length(); i++){
+                                        String commenter_login_type = jsonArray.getJSONObject(i).getString("login_type");
+                                        String commenter_id = jsonArray.getJSONObject(i).getString("login_type");
                                         String author_nickname = jsonArray.getJSONObject(i).getString("user_nickname");
                                         String author_thumbnail_url = jsonArray.getJSONObject(i).getString("user_thumbnail");
                                         String comment = jsonArray.getJSONObject(i).getString("comment");
@@ -545,8 +672,10 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                         TextView upload_date_textView = (TextView) comment_container.findViewById(R.id.upload_textView);
                                         ImageView author_thumbnail_imageView = (ImageView) comment_container.findViewById(R.id.author_imageView);
 
-                                        if(author_thumbnail_url.equals("null")){
+                                        if(author_thumbnail_url.equals("null") || author_thumbnail_url.length()<=0){
                                             //thumnail 이 없을때
+                                            author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                                            author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
                                         }else{
                                             getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail_url);
                                         }
@@ -677,6 +806,19 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 20001){
+            if (resultCode == RESULT_OK) {
+                comment_layout.removeAllViews();
+                getSelectedFlashCardComments_And_Others();
+            }else if(resultCode == RESULT_CANCELED){
+
+            }
+        }else{
+        }
+    }
 
 
 
@@ -761,11 +903,13 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "flashcard");
                 startActivity(intent);
+                slide_left_and_slide_in();
             }else{
                 Intent intent = new Intent(this, FlashcardSoloViewActivity.class);
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "folder");
                 startActivity(intent);
+                slide_left_and_slide_in();
             }
 
         }else{
@@ -775,8 +919,9 @@ public class FlashCardViewActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed(){
-        finish();
         super.onBackPressed();
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -794,7 +939,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
         TextView tv = new TextView(FlashCardViewActivity.this);
 //        tv.setBackgroundColor(getResources().getColor(R.color.colorExamViewMain));
         tv.setBackground(getResources().getDrawable(R.drawable.toast_background));
-        tv.setTextSize(20);
+        tv.setTextSize(16);
         tv.setText(message);
         toast.setView(tv);
         toast.show();
@@ -809,6 +954,10 @@ public class FlashCardViewActivity extends AppCompatActivity {
         pb.setVisibility(View.INVISIBLE);
         progressBarBackground.setVisibility(View.GONE);
     }
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+
 //    static com.melnykov.fab.FloatingActionButton fab;
 //    public void floatingbutton(){
 //

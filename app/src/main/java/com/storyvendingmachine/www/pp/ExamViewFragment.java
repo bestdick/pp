@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -44,11 +48,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.storyvendingmachine.www.pp.Allurl.url_getExamList;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.eviewPager;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.navi_selection;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_nickname;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 
@@ -57,11 +64,15 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
  */
 
 public class ExamViewFragment extends Fragment {
-
+    ProgressBar pb;
+    View rootView;
+    final int NOTE_REQUEST_CODE = 40001;
     int page;
     Bundle bundle;
     String[] note;
 
+
+    String exam_code, exam_name, published_year, published_round;
 
 
     public static ExamViewFragment newInstance(int count, Bundle bundle, String[] note) {
@@ -69,30 +80,35 @@ public class ExamViewFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt("page", count);
         args.putBundle("bundle", bundle);
-        args.putStringArray("note", note);
+
+        args.putStringArray("note", note);// working on it
+
         fragment.setArguments(args);
         return fragment;
     }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
          page = getArguments().getInt("page");
          bundle =getArguments().getBundle("bundle");
-         note = getArguments().getStringArray("note");
-
+         note = getArguments().getStringArray("note");// working on it
          answer.add(page, -1);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_exam_view, container, false);
+        rootView = inflater.inflate(R.layout.fragment_exam_view, container, false);
 
-        final String exam_code = bundle.getString("exam_code");
-        final String exam_name =bundle.getString("exam_name");
-        final String published_year = bundle.getString("published_year");
-        final String published_round = bundle.getString("published_round");
+        pb = (ProgressBar) rootView.findViewById(R.id.note_progressbar);
+        exam_code = bundle.getString("exam_code");
+        exam_name =bundle.getString("exam_name");
+        published_year = bundle.getString("published_year");
+        published_round = bundle.getString("published_round");
         String subject_code = bundle.getString("subject_code");
         String subject_name = bundle.getString("subject_name");
         String question_number = bundle.getString("question_number");
@@ -198,6 +214,7 @@ public class ExamViewFragment extends Fragment {
             // navi selection == 2
             imageCorrectAnwerChoice(correct_answer, answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout);
             ExamNote(rootView);// 노트를 가져오는 function
+//            ExamNoteRevise(rootView);
             TextView note_add_revise_button = (TextView) rootView.findViewById(R.id.note_add_revise_button);
             //로그인한상태와 안한상태를 말해줌ㅕ
 
@@ -222,14 +239,16 @@ public class ExamViewFragment extends Fragment {
                                 .show();
 
                     }else {
-                        Intent intent =new Intent(getActivity().getApplicationContext(), ExamNoteWriteActivity.class);
+                        Intent intent =new Intent(getActivity(), ExamNoteWriteActivity.class);
                         intent.putExtra("type", "note_write");
                         intent.putExtra("exam_code", exam_code);
                         intent.putExtra("exam_name", exam_name);
                         intent.putExtra("exam_placed_round", published_round);
                         intent.putExtra("exam_placed_year", published_year);
                         intent.putExtra("note_number", String.valueOf(page));
-                        startActivity(intent);
+//                        startActivity(intent);
+                        startActivityForResult(intent, NOTE_REQUEST_CODE);
+                        slide_left_and_slide_in();
                     }
 
                 }
@@ -254,6 +273,7 @@ public class ExamViewFragment extends Fragment {
             // navi selection == 2
             correctAnswerChoice(correct_answer, rootView, answer_1_textView, answer_2_textView, answer_3_textView, answer_4_textView);
             ExamNote(rootView);// 노트를 가져오는 function
+//            ExamNoteRevise(rootView);
             TextView note_add_revise_button = (TextView) rootView.findViewById(R.id.note_add_revise_button);
             //로그인한상태와 안한상태를 말해줌ㅕ
 
@@ -278,14 +298,16 @@ public class ExamViewFragment extends Fragment {
                                 .show();
 
                     }else {
-                        Intent intent =new Intent(getActivity().getApplicationContext(), ExamNoteWriteActivity.class);
+                        Intent intent =new Intent(getActivity(), ExamNoteWriteActivity.class);
                         intent.putExtra("type", "note_write");
                         intent.putExtra("exam_code", exam_code);
                         intent.putExtra("exam_name", exam_name);
                         intent.putExtra("exam_placed_round", published_round);
                         intent.putExtra("exam_placed_year", published_year);
                         intent.putExtra("note_number", String.valueOf(page));
-                        startActivity(intent);
+//                        startActivity(intent);
+                        startActivityForResult(intent, NOTE_REQUEST_CODE);
+                        slide_left_and_slide_in();
                     }
 
                 }
@@ -295,121 +317,7 @@ public class ExamViewFragment extends Fragment {
         }
     }
 
-    public void note_refresh_button(final View rootView, final String exam_code, final String exam_placed_year, final String exam_placed_round){
-        TextView refresh_button = (TextView) rootView.findViewById(R.id.refresh_button);
-        final ProgressBar pb = (ProgressBar) rootView.findViewById(R.id.note_progressbar);
-        refresh_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pb.setVisibility(View.VISIBLE);
-                new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
-                    @Override
-                    public void run() {
-//                        pb.setVisibility(View.INVISIBLE);
-                          global_note_refresh_process(rootView, exam_code, exam_placed_year, exam_placed_round, pb);
 
-                    }
-                }, 1500);
-
-            }
-        });
-    }
-
-    public void global_note_refresh_process(final View rootView, final String exam_code, final String exam_placed_year, final String exam_placed_round, final ProgressBar pb){
-        RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getNoteRefresh.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("exam note ::" , response);
-                        try {
-
-                            LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.comment_layout);
-                            ll.removeAllViews();
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray jsonArray = jsonObject.getJSONArray("response");
-
-                            for(int i = 0 ; i < jsonArray.length(); i++){
-
-                                String note = jsonArray.getJSONObject(i).getString("note");
-                                String author = jsonArray.getJSONObject(i).getString("author");
-                                if(note.equals("null") || note.length() <=0){
-
-                                }else {
-                                    View exam_view_exam_note = getLayoutInflater().inflate(R.layout.examview_exam_note_container, null);
-                                    TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.note_author_textView);
-                                    TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.each_note_textView);
-
-                                    author_text_view.setText(author);
-                                    note_text_view.setText(note);
-
-                                    ll.addView(exam_view_exam_note);
-                                }
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        pb.setVisibility(View.GONE);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
-//                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
-//                        toast(message);
-//                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("token", "passpop");
-                params.put("exam_code", exam_code);
-                params.put("exam_placed_year", exam_placed_year);
-                params.put("exam_placed_round", exam_placed_round);
-                params.put("question_number", String.valueOf(page));
-
-
-                return params;
-            }
-        };
-        queue.add(stringRequest);
-    }
-
-    public void ExamNote(View rootView){
-        ArrayList<String> list = new ArrayList<>();
-        LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.comment_layout);
-
-
-        for(int i = 0 ; i<note.length; i++){
-            if(note[i].equals("null")){
-
-            }else{
-                list.add(note[i]);
-
-                String author = note[i].split("/////")[0];
-                String note_note = note[i].split("/////")[1];
-
-                View exam_view_exam_note = getLayoutInflater().inflate(R.layout.examview_exam_note_container, null);
-                TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.note_author_textView);
-                TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.each_note_textView);
-
-                author_text_view.setText(author);
-                note_text_view.setText(note_note);
-
-                ll.addView(exam_view_exam_note);
-            }
-
-        }
-        if(list.size() == 0){
-            View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
-            ll.addView(exam_view_exam_note_empty);
-        }
-    }
 
     public void imageCorrectAnwerChoice(String correct_answer, ConstraintLayout one, ConstraintLayout two, ConstraintLayout three, ConstraintLayout four){
         //this method is for when 기출 시험 공부에 사용된다
@@ -549,32 +457,228 @@ public class ExamViewFragment extends Fragment {
         });
     }
 
+    //********************************************** all the method that are neccessary 기출 공부 a.k.a NOTE NOTE  under this line **********************************************
+    public void global_note_refresh_process(final View rootView, final String exam_code, final String exam_placed_year, final String exam_placed_round, final ProgressBar pb){
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getNoteRefresh.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("exam note ::" , response);
+                        try {
+                            LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.comment_layout);
+                            ll.removeAllViews();
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArray = jsonObject.getJSONArray("response");
+                            ArrayList<String> list = new ArrayList<>();
+                            for(int i = 0 ; i < jsonArray.length(); i++){
+                                String note_note = jsonArray.getJSONObject(i).getString("note");
+                                String author = jsonArray.getJSONObject(i).getString("author");
+                                String upload_date = jsonArray.getJSONObject(i).getString("upload_date");
+                                String upload_time = jsonArray.getJSONObject(i).getString("upload_time");
+                                String author_thumbnail = jsonArray.getJSONObject(i).getString("user_thumbnail");
+                                if(note_note.equals("null") || note_note.length() <=0){
+                                    if(i==0){
+                                        View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                        TextView empty_textView = exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                        empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                                        ll.addView(exam_view_exam_note_empty);
+                                    }
+                                }else {
+                                    list.add(note[i]);
+                                    View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+                                    ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
+                                    TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
+                                    TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
+                                    TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
 
+                                    author_text_view.setText(author);
+                                    note_text_view.setText(note_note);
+                                    upload_textView.setText(upload_date+ "\n"+ upload_time);
+                                    if(author_thumbnail.equals("null") || author_thumbnail==null || author_thumbnail.length()<=0){
+                                        author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                                        author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
+                                    }else{
+                                        getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
+                                    }
+                                    ll.addView(exam_view_exam_note);
+                                }
+                            }
+                            if (list.size() == 0) {
+                                View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                ll.addView(exam_view_exam_note_empty);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        // put your code here...
-//        testYearOrderList.clear();
-//        getExamList(navi_selection);
+                        pb.setVisibility(View.GONE);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+//                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+//                        toast(message);
+//                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("exam_code", exam_code);
+                params.put("exam_placed_year", exam_placed_year);
+                params.put("exam_placed_round", exam_placed_round);
+                params.put("question_number", String.valueOf(page));
 
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
+    public void note_refresh_button(final View rootView, final String exam_code, final String exam_placed_year, final String exam_placed_round){
+        TextView refresh_button = (TextView) rootView.findViewById(R.id.refresh_button);
+        refresh_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pb.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                    @Override
+                    public void run() {
+//                        pb.setVisibility(View.INVISIBLE);
+                        global_note_refresh_process(rootView, exam_code, exam_placed_year, exam_placed_round, pb);
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//         getActivity().getMenuInflater().inflate(R.menu.exam_answer_sheet, menu);
-         super.onCreateOptionsMenu(menu, inflater);
+                    }
+                }, 1500);
 
-
+            }
+        });
     }
+    public void ExamNoteRevise(View rootView) {
+        ArrayList<String> list = new ArrayList<>();
+        LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.comment_layout);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
 
-        return super.onOptionsItemSelected(item);
+        for (int i = 0; i < note.length; i++) {
+                if (note[i].equals("null")) {
+                    if(i==0){
+                        View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                        TextView empty_textView = exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                        empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                        ll.addView(exam_view_exam_note_empty);
+                    }
+                } else {
+                    list.add(note[i]);
+                    String[] temp = note[i].split("/////");
+                    String author = temp[0];
+                    String author_thumbnail = temp[1];
+                    String upload_date = temp[2];
+                    String upload_time = temp[3];
+                    String note_note = temp[4];
+                    String author_id = temp[5];
+
+//                View exam_view_exam_note = getLayoutInflater().inflate(R.layout.examview_exam_note_container, null);
+//                TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.note_author_textView);
+//                TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.each_note_textView);
+
+                    View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+                    ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
+                    TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
+                    TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
+                    TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+
+                    author_text_view.setText(author);
+                    note_text_view.setText(note_note);
+                    upload_textView.setText(upload_date + "\n" + upload_time);
+                    if (author_thumbnail.equals("null") || author_thumbnail == null || author_thumbnail.length() <= 0) {
+                        author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                        author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
+                    } else {
+                        getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
+                    }
+                    ll.addView(exam_view_exam_note);
+                }
+
+            }
+            if (list.size() == 0) {
+                View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                ll.addView(exam_view_exam_note_empty);
+            }
+        }
+
+    public void ExamNote(View rootView){
+        ArrayList<String> list = new ArrayList<>();
+        LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.comment_layout);
+
+//        Log.e("length of note", String.valueOf(note.length));
+        for(int i = 0 ; i<note.length; i++){
+            if(note[i].equals("null")){
+                if(i==0){
+                    View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                    TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                    empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                    ll.addView(exam_view_exam_note_empty);
+                }
+            }else{
+                list.add(note[i]);
+
+                String[] temp = note[i].split("/////");
+                String author =temp[0];
+                String author_thumbnail = temp[1];
+                String upload_date = temp[2];
+                String upload_time = temp[3];
+                String note_note = temp[4];
+
+//                View exam_view_exam_note = getLayoutInflater().inflate(R.layout.examview_exam_note_container, null);
+//                TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.note_author_textView);
+//                TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.each_note_textView);
+
+                View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+                ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
+                TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
+                TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
+                TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+
+                author_text_view.setText(author);
+                note_text_view.setText(note_note);
+                upload_textView.setText(upload_date+ "\n"+ upload_time);
+                if(author_thumbnail.equals("null") || author_thumbnail==null || author_thumbnail.length()<=0){
+                    author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                    author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
+                }else{
+                    getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
+                }
+                ll.addView(exam_view_exam_note);
+            }
+
+        }
+        if(list.size() == 0){
+            View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+            ll.addView(exam_view_exam_note_empty);
+        }
     }
+    public void getThumbnailImageForAuthor(ImageView imageView, String url){
+        Picasso.with(getActivity())
+                .load(url)
+                .transform(new CircleTransform())
+                .into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
 
-
+                    }
+                    @Override
+                    public void onError() {
+                        Log.e("load image", "fail to load images ");
+                    }
+                });
+    }
+    //********************************************** all the method that are neccessary for both 기출 // 기출 공부 under this line **********************************************
     public void getQuestionImage(ImageView imageView, String url){
         Picasso.with(getContext())
                 .load(url)
@@ -589,7 +693,6 @@ public class ExamViewFragment extends Fragment {
                     }
                 });
     }
-
     public void getAnswerImage(ImageView imageView, String url){
         Picasso.with(getContext())
                 .load(url)
@@ -604,5 +707,51 @@ public class ExamViewFragment extends Fragment {
                     }
                 });
     }
+    public void slide_left_and_slide_in(){//opening new activity
+        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
 
+    //********************************************** all the override method goes under this line **********************************************
+    @Override
+    public void onResume(){
+        super.onResume();
+        // put your code here...
+//        testYearOrderList.clear();
+//        getExamList(navi_selection);
+
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//         getActivity().getMenuInflater().inflate(R.menu.exam_answer_sheet, menu);
+         super.onCreateOptionsMenu(menu, inflater);
+
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("why not working?", "what the fuck");
+        if (requestCode == NOTE_REQUEST_CODE){
+            if (resultCode == RESULT_OK) {
+                String upload_status = data.getStringExtra("upload_status");
+                if(upload_status.equals("success")){
+                    Log.e("why not working?", "what the fuck");
+                    String page_number = data.getStringExtra("note_number");
+                    global_note_refresh_process(rootView, exam_code, published_year, published_round, pb);
+                }
+            }else if(resultCode == RESULT_CANCELED){
+
+            }
+        }else{
+        }
+
+    }
 }

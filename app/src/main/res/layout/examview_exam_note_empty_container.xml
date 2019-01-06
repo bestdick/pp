@@ -16,10 +16,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/empty_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
             android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
             android:text="노트가 존재하지 않습니다"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

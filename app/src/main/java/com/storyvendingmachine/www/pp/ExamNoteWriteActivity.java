@@ -25,6 +25,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 public class ExamNoteWriteActivity extends AppCompatActivity {
 
     EditText note_editText;
+    TextView note_notice_textView;
     String type, exam_code, exam_name, exam_placed_year, exam_placed_round;
     int note_number;
     ProgressBar pb;
@@ -47,6 +49,8 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
         Intent intent = getIntent();
         type = intent.getStringExtra("type");
         if(type.equals("note_write")){
+            note_notice_textView = (TextView) findViewById(R.id.note_notice_textView);
+            note_notice_textView.setVisibility(View.VISIBLE);
             exam_code = intent.getStringExtra("exam_code");
             exam_name= intent.getStringExtra("exam_name");
             exam_placed_year = intent.getStringExtra("exam_placed_year");
@@ -79,10 +83,7 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
             toolbar(flashcard_title);
         }
     }
-
-    public void notifier(){
-
-    }
+    //아래 매소드들은 commment 에 해당하는 매소드 들이다.
     public void uploadCommentClick(final String flashcard_db_id, Button comment_uploadButton, final EditText comment_editText){
         comment_uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +96,6 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
             }
         });
     }
-
     public void notifier_positive_negative_uploadCommentProcess(String message, String positive_message, String negative_message, final String flashcard_db_id, final EditText comment_editText){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
@@ -124,7 +124,8 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("upload_status", "success");
                         setResult(RESULT_OK, resultIntent);
-                        finish();
+//                        finish();
+                        onBackPressed();
                     }
                 })
                 .create()
@@ -184,7 +185,33 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+    //여기까지 매소드들은 comment 에 해당하는 매소드 들이다.
 
+    //아래 매소드들은 note에 해당하는 매소드 들이다.....
+    public void note_simple_notifier(String message, String positive_message, String negative_message, final JSONArray note_json_array){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setTitle("노트 업로드 및 수정")
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //public
+                        String public_or_private = "public";
+                        note_upload_process(note_json_array, public_or_private);
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //private
+                        String public_or_private = "private";
+                        note_upload_process(note_json_array, public_or_private);
+                    }
+                })
+                .setCancelable(true)
+                .create()
+                .show();
+    }
     public void note_uploadButtonClick(){
         Button note_uploadButton = (Button) findViewById(R.id.note_upload_button);
         note_uploadButton.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +221,12 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                 note_array[note_number] = note_editText.getText().toString();
                 Log.e("note array look like", String.valueOf(note_array.length));
                 JSONArray note_json_array = note_to_json_array(note_array);
-                note_upload_process(note_json_array);
+
+                String message = "\"공개\" 노트로 업로드 및 수정 하시겠습니까?\n\"비공개\" 노트로 업로드 및 수정 하시겠습니까?";
+                String pos = "공개";
+                String neg = "비공개";
+                note_simple_notifier(message, pos, neg, note_json_array);
+
             }
         });
     }
@@ -207,7 +239,7 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
         }
         return jsonArray;
     }
-    public void note_upload_process(final JSONArray note_array){
+    public void note_upload_process(final JSONArray note_array, final String public_or_private){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/upload_update_ExamNote.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -219,13 +251,22 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
-//                                examNoteJSONArray = jsonObject.getJSONArray("response");
-                                if(LoginType.equals("kakao") || LoginType.equals("normal")){
-//                                    userPersonalNoteArray = jsonObject.getJSONArray("user_personal_note");
+                                String resp =jsonObject.getString("response");
+                                if(resp.equals("success")){
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("upload_status", "success");
+                                    resultIntent.putExtra("note_number", String.valueOf(note_number));
+                                    setResult(RESULT_OK, resultIntent);
+                                    onBackPressed();
                                 }else{
 
                                 }
-
+////                                examNoteJSONArray = jsonObject.getJSONArray("response");
+//                                if(LoginType.equals("kakao") || LoginType.equals("normal")){
+////                                    userPersonalNoteArray = jsonObject.getJSONArray("user_personal_note");
+//                                }else{
+//
+//                                }
                             }else if(access_token.equals("invalid")){
 
                             }else{
@@ -259,13 +300,17 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                 params.put("user_id", G_user_id);
 
                 params.put("note", note_array.toString());
-                params.put("public_private", "public");
+                params.put("public_private", public_or_private);
                 return params;
             }
         };
         queue.add(stringRequest);
     }
+    //여기까지는 note에 해당하는 매소드들이다.
 
+
+
+    //아래ㄴ부터는 공통통
     private void toolbar(String title){
         Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
         setSupportActionBar(tb);
@@ -283,8 +328,9 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        finish();
         super.onBackPressed();
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
 
 

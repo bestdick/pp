@@ -11,6 +11,11 @@ public class TestYearOrderList {
     String published_num;
     String navi_selection;
 
+    String total_taker;
+    String pass_count;
+    String fail_count;
+    String percent;
+
     public String getExam_code() {
         return exam_code;
     }
@@ -51,13 +56,48 @@ public class TestYearOrderList {
         this.navi_selection = navi_selection;
     }
 
-    public TestYearOrderList(String exam_code, String exam_name, String published_year, String published_num, String navi_selection){
+    public String getTotal_taker() {
+        return total_taker;
+    }
+
+    public void setTotal_taker(String total_taker) {
+        this.total_taker = total_taker;
+    }
+
+    public String getPass_count() {
+        return pass_count;
+    }
+
+    public void setPass_count(String pass_count) {
+        this.pass_count = pass_count;
+    }
+
+    public String getFail_count() {
+        return fail_count;
+    }
+
+    public void setFail_count(String fail_count) {
+        this.fail_count = fail_count;
+    }
+
+    public String getPercent() {
+        return percent;
+    }
+
+    public void setPercent(String percent) {
+        this.percent = percent;
+    }
+
+    public TestYearOrderList(String exam_code, String exam_name, String published_year, String published_num, String navi_selection, String total_taker, String pass_count, String fail_count, String percent) {
         this.exam_code = exam_code;
         this.exam_name = exam_name;
         this.published_year = published_year;
         this.published_num = published_num;
         this.navi_selection = navi_selection;
+        this.total_taker = total_taker;
+        this.pass_count = pass_count;
+        this.fail_count = fail_count;
+        this.percent = percent;
     }
-
 
 }
