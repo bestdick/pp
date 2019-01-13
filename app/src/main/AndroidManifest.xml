@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".GlobalApplication"
         android:allowBackup="true"
@@ -18,15 +23,15 @@
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
-        <!--<meta-data-->
-            <!--android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-            <!--android:value="ca-app-pub-9203333069147351~3494839374" />-->
-        <!--아래 sample 구굴꺼-->
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.gms.ads.APPLICATION_ID" -->
+        <!-- android:value="ca-app-pub-9203333069147351~3494839374" /> -->
+        <!-- 아래 sample 구굴꺼 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713" />
 
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".SelectExamActivity" />
         <activity android:name=".EnteranceActivity">
             <intent-filter>
@@ -43,7 +48,7 @@
             android:theme="@style/PersonalPageTheme" />
         <activity
             android:name=".ExamViewActivity"
-            android:theme="@style/ExamViewTheme"></activity>
+            android:theme="@style/ExamViewTheme" />
         <activity
             android:name=".ExamResultActivity"
             android:theme="@style/ExamViewTheme" />
@@ -61,8 +66,21 @@
         <activity
             android:name=".FlashCardWriteActivity"
             android:theme="@style/ExamViewTheme" />
-        <activity android:name=".JoinActivity"
+        <activity
+            android:name=".JoinActivity"
+            android:theme="@style/PersonalPageTheme" />
+        <activity android:name=".NewsActivity"
             android:theme="@style/PersonalPageTheme"/>
+
+        <!-- below is yalantis activity -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <!-- below is image cropper activity -->
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
 
 </manifest>

@@ -48,6 +48,8 @@ public class FlashcardAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         View v =View.inflate(context, R.layout.flashcard_list_container, null);
+        View v_empty = View.inflate(context, R.layout.container_flashcard_comment_empty, null);
+
         final String flashcard_db_id = list.get(i).getFlashcard_db_id();
         final String exam_code = list.get(i).getExam_code();
         final String exam_name = list.get(i).getExam_name();
@@ -62,6 +64,11 @@ public class FlashcardAdapter extends BaseAdapter {
         String first_term = list.get(i).getFlashcard_first_term();
 
 
+        if(flashcard_db_id==null && exam_code ==null && exam_name ==null && subject == null){
+            TextView empty_textView = (TextView) v_empty.findViewById(R.id.empty_textView);
+            empty_textView.setText("해당 시험에 플래시카드가 없습니다.\n플래시카드를 만들어 주세요");
+            return v_empty;
+        }else{
         TextView title_textView = (TextView) v.findViewById(R.id.flashcard_title_textView);
         TextView exam_name_textView = (TextView) v.findViewById(R.id.flashcard_exam_name_textView);
         TextView exam_name_subject_textView = (TextView) v.findViewById(R.id.flashcard_subject_textView);
@@ -106,6 +113,7 @@ public class FlashcardAdapter extends BaseAdapter {
         });
 
         return v;
+        }
     }
 
 

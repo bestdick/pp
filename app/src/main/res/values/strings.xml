@@ -11,9 +11,10 @@
     <string name="note_notice_string">*주의 사항 : 기출 문제 각 문제에 대한 노트를 만들 수 있습니다. 단, 노트를 저장하는 방식은 \"공개\" 또는 \"비공개\"방식이 존재합니다. \"공개\" 혹은 \"비공개\"로 저장하시면 해당 기줄문제에
     대한 모든 노트가 설정 값에 따라 \"공개\" 또는 \"비공개\"로 변경됩니다.</string>
     <string name="footer_string">created and designed by park and moon,\npowered by parkbros</string>
-    <string name="statistic_notice_string">회원 가입을 하시고 로그인 하시면 사용 할 수 있는 메뉴 입니다.\n
+    <string name="statistic_notice_string">*회원 가입을 하시고 로그인 하시면 사용 할 수 있는 메뉴 입니다.\n
     *해당 메뉴는 기출 시험을 완료하신 내용을 토대로 합격률을 나타내는 통계 메뉴입니다.\n
     *또한 기출 시험을 완료하신 각각의 기출 시험 정보를 제공해드립니다.</string>
+    <string name="statistic_notice_never_took_exam_string">*성적 통계가 존재하지 않습니다.</string>
     <string name="app_name">pp</string>
     <string name="term">수집되는 개인정보 사항
 ◈ 패스팝은 최적의 서비스를 제공하기 위해 회원가입 할때 기본적인 필수 정보를 수집하고 있으며 필요에 따라 추가 정보를 받고 있습니다.\n
@@ -40,6 +41,19 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_news">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
 
 
 </resources>

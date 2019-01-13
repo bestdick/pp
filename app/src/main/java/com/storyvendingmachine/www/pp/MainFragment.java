@@ -2,11 +2,14 @@ package com.storyvendingmachine.www.pp;
 
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -18,6 +21,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -26,6 +30,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,12 +67,14 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 
 
 public class MainFragment extends Fragment {
+    static ViewPager quiz_viewPager;
+    ProgressBar progressBar;
 
     int infoView_visible =-1;
     LinearLayout wrapper;
 
     View rootView;
-
+    static ArrayList<Integer> quizUserSelectedAnswers;
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
@@ -81,8 +88,8 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.main_fragment_progress_bar);
         wrapper = (LinearLayout) rootView.findViewById(R.id.fragment_main_container);
 
         if(exam_selection_code == "null"){
@@ -105,6 +112,7 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    // Below ---- this data fetch when user did not select exam
     public void getWithOutChoosingExamDate(){
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getAllExamSchedule,
@@ -114,21 +122,6 @@ public class MainFragment extends Fragment {
                         Log.e("exam not selected" , response);
 
                         try {
-//                            View dday_view_layout = getLayoutInflater().inflate(R.layout.h_scrollview_d_day_container, null);
-//                            LinearLayout dday_inner_wrapper = (LinearLayout) dday_view_layout.findViewById(R.id.horizontalScrollView_dday_cointainer);
-//
-//
-//                            View exam_info_container_view = getLayoutInflater().inflate(R.layout.exam_info_container, null);
-//                            LinearLayout inner_wrapper = (LinearLayout) exam_info_container_view.findViewById(R.id.ExamInfoContainer);
-//
-//                            TextView examName = (TextView) exam_info_container_view.findViewById(R.id.ExamNameTextView);
-//                            ImageView infoDropImageView = (ImageView) exam_info_container_view.findViewById(R.id.examInfoDropImageView);
-//                            examName.setText("시험 일정");
-//
-//                            examInfoDropDown(examName, infoDropImageView, inner_wrapper);
-
-
-
 
                             JSONArray ddayjsonArray = new JSONArray();
 
@@ -208,7 +201,7 @@ public class MainFragment extends Fragment {
                                             remain_doc.setText(doc_remain_days); //  필기 남은 날
                                         }
                                         String prac_remain_days = remaindays(exam_prac_exam__start);
-                                        ddayjsonObject.put("pracRemain", doc_remain_days);//jsonobject
+                                        ddayjsonObject.put("pracRemain", prac_remain_days);//jsonobject
                                         if (prac_remain_days.equals("end_exam")) {
                                             //만약 이미 종료된 시험일때
                                             remain_prac.setText("종료");// 실기 남은 날
@@ -350,27 +343,17 @@ public class MainFragment extends Fragment {
         queue.add(stringRequest);
 
     }
+
+    // Below ---- this data fetch when user select exam
     public void getExamInfo(){
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getExamInfo,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("log in exam info" , response);
+                        Log.e("getExaminfo" , response);
 
                         try {
-//                            View dday_view_layout = getLayoutInflater().inflate(R.layout.h_scrollview_d_day_container, null);
-//                            LinearLayout dday_inner_wrapper = (LinearLayout) dday_view_layout.findViewById(R.id.horizontalScrollView_dday_cointainer);
-//
-//                            View exam_info_container_view = getLayoutInflater().inflate(R.layout.exam_info_container, null);
-//                            LinearLayout inner_wrapper = (LinearLayout) exam_info_container_view.findViewById(R.id.ExamInfoContainer);
-//
-//                            TextView examName = (TextView) exam_info_container_view.findViewById(R.id.ExamNameTextView);
-//                            ImageView infoDropImageView = (ImageView) exam_info_container_view.findViewById(R.id.examInfoDropImageView);
-//                            examName.setText(exam_selection_name + "시험 일정");
-
-//                            examInfoDropDown(examName, infoDropImageView, inner_wrapper);
-
                             JSONArray ddayjsonArray = new JSONArray();
 
                             JSONObject jsonObject = new JSONObject(response);
@@ -436,7 +419,6 @@ public class MainFragment extends Fragment {
                                         exam_title.setText(title);//시험 회차 이름
 
                                         String doc_remain_days = remaindays(docExamStartDt);
-
                                         ddayjsonObject.put("docRemain", doc_remain_days);//jsonobject
 
                                         if (doc_remain_days.equals("end_exam")) {
@@ -448,9 +430,9 @@ public class MainFragment extends Fragment {
                                             //d아직 종료되지 않은 시험
                                             remain_doc.setText(doc_remain_days); //  필기 남은 날
                                         }
-                                        String prac_remain_days = remaindays(pracExamStartDt);
 
-                                        ddayjsonObject.put("pracRemain", doc_remain_days);//jsonobject
+                                        String prac_remain_days = remaindays(pracExamStartDt);
+                                        ddayjsonObject.put("pracRemain", prac_remain_days);//jsonobject
 
                                         if (prac_remain_days.equals("end_exam")) {
                                             //만약 이미 종료된 시험일때
@@ -461,7 +443,7 @@ public class MainFragment extends Fragment {
                                             // 아직 종료되지 않은 시험
                                             remain_prac.setText(prac_remain_days);// 실기 남은 날
                                         }
-
+                                        Log.e("필기 / 실기::", doc_remain_days+"////"+prac_remain_days);
                                         ddayjsonArray.put(ddayjsonObject);
 
 //                                    dday_inner_wrapper.addView(dday_element_view);
@@ -706,70 +688,99 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
 
-                        Log.e("announcement :::" , response);
+                        Log.e("Quiz response :::" , response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String access = jsonObject.getString("access");
                             if(access.equals("valid")){
-                                final JSONArray jsonArray = jsonObject.getJSONArray("response");
-                                final int count = jsonArray.length();
+                                String existence_of_test =jsonObject.getString("existence_of_test");
+                                if(existence_of_test.equals("false")){
+                                    Log.e("test exist? :::" , existence_of_test);
+                                }else{
+                                    final String today = jsonObject.getString("today");
+                                    final JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                    final int count = (jsonArray.length()+1);
+                                    JSONObject display_info_jsonObject = jsonObject.getJSONObject("display_info");
+                                    String average_percent = display_info_jsonObject.getString("average_percent");
+                                    String total_takers = display_info_jsonObject.getString("total_takers");
+
+                                    Log.e("percent taker", String.valueOf(average_percent)+"//"+String.valueOf(total_takers));
+                                    View container_today_quiz = getLayoutInflater().inflate(R.layout.container_today_quiz, null);
+                                    wrapper.addView(container_today_quiz);
+                                    TextView today_quiz_date_textView = (TextView) container_today_quiz.findViewById(R.id.today_quiz_date_textView);
+                                    TextView see_more_textView = (TextView) container_today_quiz.findViewById(R.id.see_more_textView);
+                                    TextView today_quiz_exam_title_textview = (TextView) container_today_quiz.findViewById(R.id.today_quiz_exam_title_textview);
+                                    TextView take_quiz_textView =(TextView)  container_today_quiz.findViewById(R.id.take_quiz_textView);
+                                    TextView quiz_total_takers_textView =(TextView)  container_today_quiz.findViewById(R.id.quiz_total_takers_textView);
+                                    TextView quiz_average_percent_textView =(TextView)  container_today_quiz.findViewById(R.id.quiz_average_percent_textView);
+                                    today_quiz_date_textView.setText(period_between_date(today));
+                                    today_quiz_exam_title_textview.setText(exam_selection_name);
+                                    String quiz_total_takers_str = "퀴즈 응시자 "+total_takers+" 명";
+                                    quiz_total_takers_textView.setText(quiz_total_takers_str);
+                                    String quiz_average_percent_str = "평균 점수 "+average_percent+" %";
+                                    quiz_average_percent_textView.setText(quiz_average_percent_str);
+
+                                    see_more_textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                            intent.putExtra("enter_method", "QUIZ");
+                                            startActivity(intent);
+                                            slide_left_and_slide_in();
+                                        }
+                                    });
+
+                                    take_quiz_textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            quizUserSelectedAnswers = new ArrayList<Integer>();
+                                            progressbar_visible();
+                                            new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                                                @Override
+                                                public void run() {
+                                                    progressbar_invisible();
+                                                }
+                                            }, 1500); // 2.5초 후에 실행됨
+                                            final ConstraintLayout quiz_display_container = (ConstraintLayout) rootView.findViewById(R.id.quiz_display_container);
+
+                                            slideUp(quiz_display_container);
+                                            ImageView close_imageView = (ImageView) rootView.findViewById(R.id.close_imageView);
+//                                        TextView submit_textView = (TextView) rootView.findViewById(R.id.submit_textView);
+                                            TextView close_textView = (TextView) rootView.findViewById(R.id.close_textView);
+
+                                            quiz_viewPager = (ViewPager) rootView.findViewById(R.id.quiz_container);
+                                            QuizViewPagerAdapter adapter = new QuizViewPagerAdapter(getActivity().getSupportFragmentManager());
+                                            adapter.count= count;
+                                            adapter.jsonArray = jsonArray;
+                                            adapter.today = today;
+                                            quiz_viewPager.setAdapter(adapter);
+                                            quiz_viewPager.setOffscreenPageLimit(count);
+                                            quiz_viewPager.setPageMargin(8);
 
 
-                                View container_today_quiz = getLayoutInflater().inflate(R.layout.container_today_quiz, null);
-                                wrapper.addView(container_today_quiz);
-                                TextView see_more_textView = (TextView) container_today_quiz.findViewById(R.id.see_more_textView);
-                                TextView today_quiz_exam_title_textview = (TextView) container_today_quiz.findViewById(R.id.today_quiz_exam_title_textview);
-                                TextView take_quiz_textView =(TextView)  container_today_quiz.findViewById(R.id.take_quiz_textView);
-                                today_quiz_exam_title_textview.setText(exam_selection_name);
-                                take_quiz_textView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        final ConstraintLayout quiz_display_container = (ConstraintLayout) rootView.findViewById(R.id.quiz_display_container);
-//                                        quiz_display_container.setVisibility(View.VISIBLE);
-                                        slideUp(quiz_display_container);
-                                        ImageView close_imageView = (ImageView) rootView.findViewById(R.id.close_imageView);
-                                        TextView submit_textView = (TextView) rootView.findViewById(R.id.submit_textView);
-                                        TextView close_textView = (TextView) rootView.findViewById(R.id.close_textView);
 
-                                        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.quiz_container);
-                                        QuizViewPagerAdapter adapter = new QuizViewPagerAdapter(getActivity().getSupportFragmentManager());
-                                        adapter.count= count;
-                                        adapter.jsonArray = jsonArray;
-                                        viewPager.setAdapter(adapter);
-                                        viewPager.setOffscreenPageLimit(count);
-                                        viewPager.setPageMargin(8);
-
-
-
-                                        close_imageView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                slideDown(quiz_display_container);
+                                            close_imageView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    slideDown(quiz_display_container);
 //                                                quiz_display_container.setVisibility(View.INVISIBLE);
 
-                                            }
-                                        });
-
-                                        close_textView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                slideDown(quiz_display_container);
+                                                }
+                                            });
+                                            close_textView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    slideDown(quiz_display_container);
 //                                                quiz_display_container.setVisibility(View.INVISIBLE);
-                                            }
-                                        });
-                                    }
-                                });
-
-
-//                                JSONArray jsonArray = jsonObject.getJSONArray("response");
-//                                for(int i = 0 ; i<jsonArray.length(); i++){
-//                                    View container_today_quiz_inner_element = getLayoutInflater().inflate(R.layout.container_today_quiz_inner_element, null);
-//
-//                                    ll.addView(container_today_quiz_inner_element);
-//                                }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
                             }
                             BackgroundTask backgroundTask = new BackgroundTask();
                             backgroundTask.execute();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -795,6 +806,7 @@ public class MainFragment extends Fragment {
         };
         queue.add(stringRequest);
     }
+
     public void getNewsAndAnnouncement(){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getNewsAndAnnouncement.php";
@@ -809,8 +821,18 @@ public class MainFragment extends Fragment {
                             String access = jsonObject.getString("access");
                             if(access.equals("valid")){
                                 View container_news = getLayoutInflater().inflate(R.layout.container_news, null);
-                                TextView see_more_textView = (TextView) container_news.findViewById(R.id.see_more_textView);
                                 LinearLayout ll = container_news.findViewById(R.id.news_announcement_linearLayout);
+                                TextView see_more_textView = (TextView) container_news.findViewById(R.id.see_more_textView);
+
+                                see_more_textView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                        intent.putExtra("enter_method", "ALL");
+                                        startActivity(intent);
+                                        slide_left_and_slide_in();
+                                    }
+                                });
                                 wrapper.addView(container_news);
 
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
@@ -821,7 +843,7 @@ public class MainFragment extends Fragment {
                                     TextView new_title_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_textView);
                                     TextView upload_date_textView = (TextView) container_news_inner_element.findViewById(R.id.upload_date_textView);
 
-                                    String key = jsonArray.getJSONObject(i).getString("key");
+                                    final String key = jsonArray.getJSONObject(i).getString("key");
                                     String type = jsonArray.getJSONObject(i).getString("type");
                                     String title = jsonArray.getJSONObject(i).getString("title");
                                     String content = jsonArray.getJSONObject(i).getString("content");
@@ -845,6 +867,17 @@ public class MainFragment extends Fragment {
                                     }
                                     new_title_textView.setText(title);
                                     upload_date_textView.setText(upload_date);
+                                    final String temp_i = String.valueOf(i);
+                                    container_news_inner_element.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                            intent.putExtra("enter_method", "ONE");
+                                            intent.putExtra("key", temp_i);
+                                            startActivity(intent);
+                                            slide_left_and_slide_in();
+                                        }
+                                    });
 
                                     ll.addView(container_news_inner_element);
                                 }
@@ -868,10 +901,23 @@ public class MainFragment extends Fragment {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
+                params.put("limit", "true");
                 return params;
             }
         };
         queue.add(stringRequest);
+    }
+
+    public String period_between_date(String date){
+        String temp = "";
+        for(int i = 0 ; i < date.length(); i++){
+            if(i == 3 || i ==5){
+                temp += date.charAt(i)+".";
+            }else {
+                temp += date.charAt(i);
+            }
+        }
+        return temp;
     }
 //    background task
 public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
@@ -937,5 +983,16 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
 //        animate.setFillAfter(true);
         view.startAnimation(animate);
         view.setVisibility(View.INVISIBLE);
+    }
+    public void slide_left_and_slide_in(){//opening new activity
+        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+    public void progressbar_visible(){
+        progressBar.setVisibility(View.VISIBLE);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+    public void progressbar_invisible(){
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 }

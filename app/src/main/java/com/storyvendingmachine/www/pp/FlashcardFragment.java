@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -65,6 +66,8 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
     int page;
     int total_query_count;
 
+    View rootView;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     Button  menu_one, menu_two, menu_three;
     TextView see_more_textView;
@@ -78,7 +81,8 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_flashcard, container, false);
+
+        rootView = inflater.inflate(R.layout.fragment_flashcard, container, false);
         page = 0;
         flashcard_menu = 0;// flashcard menu 0 은 기분  1 은 인기순, 2는 과목
 
@@ -259,7 +263,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 
     }
     public void swiper(View RootView){
-        final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) RootView.findViewById(R.id.FragmentFlashcardSwiperLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) RootView.findViewById(R.id.FragmentFlashcardSwiperLayout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -490,32 +494,43 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                             if(access.equals("valid")){
                                 // access valid
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
-                                for(int i = 0 ; i< jsonArray.length(); i++){
-                                    String fc_db_id = jsonArray.getJSONObject(i).getString("flashcard_db_id");
-                                    String fc_exam_code = jsonArray.getJSONObject(i).getString("exam_code");
-                                    String fc_exam_name = jsonArray.getJSONObject(i).getString("exam_name");
-                                    String fc_subject_code = jsonArray.getJSONObject(i).getString("subject_code");
-                                    String fc_subject_name = jsonArray.getJSONObject(i).getString("subject_name");
-                                    String fc_author_login_type = jsonArray.getJSONObject(i).getString("author_login_type");
-                                    String fc_author_id = jsonArray.getJSONObject(i).getString("author_id");
-                                    String fc_author_nickname = jsonArray.getJSONObject(i).getString("author_nickname");
-                                    String fc_upload_date = jsonArray.getJSONObject(i).getString("upload_date");
-                                    String fc_upload_time = jsonArray.getJSONObject(i).getString("upload_time");
-                                    String fc_comment_count = jsonArray.getJSONObject(i).getString("comment_count");
-                                    String fc_flashcard_hit = jsonArray.getJSONObject(i).getString("flashcard_hit");
-                                    String fc_flashcard_scrap = jsonArray.getJSONObject(i).getString("flashcard_scrap");
-                                    String fc_flashcard_like = jsonArray.getJSONObject(i).getString("flashcard_like");
-                                    String fc_flashcard_title = jsonArray.getJSONObject(i).getString("flashcard_title");
-                                    String fc_flashcard_count = jsonArray.getJSONObject(i).getString("flashcard_count");
-                                    String fc_flashcard_first_term = jsonArray.getJSONObject(i).getString("flashcard_first_term");
+                                if(total_query_count == 0){
+                                    //flashcard 가 존재하지 않을때.
+//                                    FlashCardList elements = new FlashCardList(null, null, null, null, null, null,
+//                                            null, null, null, null, null, null, null, null, null, null);
+//                                    flashcard_list.add(elements);
+//                                    flashcard_adapter.notifyDataSetChanged();
+                                    LinearLayout menu_linearLayout = (LinearLayout) rootView.findViewById(R.id.linearLayout);
+                                    menu_linearLayout.setVisibility(View.INVISIBLE);
+                                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                                    ConstraintLayout empty_conLayout = (ConstraintLayout) rootView.findViewById(R.id.empty_conLayout);
+                                    empty_conLayout.setVisibility(View.VISIBLE);
+                                }else{
+                                    for(int i = 0 ; i< jsonArray.length(); i++){
+                                        String fc_db_id = jsonArray.getJSONObject(i).getString("flashcard_db_id");
+                                        String fc_exam_code = jsonArray.getJSONObject(i).getString("exam_code");
+                                        String fc_exam_name = jsonArray.getJSONObject(i).getString("exam_name");
+                                        String fc_subject_code = jsonArray.getJSONObject(i).getString("subject_code");
+                                        String fc_subject_name = jsonArray.getJSONObject(i).getString("subject_name");
+                                        String fc_author_login_type = jsonArray.getJSONObject(i).getString("author_login_type");
+                                        String fc_author_id = jsonArray.getJSONObject(i).getString("author_id");
+                                        String fc_author_nickname = jsonArray.getJSONObject(i).getString("author_nickname");
+                                        String fc_upload_date = jsonArray.getJSONObject(i).getString("upload_date");
+                                        String fc_upload_time = jsonArray.getJSONObject(i).getString("upload_time");
+                                        String fc_comment_count = jsonArray.getJSONObject(i).getString("comment_count");
+                                        String fc_flashcard_hit = jsonArray.getJSONObject(i).getString("flashcard_hit");
+                                        String fc_flashcard_scrap = jsonArray.getJSONObject(i).getString("flashcard_scrap");
+                                        String fc_flashcard_like = jsonArray.getJSONObject(i).getString("flashcard_like");
+                                        String fc_flashcard_title = jsonArray.getJSONObject(i).getString("flashcard_title");
+                                        String fc_flashcard_count = jsonArray.getJSONObject(i).getString("flashcard_count");
+                                        String fc_flashcard_first_term = jsonArray.getJSONObject(i).getString("flashcard_first_term");
 
-
-
-                                    FlashCardList elements = new FlashCardList(fc_db_id, fc_exam_code, fc_exam_name, fc_subject_name, fc_author_login_type, fc_author_id,
-                                            fc_author_nickname, fc_upload_date, fc_upload_time, fc_flashcard_scrap, fc_comment_count, fc_flashcard_hit, fc_flashcard_like, fc_flashcard_title, fc_flashcard_count, fc_flashcard_first_term);
-                                    flashcard_list.add(elements);
+                                        FlashCardList elements = new FlashCardList(fc_db_id, fc_exam_code, fc_exam_name, fc_subject_name, fc_author_login_type, fc_author_id,
+                                                fc_author_nickname, fc_upload_date, fc_upload_time, fc_flashcard_scrap, fc_comment_count, fc_flashcard_hit, fc_flashcard_like, fc_flashcard_title, fc_flashcard_count, fc_flashcard_first_term);
+                                        flashcard_list.add(elements);
+                                    }
+                                    flashcard_adapter.notifyDataSetChanged();
                                 }
-                                flashcard_adapter.notifyDataSetChanged();
                             }else{
                                 //access invalid
                             }

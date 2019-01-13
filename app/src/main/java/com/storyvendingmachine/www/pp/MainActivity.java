@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity{
 
             logintype_textView.setText("passpop");
 
+            getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
             user_thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -433,6 +434,7 @@ public class MainActivity extends AppCompatActivity{
                     Log.e("result 10002", "cancel");
                 }
         }else if(requestCode == 10003){
+            //this requestCode is from LoggedInActivity
             Log.e("result 10003", String.valueOf(requestCode));
 
             if (resultCode == RESULT_OK) {
@@ -463,6 +465,11 @@ public class MainActivity extends AppCompatActivity{
 
             }else if(resultCode == RESULT_CANCELED){
                 Log.e("result 10003", "cancel");
+                if(G_user_thumbnail.equals("null") || G_user_thumbnail.length() <=0 ){
+                    user_thumbnail.setImageResource(R.drawable.user_thumbnail_icon);
+                }else{
+                    getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+                }
             }
         }else if(resultCode == RESULT_OK){
             

@@ -2,10 +2,16 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,11 +20,14 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdListener;
@@ -26,12 +35,21 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.kakao.auth.Session;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.UCrop;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +65,15 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 public class LoggedInActivity extends AppCompatActivity {
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
+
+    final int REQUEST_CODE_IMAGE = 8081;
+
+    private Uri mDestinationUri;
+    private static final String SAMPLE_CROPPED_IMAGE_NAME = "SampleCropImage.jpeg";
+
+    ImageView user_thumbnail_imageView;
+
+
 
     public void ad(){
         AdView mAdView = findViewById(R.id.adView);
@@ -96,8 +123,10 @@ public class LoggedInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_in);
 
+        mDestinationUri = Uri.fromFile(new File(getCacheDir(), SAMPLE_CROPPED_IMAGE_NAME));
+
         ad();
-        ImageView user_thumbnail_imageView = (ImageView) findViewById(R.id.user_thumbnail_imageView);
+        user_thumbnail_imageView = (ImageView) findViewById(R.id.user_thumbnail_imageView);
         TextView login_type_textView = (TextView) findViewById(R.id.login_type_textView);
         TextView user_nickname_textView = (TextView) findViewById(R.id.user_nickname_textView);
         TextView join_date_textView = (TextView) findViewById(R.id.join_date_textView);
@@ -106,6 +135,8 @@ public class LoggedInActivity extends AppCompatActivity {
         user_kakao_normal_info(login_type_textView, user_nickname_textView, join_date_textView, study_exam_name_textView, user_thumbnail_imageView);
         toolbar();
         logoutProcess();
+
+
 
     }
 
@@ -120,6 +151,14 @@ public class LoggedInActivity extends AppCompatActivity {
             user_nickname_textView.setText(G_user_nickname+" ( "+ G_user_id +" ) ");
             getThumbnailImageForAuthor(user_thumbnail_imageView, G_user_thumbnail);
             getUserInfo(join_date_textView, study_exam_name_textView);
+
+            user_thumbnail_imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");                    startActivityForResult(photoPickerIntent, REQUEST_CODE_IMAGE);
+                }
+            });
         }else{
             //로그인 타입 // 정해지지 않음
         }
@@ -171,6 +210,7 @@ public class LoggedInActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
     public void getThumbnailImageForAuthor(ImageView imageView, String url){
+        imageView.setImageDrawable(null);
         if(url.equals("null") || url.length() <=0){
             imageView.setImageResource(R.drawable.icon_empty_thumbnail);
         }else{
@@ -233,6 +273,141 @@ public class LoggedInActivity extends AppCompatActivity {
         });
 
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if(requestCode == REQUEST_CODE_IMAGE){
+//            Uri selectedImage = data.getData();
+//            UCrop.of(selectedImage, selectedImage)
+////                    .withAspectRatio(16, 9)
+////                    .withMaxResultSize(124, 124)
+//                    .start(this);
+//            try {
+//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+//            } catch (IOException e) {
+//                Log.i("TAG", "Some exception " + e);
+//            }
+//        }else{
+//            if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+//                final Uri resultUri = UCrop.getOutput(data);
+//                Log.e("image result uri :", resultUri.toString());
+//            } else if (resultCode == UCrop.RESULT_ERROR) {
+//                final Throwable cropError = UCrop.getError(data);
+//            }
+//        }
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_IMAGE) {
+                final Uri selectedUri = data.getData();
+                if (selectedUri != null) {
+                    startCropActivity(data.getData());
+                    Log.e("e", "selected uri is not empty ");
+                } else {
+                    Toast.makeText(LoggedInActivity.this,
+                            "cannot retrive select image",
+                            Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == UCrop.REQUEST_CROP) {
+                // 여기서 이미지를 자르고 회전하고 한 이미지를 받아오는 곳이다.
+                //아래 handleCropResult 가 그 처리를 한다.
+                handleCropResult(data);
+                Log.e("e", "selected handling crop result ");
+            }
+        }
+        if (resultCode == UCrop.RESULT_ERROR) {
+//            handleCropError(data);
+            Toast.makeText(this, "crop error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void startCropActivity(@NonNull Uri uri) {
+        UCrop uCrop = UCrop.of(uri, mDestinationUri);
+//        uCrop = _setRatio(uCrop, RATIO_ORIGIN, 0, 0);
+//        uCrop = _setSize(uCrop, 0, 0);
+//        uCrop = _advancedConfig(uCrop, FORMAT_JPEG, 90);
+        uCrop.start(this);
+    }
+
+//    private void handleCropResult(@NonNull final Intent result) {
+private void handleCropResult(final Intent result) {
+        final Uri resultUri = UCrop.getOutput(result);
+        if (resultUri != null) {
+            // ResultActivity.startWithUri(MainActivity.this, resultUri);
+            Toast.makeText(this, resultUri.toString(), Toast.LENGTH_SHORT).show();
+            user_thumbnail_imageView.setImageDrawable(null);
+            Picasso.with(this)
+                    .load(resultUri)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+                    .transform(new CircleTransform())
+                    .fit()
+                    .centerInside()
+                    .into(user_thumbnail_imageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            //온라인에 저장한다.
+                            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                            Date date = new Date();
+                            String today_date = dateFormat.format(date);
+                            try {
+                                Bitmap bitmap_image = MediaStore.Images.Media.getBitmap(LoggedInActivity.this.getContentResolver(), resultUri);
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                bitmap_image.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream);
+                                String encoded_image = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+                                JSONObject jsonObject = new JSONObject();
+                                String image_name = "thumbnail_"+G_user_id+"_"+today_date+".JPEG";
+                                G_user_thumbnail = "http://www.joonandhoon.com/pp/PassPop/android/server/thumbnail/"+image_name;
+                                try {
+                                    Log.e("name", image_name);
+                                    Log.e("image", encoded_image);
+
+                                    jsonObject.put("name", image_name);
+                                    jsonObject.put("image", encoded_image);
+//                                    jsonObject.put("login_type", LoginType);
+                                    jsonObject.put("user_id", G_user_id);
+                                    upload_user_thumbnail(jsonObject);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        @Override
+                        public void onError() {
+                            Log.e("load image", "fail to load images ");
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "crop cannot retrieve select image", Toast.LENGTH_SHORT).show();
+//            user_thumbnail_imageView.setImageURI(resultUri);
+        }
+    }
+
+    public void upload_user_thumbnail(JSONObject jsonObject){
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/UploadUserThumbnail.php";
+        JsonObjectRequest jsonObjectRequest =new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+
+                            Log.e("thumbnail message succ", jsonObject.toString());
+
+                    }
+                }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    Log.e("thumbnail message fail", volleyError.getMessage());
+                }
+        });
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy( 5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        Volley.newRequestQueue(LoggedInActivity.this).add(jsonObjectRequest);
+    }
+
+
+
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         return super.onCreateOptionsMenu(menu);

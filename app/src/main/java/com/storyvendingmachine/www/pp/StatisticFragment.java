@@ -53,9 +53,18 @@ import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
+import static com.storyvendingmachine.www.pp.MainActivity.getScreenHeight;
 
 public class StatisticFragment extends Fragment {
-    PieChart pieChart;
+
+    //
+    //      ConstraintLayout id = "guest_notifier" can be visible when login as guest or also there are no exam that user taken
+    //              if user have not take exam than text view must be set.
+    //
+
+
+
+
     TextView title_textView, second_title_textView, never_took_exam_textView;
     LinearLayout statistic_exam_result_container, subject_result_container;
     final int EXAM_RESULT_LINEARLAOUT_TAG_BASE =90000;
@@ -94,7 +103,7 @@ public class StatisticFragment extends Fragment {
             guest_initializer(rootview);
         }else{
             //로그인 한 상태
-            pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+
             if(exam_selection_code.equals("null")){
                 //처음 가입했을때 시험을 선택하지 않았을떄...
                 no_exam_select_initializer(rootview);
@@ -136,7 +145,7 @@ public class StatisticFragment extends Fragment {
         subject_result_container = (LinearLayout) rootview.findViewById(R.id.subject_result_container);
 
 
-        String title_str = "현재 공부중인 시험 \n\""+exam_selection_name+"\"\n기출 시험 통계";
+        String title_str = "현재 공부중인 시험 《 "+exam_selection_name+" 》 기출 시험 통계";
         title_textView.setText(title_str);
     }
     public void swiper(final View rootview){
@@ -221,7 +230,15 @@ public class StatisticFragment extends Fragment {
 
                         title_textView.setText(exam_name+" "+exam_placed_year+"년 "+" "+exam_placed_round+"회 성적");
                         date_time_textView.setText(date_user_took_exam+" "+time_user_took_exam);
-                        pass_textView.setText(pass);
+                        if(pass.equals("pass")){
+                            //pass일때
+                            pass_textView.setText("합격");
+                        }else{
+                            // fail 일떄
+                            pass_textView.setText("불합격");
+                            pass_textView.setBackground(getResources().getDrawable(R.drawable.outline_cornered_red));
+                        }
+
 
                         see_more_textView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -287,97 +304,59 @@ public class StatisticFragment extends Fragment {
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
-                                JSONArray jsonArray_array_by_each_exam = jsonObject.getJSONArray("array_by_each_exam");
-                                behaveLike_expandableListview(rootview, jsonArray_array_by_each_exam);
-
-                                JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
-                                JSONArray jsonArray_for_subject_pie = jsonObject.getJSONArray("response_for_subjectpiechart");
-//                                for(int i = 0 ; i <jsonArray.length(); i++){
-//                                    String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
-//                                    String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
-//                                    String exam_placed_year = jsonArray.getJSONObject(i).getString("exam_placed_year");
-//                                    String exam_placed_round = jsonArray.getJSONObject(i).getString("exam_placed_round");
-//                                    String date_user_took_exam = jsonArray.getJSONObject(i).getString("date_user_took_exam");
-//                                    String time_user_took_exam = jsonArray.getJSONObject(i).getString("time_user_took_exam");
-//                                    String time_duration = jsonArray.getJSONObject(i).getString("time_duration");
-//                                    String pass = jsonArray.getJSONObject(i).getString("pass");
-//
-//                                    String correct_count = jsonArray.getJSONObject(i).getJSONArray("total_score").getString(0);
-//                                    String total_question = jsonArray.getJSONObject(i).getJSONArray("total_score").getString(1);
-//
-//                                    View transcript_container = getLayoutInflater().inflate(R.layout.container_statistic_exam_result, null);
-//                                    TextView transcript_title = (TextView)transcript_container.findViewById(R.id.title_textView);
-//                                    TextView exam_took_date_textView = (TextView) transcript_container.findViewById(R.id.exam_took_date_textView);
-//                                    LinearLayout transcript_subject_container = (LinearLayout) transcript_container.findViewById(R.id.subject_container);
-//                                    TextView pass_textView = (TextView)transcript_container.findViewById(R.id.pass_textView);
-//
-//
-//                                    transcript_title.setText(exam_name+" "+ exam_placed_year+" 년도 "+exam_placed_round + "회");
-//                                    exam_took_date_textView.setText(date_user_took_exam+" "+time_user_took_exam);
-//                                    if(pass.equals("fail")){
-//                                        pass_textView.setBackground(getResources().getDrawable(R.drawable.outline_cornered_red));
-//                                        pass_textView.setText("불합격");
-//                                    }else{
-//                                        pass_textView.setBackground(getResources().getDrawable(R.drawable.outline_cornered_green));
-//                                        pass_textView.setText("합격");
-//                                    }
-//
-//
-//                                    statistic_exam_result_container.addView(transcript_container);
-//
-//                                    JSONArray subjectjsonArray = jsonArray.getJSONObject(i).getJSONArray("subject_score_json");
-//                                        for(int j = 0 ; j < subjectjsonArray.length(); j++){
-//                                            String subject_name = subjectjsonArray.getJSONObject(j).getString("subject");
-//                                            String subject_correct = subjectjsonArray.getJSONObject(j).getString("correct_count");
-//                                            String subject_total = subjectjsonArray.getJSONObject(j).getString("total_count");
-//
-//                                            View subject_container = getLayoutInflater().inflate(R.layout.inner_container_statistic_exam_result_element, null);
-//                                            TextView subjectname_textView  = (TextView) subject_container.findViewById(R.id.subject_name_textView);
-//                                            TextView subjectscore_textView  = (TextView) subject_container.findViewById(R.id.subject_score_textView);
-//
-//                                            subjectname_textView.setText(subject_name);
-//                                            subjectscore_textView.setText(subject_correct+"/"+subject_total);
-//                                            transcript_subject_container.addView(subject_container);
-//
-//
-//                                        }
-//                                }
-//subject pie chart
-                                for(int i = 0 ; i<jsonArray_for_subject_pie.length(); i++){
-                                    String pie_subject_name = jsonArray_for_subject_pie.getJSONObject(i).getString("subject_name");
-                                    String pie_pass_count = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_count");
-                                    String pass_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_percent");
-                                    String fail_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("fail_percent");
-
-                                    Log.e("percent", "pass ::" +pass_percent+ "/// fail ::"+fail_percent);
-
-                                    View subject_pieView = getLayoutInflater().inflate(R.layout.container_subject_pie_chart, null);
-                                    TextView subject_title_textView = (TextView) subject_pieView.findViewById(R.id.subject_title_textView);
-                                    PieChart subject_pieChart = (PieChart) subject_pieView.findViewById(R.id.subject_piechart);
-                                    pieChart_subject(subject_pieChart, Integer.parseInt(pass_percent),Integer.parseInt(fail_percent));//casting pie chart for subject
-                                    subject_title_textView.setText(pie_subject_name);
-
-                                    subject_result_container.addView(subject_pieView);
-
-                                }
-// total pie chart
-                                String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
-                                String second_title_str = "성적표\n"+exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
-                                second_title_textView.setText(second_title_str);
-                                String pass = jsonObject_for_pie.getString("pass");
-                                String fail = jsonObject_for_pie.getString("fail");
-                                String percent_pass = jsonObject_for_pie.getString("percent_pass");
-                                String percent_fail = jsonObject_for_pie.getString("percent_fail");
-
-                                if(Integer.parseInt(user_taken_exam_count) == 0){
-                                    //시험을 응시한적이 없을떄
-                                    never_took_exam_textView.setVisibility(View.VISIBLE);
-                                    pieChart.setVisibility(View.GONE);
-                                    statistic_exam_result_container.setVisibility(View.GONE);
-                                    subject_result_container.setVisibility(View.GONE);
+                                if(jsonArray.length() == 0){
+                                    SwipeRefreshLayout swiper_layout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper_layout);
+                                    swiper_layout.setVisibility(View.GONE);
+                                    ConstraintLayout guest_notifier = (ConstraintLayout) rootview.findViewById(R.id.guest_notifier);
+                                    guest_notifier.setVisibility(View.VISIBLE);
+                                    TextView guest_notifer_textView = (TextView) rootview.findViewById(R.id.guest_notifer_textView);
+                                    guest_notifer_textView.setText(getResources().getString(R.string.statistic_notice_never_took_exam_string));
                                 }else{
-                                    //한번이라도 시험을 응시했을때
-                                    pieChart(rootview, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                    JSONArray jsonArray_array_by_each_exam = jsonObject.getJSONArray("array_by_each_exam");
+                                    behaveLike_expandableListview(rootview, jsonArray_array_by_each_exam);
+
+                                    JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
+                                    JSONArray jsonArray_for_subject_pie = jsonObject.getJSONArray("response_for_subjectpiechart");
+
+    //subject pie chart
+                                    for(int i = 0 ; i<jsonArray_for_subject_pie.length(); i++){
+                                        String pie_subject_name = jsonArray_for_subject_pie.getJSONObject(i).getString("subject_name");
+                                        String pie_pass_count = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_count");
+                                        String pass_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_percent");
+                                        String fail_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("fail_percent");
+
+                                        Log.e("percent", "pass ::" +pass_percent+ "/// fail ::"+fail_percent);
+
+                                        View subject_pieView = getLayoutInflater().inflate(R.layout.container_subject_pie_chart, null);
+                                        TextView subject_title_textView = (TextView) subject_pieView.findViewById(R.id.subject_title_textView);
+                                        PieChart subject_pieChart = (PieChart) subject_pieView.findViewById(R.id.subject_piechart);
+                                        pieChart_subject(subject_pieChart, Integer.parseInt(pass_percent),Integer.parseInt(fail_percent));//casting pie chart for subject
+                                        subject_title_textView.setText(pie_subject_name);
+
+                                        subject_result_container.addView(subject_pieView);
+
+                                    }
+    // total pie chart
+                                    String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
+                                    String second_title_str = exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
+                                    second_title_textView.setText(second_title_str);
+                                    String pass = jsonObject_for_pie.getString("pass");
+                                    String fail = jsonObject_for_pie.getString("fail");
+                                    String percent_pass = jsonObject_for_pie.getString("percent_pass");
+                                    String percent_fail = jsonObject_for_pie.getString("percent_fail");
+
+                                    if(Integer.parseInt(user_taken_exam_count) == 0){
+                                        //시험을 응시한적이 없을떄
+                                        PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                        pieChart.setVisibility(View.GONE);
+                                        never_took_exam_textView.setVisibility(View.VISIBLE);
+                                        statistic_exam_result_container.setVisibility(View.GONE);
+                                        subject_result_container.setVisibility(View.GONE);
+                                    }else{
+                                        //한번이라도 시험을 응시했을때
+                                        PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                        pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                    }
                                 }
                             }else if(access_token.equals("invalid")){
                                 Toast.makeText(getContext(),"잘못된 접근입니다", Toast.LENGTH_SHORT).show();
@@ -445,7 +424,7 @@ public class StatisticFragment extends Fragment {
 
         subject_pieChart.setData(data);
     }
-    public void pieChart(View rootview, int pass, int fail){
+    public void pieChart(View rootview, PieChart pieChart, int pass, int fail){
         pieChart.setTouchEnabled(false);
 
         pieChart.setUsePercentValues(true);
@@ -504,12 +483,20 @@ public class StatisticFragment extends Fragment {
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String access_token = jsonObject.getString("access");
-                                if(access_token.equals("valid")){
+                                if(access_token.equals("valid")) {
                                     JSONArray jsonArray = jsonObject.getJSONArray("response");
-                                    JSONArray jsonArray_array_by_each_exam = jsonObject.getJSONArray("array_by_each_exam");
-                                    behaveLike_expandableListview(rootview, jsonArray_array_by_each_exam);
-                                    JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
-                                    JSONArray jsonArray_for_subject_pie = jsonObject.getJSONArray("response_for_subjectpiechart");
+                                    if (jsonArray.length() == 0) {
+                                        SwipeRefreshLayout swiper_layout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper_layout);
+                                        swiper_layout.setVisibility(View.GONE);
+                                        ConstraintLayout guest_notifier = (ConstraintLayout) rootview.findViewById(R.id.guest_notifier);
+                                        guest_notifier.setVisibility(View.VISIBLE);
+                                        TextView guest_notifer_textView = (TextView) rootview.findViewById(R.id.guest_notifer_textView);
+                                        guest_notifer_textView.setText(getResources().getString(R.string.statistic_notice_never_took_exam_string));
+                                    } else {
+                                        JSONArray jsonArray_array_by_each_exam = jsonObject.getJSONArray("array_by_each_exam");
+                                        behaveLike_expandableListview(rootview, jsonArray_array_by_each_exam);
+                                        JSONObject jsonObject_for_pie = jsonObject.getJSONObject("response_for_piechart");
+                                        JSONArray jsonArray_for_subject_pie = jsonObject.getJSONArray("response_for_subjectpiechart");
 //                                for(int i = 0 ; i <jsonArray.length(); i++){
 //                                    String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
 //                                    String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
@@ -561,47 +548,50 @@ public class StatisticFragment extends Fragment {
 //                                        }
 //                                }
 //subject pie chart
-                                    for(int i = 0 ; i<jsonArray_for_subject_pie.length(); i++){
-                                        String pie_subject_name = jsonArray_for_subject_pie.getJSONObject(i).getString("subject_name");
-                                        String pie_pass_count = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_count");
-                                        String pass_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_percent");
-                                        String fail_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("fail_percent");
+                                        for (int i = 0; i < jsonArray_for_subject_pie.length(); i++) {
+                                            String pie_subject_name = jsonArray_for_subject_pie.getJSONObject(i).getString("subject_name");
+                                            String pie_pass_count = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_count");
+                                            String pass_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("pass_percent");
+                                            String fail_percent = jsonArray_for_subject_pie.getJSONObject(i).getString("fail_percent");
 
-                                        Log.e("percent", "pass ::" +pass_percent+ "/// fail ::"+fail_percent);
+                                            Log.e("percent", "pass ::" + pass_percent + "/// fail ::" + fail_percent);
 
-                                        View subject_pieView = getLayoutInflater().inflate(R.layout.container_subject_pie_chart, null);
-                                        TextView subject_title_textView = (TextView) subject_pieView.findViewById(R.id.subject_title_textView);
-                                        PieChart subject_pieChart = (PieChart) subject_pieView.findViewById(R.id.subject_piechart);
-                                        pieChart_subject(subject_pieChart, Integer.parseInt(pass_percent),Integer.parseInt(fail_percent));//casting pie chart for subject
-                                        subject_title_textView.setText(pie_subject_name);
+                                            View subject_pieView = getLayoutInflater().inflate(R.layout.container_subject_pie_chart, null);
+                                            TextView subject_title_textView = (TextView) subject_pieView.findViewById(R.id.subject_title_textView);
+                                            PieChart subject_pieChart = (PieChart) subject_pieView.findViewById(R.id.subject_piechart);
+                                            pieChart_subject(subject_pieChart, Integer.parseInt(pass_percent), Integer.parseInt(fail_percent));//casting pie chart for subject
+                                            subject_title_textView.setText(pie_subject_name);
 
-                                        subject_result_container.addView(subject_pieView);
-
-                                    }
+                                            subject_result_container.addView(subject_pieView);
+                                        }
 // total pie chart
-                                    String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
-                                    String second_title_str = "성적표\n"+exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
-                                    second_title_textView.setText(second_title_str);
-                                    String pass = jsonObject_for_pie.getString("pass");
-                                    String fail = jsonObject_for_pie.getString("fail");
-                                    String percent_pass = jsonObject_for_pie.getString("percent_pass");
-                                    String percent_fail = jsonObject_for_pie.getString("percent_fail");
+                                        String user_taken_exam_count = jsonObject_for_pie.getString("user_taken_exam_count");
+                                        String second_title_str = exam_selection_name+" 기출 "+ user_taken_exam_count+ " 회 응시";
+                                        second_title_textView.setText(second_title_str);
+                                        String pass = jsonObject_for_pie.getString("pass");
+                                        String fail = jsonObject_for_pie.getString("fail");
+                                        String percent_pass = jsonObject_for_pie.getString("percent_pass");
+                                        String percent_fail = jsonObject_for_pie.getString("percent_fail");
 
-                                    if(Integer.parseInt(user_taken_exam_count) == 0){
-                                        //시험을 응시한적이 없을떄
-                                        never_took_exam_textView.setVisibility(View.VISIBLE);
-                                        pieChart.setVisibility(View.GONE);
-                                        statistic_exam_result_container.setVisibility(View.GONE);
-                                        subject_result_container.setVisibility(View.GONE);
-                                    }else{
-                                        //한번이라도 시험을 응시했을때
-                                        pieChart(rootview, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                        if (Integer.parseInt(user_taken_exam_count) == 0) {
+                                            //시험을 응시한적이 없을떄
+                                            PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                            pieChart.setVisibility(View.GONE);
+                                            never_took_exam_textView.setVisibility(View.VISIBLE);
+                                            statistic_exam_result_container.setVisibility(View.GONE);
+                                            subject_result_container.setVisibility(View.GONE);
+                                        } else {
+                                            //한번이라도 시험을 응시했을때
+                                            PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                            pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                        }
+
+                                        }
+                                    }else if (access_token.equals("invalid")) {
+                                        Toast.makeText(getContext(), "잘못된 접근입니다", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getContext(), "error", Toast.LENGTH_SHORT).show();
                                     }
-                                }else if(access_token.equals("invalid")){
-                                    Toast.makeText(getContext(),"잘못된 접근입니다", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    Toast.makeText(getContext(),"error", Toast.LENGTH_SHORT).show();
-                                }
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

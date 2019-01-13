@@ -6,6 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.storyvendingmachine.www.pp.SelectExamActivity">
+    <ProgressBar
+        android:id="@+id/main_fragment_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:backgroundTint="@color/colorWhite"
+        android:elevation="15dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/quiz_display_container"
@@ -28,6 +41,7 @@
             android:layout_marginTop="64dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="64dp"
+            android:elevation="12dp"
             android:background="@color/colorWhiteSmoke"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -38,7 +52,7 @@
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/con1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:background="@color/colorWhite"
                 app:layout_constraintBottom_toTopOf="@+id/quiz_container"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -49,8 +63,21 @@
                     android:id="@+id/close_imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:src="@drawable/icon_close"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:text="Today's Quiz"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
@@ -84,25 +111,13 @@
                     android:id="@+id/close_textView"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginEnd="1dp"
                     android:gravity="center"
                     android:text="닫기"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/submit_textView"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/submit_textView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="1dp"
-                    android:gravity="center"
-                    android:text="제출"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/close_textView"
-                    app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
         </android.support.constraint.ConstraintLayout>
 

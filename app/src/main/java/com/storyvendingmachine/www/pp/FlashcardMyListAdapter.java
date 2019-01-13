@@ -43,39 +43,45 @@ public class FlashcardMyListAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         View v =View.inflate(context, R.layout.container_flashcard_my_list, null);
+        View v_empty = View.inflate(context, R.layout.container_flashcard_comment_empty, null);
 
         final String folder_name = list.get(i).getFolder_name();
         final String folder_code = list.get(i).getFolder_code();
         final String flashcard_length = list.get(i).getFlashcard_length();
 
-        if(LoginType.equals("null") && G_user_id.equals("null")){
-            TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
-            TextView flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
-
-            folder_name_textView.setText("회원 가입 및 로그인을 하시면 폴더 메뉴를 사용할수 있습니다.");
-            flashcard_length_textView.setText("");
-            return v;
+        if(folder_name == null && folder_code==null && flashcard_length ==null){
+            TextView empty_textView = (TextView) v_empty.findViewById(R.id.empty_textView);
+            empty_textView.setText("해당 시험에 플래시카드가 없습니다.\n플래시카드를 만들어 주세요");
+            return v_empty;
         }else {
-            TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
-            TextView flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
+            if (LoginType.equals("null") && G_user_id.equals("null")) {
+                TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
+                TextView flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
 
-            folder_name_textView.setText(folder_name);
-            flashcard_length_textView.setText(flashcard_length);
+                folder_name_textView.setText("회원 가입 및 로그인을 하시면 폴더 메뉴를 사용할수 있습니다.");
+                flashcard_length_textView.setText("");
+                return v;
+            } else {
+                TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
+                TextView flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
 
+                folder_name_textView.setText(folder_name);
+                flashcard_length_textView.setText(flashcard_length);
 
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, FlashCardViewActivity.class);
-                    intent.putExtra("type", "my_folder");
-                    intent.putExtra("folder_name", folder_name);
-                    intent.putExtra("folder_code", folder_code);
-                    intent.putExtra("flashcard_length", flashcard_length);
-                    context.startActivity(intent);
-                    slide_left_and_slide_in();
-                }
-            });
-            return v;
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, FlashCardViewActivity.class);
+                        intent.putExtra("type", "my_folder");
+                        intent.putExtra("folder_name", folder_name);
+                        intent.putExtra("folder_code", folder_code);
+                        intent.putExtra("flashcard_length", flashcard_length);
+                        context.startActivity(intent);
+                        slide_left_and_slide_in();
+                    }
+                });
+                return v;
+            }
         }
     }
 

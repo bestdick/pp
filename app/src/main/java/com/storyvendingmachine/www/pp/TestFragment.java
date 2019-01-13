@@ -3,6 +3,7 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,6 +60,9 @@ public class TestFragment extends Fragment {
 
 
     ProgressBar progressBar;
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayout menu_layout;
+    ConstraintLayout no_exam_conLayout;
     public static TestFragment newInstance() {
         TestFragment fragment = new TestFragment();
         Bundle args = new Bundle();
@@ -70,13 +75,14 @@ public class TestFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_test, container, false);
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.testfragment_progress_bar);
+        menu_layout = (LinearLayout) rootView.findViewById(R.id.linearLayout);
+        no_exam_conLayout = (ConstraintLayout) rootView.findViewById(R.id.no_exam_conLayout);
 
         navi_selection = 1;
         firstNaviButton = (Button) rootView.findViewById(R.id.testFragment_bottom_btn1);
         secondNaviButton = (Button) rootView.findViewById(R.id.testFragment_bottom_btn2);
 //        thirdNaviButton = (Button) rootView.findViewById(R.id.testFragment_bottom_btn3);
 //        fourthNaviButton = (Button) rootView.findViewById(R.id.testFragment_bottom_btn4);
-
 
         FragmentTestListView = (ListView) rootView.findViewById(R.id.FragmentTestListView);
         adaptListView();
@@ -126,7 +132,7 @@ public class TestFragment extends Fragment {
     }
 
     public void swiper(View RootView){
-        final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) RootView.findViewById(R.id.FragmentTestSwiperLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) RootView.findViewById(R.id.FragmentTestSwiperLayout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -149,66 +155,36 @@ public class TestFragment extends Fragment {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
-                            // Toast.makeText(SelectExamActivity.this,access_token, Toast.LENGTH_SHORT).show();
                             if(access_token.equals("valid")){
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                if(jsonArray.length() <= 0 || jsonArray == null){
+                                    menu_layout.setVisibility(View.INVISIBLE);
+                                    mSwipeRefreshLayout.setVisibility(View.INVISIBLE);
+                                    no_exam_conLayout.setVisibility(View.VISIBLE);
+                                }else{
+                                    for(int i=0; i<jsonArray.length(); i++){
+                                        String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
+                                        String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
+                                        String published_year = jsonArray.getJSONObject(i).getString("published_year");
+                                        String empty = "empty";
+                                        TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, empty, String.valueOf(navi_selection), empty,empty,empty,empty);
+                                        testYearOrderList.add(element_outer);
 
-                                for(int i=0; i<jsonArray.length(); i++){
-                                    String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
-                                    String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
-                                    String published_year = jsonArray.getJSONObject(i).getString("published_year");
+                                        JSONArray statistic_jsonArray = jsonArray.getJSONObject(i).getJSONArray("published_data_by_round");
+                                        for(int k = 0 ; k <statistic_jsonArray.length(); k++){
+                                            String published_round = statistic_jsonArray.getJSONObject(k).getString("published_round");
+                                            String total = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("total");
+                                            String pass = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("pass");
+                                            String fail = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("fail");
+                                            String percent = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("percent");
 
+                                            TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_round, String.valueOf(navi_selection), total, pass, fail, percent);
+                                            testYearOrderList.add(element);
+                                        }
 
-
-
-
-
-                                    String empty = "empty";
-                                    TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, empty, String.valueOf(navi_selection), empty,empty,empty,empty);
-                                    testYearOrderList.add(element_outer);
-
-                                    JSONArray statistic_jsonArray = jsonArray.getJSONObject(i).getJSONArray("published_data_by_round");
-                                    for(int k = 0 ; k <statistic_jsonArray.length(); k++){
-                                        String published_round = statistic_jsonArray.getJSONObject(k).getString("published_round");
-                                        String total = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("total");
-                                        String pass = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("pass");
-                                        String fail = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("fail");
-                                        String percent = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("percent");
-
-                                        TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_round, String.valueOf(navi_selection), total, pass, fail, percent);
-                                        testYearOrderList.add(element);
                                     }
-//                                    JSONArray jsonArray1 = jsonArray.getJSONObject(i).getJSONArray("published_num");
-//                                    for(int j =0 ; j<jsonArray1.length(); j++){
-//                                        String published_num = jsonArray1.get(j).toString();
-//
-//                                        TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_num, String.valueOf(navi_selection));
-//                                        testYearOrderList.add(element);
-//
-//
-//                                    }
-
+                                    testYearOrderAdapter.notifyDataSetChanged();
                                 }
-
-
-
-
-
-//                                for (int i=0; i < jsonArray.length(); i++) {
-//                                    JSONObject temp = jsonArray.getJSONObject(i);
-//                                    String exam_code = temp.getString("exam_code");
-//                                    String exam_name = temp.getString("exam_name");
-//                                    String published_year = temp.getString("published_year");
-//                                    String published_num = temp.getString("published_num");
-//
-//                                    TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_num);
-//                                    testYearOrderList.add(element);
-//
-//                                }
-
-                                testYearOrderAdapter.notifyDataSetChanged();
-
-                                progressbar_invisible();
                             }else if(access_token.equals("invalid")){
 
                             }else{
@@ -219,7 +195,7 @@ public class TestFragment extends Fragment {
                             e.printStackTrace();
 
                         }
-
+                        progressbar_invisible();
                     }
                 },
                 new Response.ErrorListener() {
@@ -230,6 +206,7 @@ public class TestFragment extends Fragment {
 //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
 //                        toast(message);
 //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+                        progressbar_invisible();
                     }
                 }
         ) {

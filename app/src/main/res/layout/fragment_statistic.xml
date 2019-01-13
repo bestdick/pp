@@ -10,6 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="invisible"
+        android:background="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -17,34 +18,24 @@
 
         <TextView
             android:id="@+id/textView20"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:padding="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text="시험 통계 및 성적표"
-            android:background="@drawable/outline_question_example"
-            android:textSize="20sp"
-            android:gravity="center"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/guest_notifer_textView"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/outline_question_example"
-            android:gravity="center"
-            android:padding="16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/statistic_notice_string"
             android:textColor="@color/colorBlack"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView20" />
@@ -55,6 +46,7 @@
         android:id="@+id/swiper_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +60,7 @@
             android:fillViewport="true"
             android:nestedScrollingEnabled="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:background="@color/colorWhiteSmoke"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -87,21 +80,30 @@
 
 
                     <TextView
-                        android:id="@+id/statistic_title_textView"
-                        android:layout_width="0dp"
+                        android:id="@+id/textView25"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/outline_round_gray"
                         android:gravity="center"
-                        android:padding="8dp"
-                        android:text="현재 공부중인 시험\n0000\n기출 시험 통계"
-                        android:textColor="@color/colorBlack"
-                        android:textSize="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:text="시험 통계"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/statistic_title_textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="32dp"
+                        android:gravity="center"
+                        android:text="시험 이름"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView25" />
 
 
                     <com.github.mikephil.charting.charts.PieChart
@@ -161,38 +163,54 @@
                 </android.support.constraint.ConstraintLayout>
 
 
-
-                <LinearLayout
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorWhite"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/statistic_second_title_textView"
-                        android:layout_width="match_parent"
+                        android:id="@+id/textView26"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:text="시험 성적"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/statistic_second_title_textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/outline_round_gray"
+                        android:layout_marginEnd="32dp"
                         android:gravity="center"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:text="성적표\n기출 응시횟수"
-                        android:textColor="@color/colorBlack"
-                        android:textSize="16dp" />
+                        android:text="응시횟수"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView26" />
+
                     <LinearLayout
                         android:id="@+id/statistic_exam_result_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:background="@color/colorWhiteSmoke"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_marginBottom="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/statistic_second_title_textView">
+
                     </LinearLayout>
 
 
-                </LinearLayout>
+                </android.support.constraint.ConstraintLayout>
             </LinearLayout>
         </ScrollView>
 
