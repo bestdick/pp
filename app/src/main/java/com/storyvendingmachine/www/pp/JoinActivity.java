@@ -65,10 +65,34 @@ public class JoinActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
-        initializer();
         toolbar();
+        Intent intent = getIntent();
+        String intent_type = intent.getStringExtra("type");
+        if(intent_type.equals("join")){
+            initializer();
+        }else if(intent_type.equals("verification_resend")){
+
+        }else{
+            // find pass word
+
+        }
+
 
     }
+
+    private void toolbar(){
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+    }
+
+
+
+
+
+
 
     public void initializer(){
         isEmailOK=false;
@@ -104,13 +128,6 @@ public class JoinActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-    private void toolbar(){
-        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(tb);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
-        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
     }
     public void editTextListener(){
         user_email.addTextChangedListener(new TextWatcher() {
@@ -164,7 +181,6 @@ public class JoinActivity extends AppCompatActivity {
         });
 
     }
-
     public void email_nickname_check_Function(final String check_type, final String check_input){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/check_email_nickname_password.php";
@@ -232,7 +248,6 @@ public class JoinActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-
     private void simple_notifier(String message, String positive_message){
         AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
         builder.setMessage(message)

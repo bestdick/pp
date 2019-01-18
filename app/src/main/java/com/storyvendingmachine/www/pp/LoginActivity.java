@@ -115,9 +115,20 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, JoinActivity.class);
+                intent.putExtra("type", "join");
                 startActivity(intent);
                 slide_left_and_slide_in();
-
+            }
+        });
+    }
+    public void verificationResendClicked(Button verificationResendButton){
+        verificationResendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, JoinActivity.class);
+                intent.putExtra("type", "verification_resend");
+                startActivity(intent);
+                slide_left_and_slide_in();
             }
         });
     }
