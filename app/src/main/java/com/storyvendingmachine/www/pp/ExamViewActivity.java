@@ -398,7 +398,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                                 examNoteJSONArray = jsonObject.getJSONArray("response");
                                 if(LoginType.equals("kakao") || LoginType.equals("normal")){
                                     userPersonalNoteArray = jsonObject.getJSONObject("user_personal_note").getJSONArray("note");
-
                                 }else{
 
                                 }

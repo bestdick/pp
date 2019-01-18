@@ -183,10 +183,10 @@ public class ExamViewFragment extends Fragment {
             answer_3_textView.setVisibility(View.VISIBLE);
             answer_4_textView.setVisibility(View.VISIBLE);
 
-            answer_1_textView.setText("①."+question_answer[0]);
-            answer_2_textView.setText("②."+question_answer[1]);
-            answer_3_textView.setText("③."+question_answer[2]);
-            answer_4_textView.setText("④."+question_answer[3]);
+            answer_1_textView.setText("① "+question_answer[0]);
+            answer_2_textView.setText("② "+question_answer[1]);
+            answer_3_textView.setText("③ "+question_answer[2]);
+            answer_4_textView.setText("④ "+question_answer[3]);
 
             no_image_navi_selection_function(rootView, answer_1_textView, answer_2_textView, answer_3_textView, answer_4_textView,
                     correct_answer, exam_code, exam_name, published_round, published_year);
@@ -480,10 +480,17 @@ public class ExamViewFragment extends Fragment {
                                 String author_thumbnail = jsonArray.getJSONObject(i).getString("user_thumbnail");
                                 if(note_note.equals("null") || note_note.length() <=0){
                                     if(i==0){
-                                        View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
-                                        TextView empty_textView = exam_view_exam_note_empty.findViewById(R.id.empty_textView);
-                                        empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
-                                        ll.addView(exam_view_exam_note_empty);
+                                        if(LoginType.equals("null") || G_user_id.equals("null")){
+                                            View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                            TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                            empty_textView.setText("로그인 하시면 노트를 작성할 수 있습니다.");
+                                            ll.addView(exam_view_exam_note_empty);
+                                        }else{
+                                            View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                            TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                            empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                                            ll.addView(exam_view_exam_note_empty);
+                                        }
                                     }
                                 }else {
                                     list.add(note[i]);
@@ -505,6 +512,8 @@ public class ExamViewFragment extends Fragment {
                                     ll.addView(exam_view_exam_note);
                                 }
                             }
+
+
                             if (list.size() == 0) {
                                 View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
                                 ll.addView(exam_view_exam_note_empty);
@@ -620,10 +629,17 @@ public class ExamViewFragment extends Fragment {
         for(int i = 0 ; i<note.length; i++){
             if(note[i].equals("null")){
                 if(i==0){
-                    View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
-                    TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
-                    empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
-                    ll.addView(exam_view_exam_note_empty);
+                    if(LoginType.equals("null") || G_user_id.equals("null")){
+                        View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                        TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                        empty_textView.setText("로그인 하시면 노트를 작성할 수 있습니다.");
+                        ll.addView(exam_view_exam_note_empty);
+                    }else{
+                        View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                        TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                        empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                        ll.addView(exam_view_exam_note_empty);
+                    }
                 }
             }else{
                 list.add(note[i]);

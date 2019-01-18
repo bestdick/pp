@@ -66,6 +66,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 
 
+
 public class MainFragment extends Fragment {
     static ViewPager quiz_viewPager;
     ProgressBar progressBar;
@@ -74,6 +75,7 @@ public class MainFragment extends Fragment {
     LinearLayout wrapper;
 
     View rootView;
+    boolean isQuizOpened;
     static ArrayList<Integer> quizUserSelectedAnswers;
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
@@ -91,7 +93,7 @@ public class MainFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         progressBar = (ProgressBar) rootView.findViewById(R.id.main_fragment_progress_bar);
         wrapper = (LinearLayout) rootView.findViewById(R.id.fragment_main_container);
-
+        isQuizOpened =false;
         if(exam_selection_code == "null"){
             //시험을 고르지 않은 상태
             //시험을 고르지 않은 상태에서는 1. 전체 시험 스케쥴과
@@ -226,6 +228,21 @@ public class MainFragment extends Fragment {
                                 View schedule_view_pager = getLayoutInflater().inflate(R.layout.fragment_main_schedule_view_pager, null);
                                 ViewPager viewPager = (ViewPager) schedule_view_pager.findViewById(R.id.schedule_viewPager);
                                 LinearLayout indicatorLayout = schedule_view_pager.findViewById(R.id.pager_indicator_layout);
+                                TextView no_exam_schedule_textView =(TextView) schedule_view_pager.findViewById(R.id.no_exam_schedule_textView);
+                                Spanned text = Html.fromHtml("* 위 스케쥴이 정확하지 않을 수 있습니다. <a style='color:red' href='http://www.q-net.or.kr/crf021.do?id=crf02101&gSite=Q&gId='>Q-net</a>에서 다시 한번 확인 해보세요.");
+
+                                    no_exam_schedule_textView.setText(text);
+                                    no_exam_schedule_textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            String url = "http://www.q-net.or.kr/crf021.do?id=crf02101&gSite=Q&gId=";
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(url));
+                                            startActivity(intent);
+                                        }
+                                    });
+
+
 
                                 MainFragmentScheduleViewPagerAdapter adapter = new MainFragmentScheduleViewPagerAdapter(getActivity().getSupportFragmentManager());
                                 adapter.getType = "all_exam";
@@ -457,6 +474,18 @@ public class MainFragment extends Fragment {
                                     View schedule_view_pager = getLayoutInflater().inflate(R.layout.fragment_main_schedule_view_pager, null);
                                     ViewPager viewPager = (ViewPager) schedule_view_pager.findViewById(R.id.schedule_viewPager);
                                     LinearLayout indicatorLayout = schedule_view_pager.findViewById(R.id.pager_indicator_layout);
+                                    TextView no_exam_schedule_textView =(TextView) schedule_view_pager.findViewById(R.id.no_exam_schedule_textView);
+                                    Spanned text = Html.fromHtml("* 위 스케쥴이 정확하지 않을 수 있습니다. <a style='color:red' href='http://www.q-net.or.kr/crf021.do?id=crf02101&gSite=Q&gId='>Q-net</a>에서 다시 한번 확인 해보세요.");
+                                    no_exam_schedule_textView.setText(text);
+                                    no_exam_schedule_textView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            String url = "http://www.q-net.or.kr/crf021.do?id=crf02101&gSite=Q&gId=";
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(url));
+                                            startActivity(intent);
+                                        }
+                                    });
 
                                     MainFragmentScheduleViewPagerAdapter adapter = new MainFragmentScheduleViewPagerAdapter(getActivity().getSupportFragmentManager());
                                     adapter.getType = "selected_exam";
@@ -725,6 +754,7 @@ public class MainFragment extends Fragment {
                                         public void onClick(View view) {
                                             Intent intent = new Intent(getActivity(), NewsActivity.class);
                                             intent.putExtra("enter_method", "QUIZ");
+                                            intent.putExtra("quiz_menu","1");
                                             startActivity(intent);
                                             slide_left_and_slide_in();
                                         }
@@ -733,6 +763,7 @@ public class MainFragment extends Fragment {
                                     take_quiz_textView.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
+
                                             quizUserSelectedAnswers = new ArrayList<Integer>();
                                             progressbar_visible();
                                             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
@@ -750,6 +781,7 @@ public class MainFragment extends Fragment {
 
                                             quiz_viewPager = (ViewPager) rootView.findViewById(R.id.quiz_container);
                                             QuizViewPagerAdapter adapter = new QuizViewPagerAdapter(getActivity().getSupportFragmentManager());
+                                            adapter.from = "main_fragment";
                                             adapter.count= count;
                                             adapter.jsonArray = jsonArray;
                                             adapter.today = today;
@@ -762,6 +794,7 @@ public class MainFragment extends Fragment {
                                             close_imageView.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
+
                                                     slideDown(quiz_display_container);
 //                                                quiz_display_container.setVisibility(View.INVISIBLE);
 
@@ -770,6 +803,7 @@ public class MainFragment extends Fragment {
                                             close_textView.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
+
                                                     slideDown(quiz_display_container);
 //                                                quiz_display_container.setVisibility(View.INVISIBLE);
                                                 }
@@ -995,4 +1029,5 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.INVISIBLE);
     }
+
 }

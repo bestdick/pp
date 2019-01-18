@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -36,6 +37,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -59,7 +61,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
     String exam_name, exam_code, published_year, published_round, refresh_upload_prevent, date_user_took_exam, time_user_took_exam;
 
-    TextView wrong_question_textView, correct_color_textView, incorrect_color_textView;
+    TextView wrong_question_textView;
     private RewardedVideoAd mRewardedVideoAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,8 +185,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         linearLayout_inner_second = (LinearLayout) findViewById(R.id.exam_result_inner_second_container);
 
         wrong_question_textView = (TextView) findViewById(R.id.wrong_question_textView);
-        correct_color_textView = (TextView) findViewById(R.id.correct_color_textView);
-        incorrect_color_textView = (TextView) findViewById(R.id.incorrect_color_textView);
         wrong_question_textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -320,6 +320,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                 int total_questions = 0;
                                     for(int i = 0 ; i<jsonArray.length(); i++){
                                         View view =View.inflate(ExamResultActivity.this, R.layout.exam_subject_result_element, null);
+                                        View result_prob_view = View.inflate(ExamResultActivity.this, R.layout.container_exam_result_subject_title, null);
 
                                         TextView subject_name_textView = (TextView) view.findViewById(R.id.subject_name_textView);
                                         TextView subject_score_textView = (TextView) view.findViewById(R.id.subject_score_textView);
@@ -328,8 +329,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                         String subject_name = jsonArray.getJSONObject(i).getString("subject_name");
                                         String correct_count = jsonArray.getJSONObject(i).getString("correct_count");
                                         String incorrect_count = jsonArray.getJSONObject(i).getString("incorrect_count");
-
-
 
                                         int correct_count_int = Integer.parseInt(correct_count);
                                         int incorrect_count_int = Integer.parseInt(incorrect_count);
@@ -345,6 +344,25 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                         int PassFail = eachSubjectPassFail(correct_count_int, incorrect_count_int); // 1 is pass , -1 is fail
                                         pass_fail_array[i] = PassFail;
                                         linearLayout_inner.addView(view);
+                                        //                                        여기까지은 시험 결과 단순한 표를 나타낸다.
+                                        // 여기서부터는 모든 문제를 채점 그리고 보여주기
+                                        TextView subject_title_textView = (TextView) result_prob_view.findViewById(R.id.subject_titleTextView);
+                                        final LinearLayout problem_result_container = (LinearLayout) result_prob_view.findViewById(R.id.problem_result_container);
+                                        subject_title_textView.setText(subject_name);
+                                        subject_title_textView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                int visiblity = problem_result_container.getVisibility();
+                                                if(visiblity == View.GONE || visiblity == View.INVISIBLE){
+                                                    problem_result_container.setVisibility(View.VISIBLE);
+                                                }else{
+                                                    problem_result_container.setVisibility(View.GONE);
+                                                }
+                                            }
+                                        });
+                                        linearLayout_inner_second.addView(result_prob_view);
+
+
 
                                         JSONArray compared_array = jsonArray.getJSONObject(i).getJSONArray("compared");
                                         JSONArray question_number = jsonArray.getJSONObject(i).getJSONArray("question_number");
@@ -356,95 +374,112 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                         JSONArray answer_image = jsonArray.getJSONObject(i).getJSONArray("answer_image");
                                         JSONArray example_exist = jsonArray.getJSONObject(i).getJSONArray("example_exist");
                                         for(int j = 0; j<compared_array.length(); j++){
-                                            String compared = compared_array.getString(j);// identify correct or incorrect
-                                            if(compared.equals("incorrect")){
-                                                View view_incorrect =View.inflate(ExamResultActivity.this, R.layout.exam_result_wrong_question_element, null);
-                                                TextView subject_name_inner_textView = view_incorrect.findViewById(R.id.subject_name_textView);
-                                                TextView exam_name_inner_textView = view_incorrect.findViewById(R.id.exam_name_textView);
-                                                TextView question_textView = view_incorrect.findViewById(R.id.question_textView);
-                                                TextView question_example_textView = view_incorrect.findViewById(R.id.question_example_textView);
-                                                ImageView question_imageView = view_incorrect.findViewById(R.id.question_imageView);
+                                            String question_number1 = question_number.getString(j);
+                                            String question_question = question_array.getString(j);
+                                            String question_answer = answer_array.getString(j);
+                                            String correct_answer1 = correct_answer.getString(j);
+                                            String user_answer1 = user_answer.getString(j);
+                                            String question_image_exist = question_image.getString(j);
+                                            String answer_image_exist = answer_image.getString(j);
+                                            String example_exist1 = example_exist.getString(j);
 
-                                                TextView answer_1_textView = view_incorrect.findViewById(R.id.answer_1_textView);
-                                                TextView answer_2_textView = view_incorrect.findViewById(R.id.answer_2_textView);
-                                                TextView answer_3_textView = view_incorrect.findViewById(R.id.answer_3_textView);
-                                                TextView answer_4_textView = view_incorrect.findViewById(R.id.answer_4_textView);
-
-                                                ConstraintLayout answer_1_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_1_conLayout);
-                                                ConstraintLayout answer_2_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_2_conLayout);
-                                                ConstraintLayout answer_3_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_3_conLayout);
-                                                ConstraintLayout answer_4_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_4_conLayout);
-
-
-
-                                                if(example_exist.getString(j).equals("true")){
-                                                    String[] question_question = question_array.getString(j).split("##");
-                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question[0].replace("<br>", "\n"));
-                                                    question_example_textView.setText(question_question[1].replace("<br>", "\n"));
-                                                }else{
-                                                    String question_question = question_array.getString(j);
-                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question);
-                                                    question_example_textView.setVisibility(View.GONE);
-                                                }
-
-                                                if(question_image.getString(j).equals("true")){
-                                                    String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+".PNG";
-                                                    getQuestionImage(question_imageView, url);
-                                                }else{
-                                                    question_imageView.setVisibility(View.GONE);
-                                                }
-
-                                                String c_answer = correct_answer.getString(j);
-                                                String u_answer = user_answer.getString(j);
-
-                                                int c_answer_int = Integer.parseInt(c_answer);
-                                                int u_answer_int = Integer.parseInt(u_answer);
-
-                                                if(answer_image.getString(j).equals("true")){
-                                                    answer_1_conLayout.setVisibility(View.VISIBLE);
-                                                    answer_2_conLayout.setVisibility(View.VISIBLE);
-                                                    answer_3_conLayout.setVisibility(View.VISIBLE);
-                                                    answer_4_conLayout.setVisibility(View.VISIBLE);
-
-                                                    ImageView answer_1_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_1_imageView);
-                                                    answer_1_imageView.setTag(1);
-                                                    ImageView answer_2_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_2_imageView);
-                                                    answer_2_imageView.setTag(2);
-                                                    ImageView answer_3_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_3_imageView);
-                                                    answer_3_imageView.setTag(3);
-                                                    ImageView answer_4_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_4_imageView);
-                                                    answer_4_imageView.setTag(4);
-
-                                                    for(int k = 1; k<=4; k++){
-                                                        String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+"_a_"+k+".PNG";
-                                                        ImageView imageView = (ImageView) view_incorrect.findViewWithTag(k);
-                                                        getAnswerImage(imageView, url);
-                                                    }
-                                                    higlight_user_and_correct_answer_image(answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout, c_answer_int, u_answer_int);
-                                                }else{
-                                                    answer_1_textView.setVisibility(View.VISIBLE);
-                                                    answer_2_textView.setVisibility(View.VISIBLE);
-                                                    answer_3_textView.setVisibility(View.VISIBLE);
-                                                    answer_4_textView.setVisibility(View.VISIBLE);
-
-                                                    String[] answer = answer_array.getString(j).split("##");
-                                                    answer_1_textView.setText("①."+answer[0]);
-                                                    answer_2_textView.setText("②."+answer[1]);
-                                                    answer_3_textView.setText("③."+answer[2]);
-                                                    answer_4_textView.setText("④."+answer[3]);
-
-
-                                                     highlight_user_and_correct_answer(answer_1_textView, answer_2_textView,
-                                                        answer_3_textView, answer_4_textView, c_answer_int, u_answer_int);
-                                                }
-                                                subject_name_inner_textView.setText(subject_name);
-                                                exam_name_inner_textView.setText(exam_name);
-                                                linearLayout_inner_second.addView(view_incorrect);
-                                            }
+                                            create_quiz_result_view( j,  null, exam_code, exam_name, published_year,  published_round,
+                                                    subject_code,  subject_name,  question_number1,  question_question,  question_answer,
+                                                    correct_answer1, question_image_exist,  answer_image_exist,  example_exist1,
+                                                    user_answer1, problem_result_container);
+//                                            String compared = compared_array.getString(j);// identify correct or incorrect
+//                                            if(compared.equals("incorrect")){
+//                                                View view_incorrect =View.inflate(ExamResultActivity.this, R.layout.exam_result_wrong_question_element, null);
+//
+//                                                TextView subject_name_inner_textView = view_incorrect.findViewById(R.id.subject_name_textView);
+//                                                TextView exam_name_inner_textView = view_incorrect.findViewById(R.id.exam_name_textView);
+//                                                TextView question_textView = view_incorrect.findViewById(R.id.question_textView);
+//                                                TextView question_example_textView = view_incorrect.findViewById(R.id.question_example_textView);
+//                                                ImageView question_imageView = view_incorrect.findViewById(R.id.question_imageView);
+//
+//                                                TextView answer_1_textView = view_incorrect.findViewById(R.id.answer_1_textView);
+//                                                TextView answer_2_textView = view_incorrect.findViewById(R.id.answer_2_textView);
+//                                                TextView answer_3_textView = view_incorrect.findViewById(R.id.answer_3_textView);
+//                                                TextView answer_4_textView = view_incorrect.findViewById(R.id.answer_4_textView);
+//
+//                                                ConstraintLayout answer_1_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_1_conLayout);
+//                                                ConstraintLayout answer_2_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_2_conLayout);
+//                                                ConstraintLayout answer_3_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_3_conLayout);
+//                                                ConstraintLayout answer_4_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_4_conLayout);
+//
+//
+//
+//                                                if(example_exist.getString(j).equals("true")){
+//                                                    String[] question_question = question_array.getString(j).split("##");
+//                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question[0].replace("<br>", "\n"));
+//                                                    question_example_textView.setText(question_question[1].replace("<br>", "\n"));
+//                                                }else{
+//                                                    String question_question = question_array.getString(j);
+//                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question);
+//                                                    question_example_textView.setVisibility(View.GONE);
+//                                                }
+//
+//                                                if(question_image.getString(j).equals("true")){
+//                                                    String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+".PNG";
+//                                                    getQuestionImage(question_imageView, url);
+//                                                }else{
+//                                                    question_imageView.setVisibility(View.GONE);
+//                                                }
+//
+//                                                String c_answer = correct_answer.getString(j);
+//                                                String u_answer = user_answer.getString(j);
+//
+//                                                int c_answer_int = Integer.parseInt(c_answer);
+//                                                int u_answer_int = Integer.parseInt(u_answer);
+//
+//                                                if(answer_image.getString(j).equals("true")){
+//                                                    answer_1_conLayout.setVisibility(View.VISIBLE);
+//                                                    answer_2_conLayout.setVisibility(View.VISIBLE);
+//                                                    answer_3_conLayout.setVisibility(View.VISIBLE);
+//                                                    answer_4_conLayout.setVisibility(View.VISIBLE);
+//
+//                                                    ImageView answer_1_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_1_imageView);
+//                                                    answer_1_imageView.setTag(1);
+//                                                    ImageView answer_2_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_2_imageView);
+//                                                    answer_2_imageView.setTag(2);
+//                                                    ImageView answer_3_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_3_imageView);
+//                                                    answer_3_imageView.setTag(3);
+//                                                    ImageView answer_4_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_4_imageView);
+//                                                    answer_4_imageView.setTag(4);
+//
+//                                                    for(int k = 1; k<=4; k++){
+//                                                        String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+"_a_"+k+".PNG";
+//                                                        ImageView imageView = (ImageView) view_incorrect.findViewWithTag(k);
+//                                                        getAnswerImage(imageView, url);
+//                                                    }
+//                                                    higlight_user_and_correct_answer_image(answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout, c_answer_int, u_answer_int);
+//                                                }else{
+//                                                    answer_1_textView.setVisibility(View.VISIBLE);
+//                                                    answer_2_textView.setVisibility(View.VISIBLE);
+//                                                    answer_3_textView.setVisibility(View.VISIBLE);
+//                                                    answer_4_textView.setVisibility(View.VISIBLE);
+//
+//                                                    String[] answer = answer_array.getString(j).split("##");
+//                                                    answer_1_textView.setText("①."+answer[0]);
+//                                                    answer_2_textView.setText("②."+answer[1]);
+//                                                    answer_3_textView.setText("③."+answer[2]);
+//                                                    answer_4_textView.setText("④."+answer[3]);
+//
+//
+//                                                     highlight_user_and_correct_answer(answer_1_textView, answer_2_textView,
+//                                                        answer_3_textView, answer_4_textView, c_answer_int, u_answer_int);
+//                                                }
+//                                                subject_name_inner_textView.setText(subject_name);
+//                                                exam_name_inner_textView.setText(exam_name);
+//                                                linearLayout_inner_second.addView(view_incorrect);
+//                                            }
 
                                         }
                                     }
 
+
+
+//                                     여기는 전체 합격 여부 판단.......
                                     View view =View.inflate(ExamResultActivity.this, R.layout.exam_subject_result_element, null);
 
                                     TextView subject_name_textView = (TextView) view.findViewById(R.id.subject_name_textView);
@@ -533,6 +568,173 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         };
         queue.add(stringRequest);
     }
+    public void create_quiz_result_view(int position, String key, String exam_code, String exam_name,  String exam_placed_year, String exam_placed_round, String subject_code, String subject_name, String question_number, String question_question, String question_answer, String correct_answer,
+                                        String question_image_exist, String answer_image_exist, String example_exist, String user_answer, LinearLayout container){
+        View each_problem_container = getLayoutInflater().inflate(R.layout.container_quiz_result_each_problem, null);
+        TextView exam_name_year_round_textView = (TextView) each_problem_container.findViewById(R.id.exam_name_year_round_textView);
+        TextView subject_name_number_textView = (TextView) each_problem_container.findViewById(R.id.subject_name_number_textView);
+        TextView question_textView = (TextView) each_problem_container.findViewById(R.id.question_textView);
+        TextView question_example_textView = (TextView) each_problem_container.findViewById(R.id.question_example_textView);
+        ImageView question_imageView = (ImageView) each_problem_container.findViewById(R.id.question_imageView);
+        ImageView icon_correct_incorrect_imageView = (ImageView) each_problem_container.findViewById(R.id.icon_correct_incorrect_imageView);
+
+
+
+        exam_name_year_round_textView.setText(exam_placed_year+"년 "+exam_placed_round+"회 "+exam_name);
+        subject_name_number_textView.setText(subject_name+" ["+question_number+"]");
+        if(question_image_exist.equals("true") && example_exist.equals("true")){
+
+        }else if(question_image_exist.equals("true") && (example_exist.equals("false") || example_exist.equals("null"))){
+            question_example_textView.setVisibility(View.GONE); // 보기 텍스트뷰를 안보이게 하는 것
+
+            String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+exam_placed_year+"_"+exam_placed_round+"_"+subject_code+"_q_"+question_number+".PNG";
+            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
+            getQuestionImage(question_imageView, url);
+        }else if(question_image_exist.equals("false") && example_exist.equals("true")){
+            question_imageView.setVisibility(View.GONE);// 문제 이미지뷰 안보이게 하기
+
+//            String[] temp = question_question.split("#_SPLIT_#");
+            String[] temp = question_question.split("##");
+            String question = Html.fromHtml((String) temp[0]).toString().replaceAll("<br>", "\n");
+            String example =  Html.fromHtml((String) temp[1]).toString().replaceAll("<br>", "\n");
+            question_textView.setText("["+(position+1)+"]"+question);
+            question_example_textView.setText(example);
+        }else{
+            // question image and example does not exist
+            question_example_textView.setVisibility(View.GONE); // 보기 텍스트뷰를 안보이게 하는 것
+            question_imageView.setVisibility(View.GONE);// 문제 이미지뷰 안보이게 하기
+            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
+        }
+
+        if(answer_image_exist.equals("true")){
+            // 답에 이미지가 존재할 경우
+            //                이미지가 존재하는 답일때
+            ConstraintLayout answer_1_conLayout =(ConstraintLayout) each_problem_container.findViewById(R.id.answer_1_conLayout);
+            ImageView answer_1_imageView =(ImageView) each_problem_container.findViewById(R.id.answer_1_imageView);
+            TextView image_correct_or_incorrect_1_textView = (TextView) each_problem_container.findViewById(R.id.image_correct_or_incorrect_1_textView);
+            ConstraintLayout answer_2_conLayout =(ConstraintLayout) each_problem_container.findViewById(R.id.answer_2_conLayout);
+            ImageView answer_2_imageView =(ImageView) each_problem_container.findViewById(R.id.answer_2_imageView);
+            TextView image_correct_or_incorrect_2_textView = (TextView) each_problem_container.findViewById(R.id.image_correct_or_incorrect_2_textView);
+            ConstraintLayout answer_3_conLayout =(ConstraintLayout) each_problem_container.findViewById(R.id.answer_3_conLayout);
+            ImageView answer_3_imageView =(ImageView) each_problem_container.findViewById(R.id.answer_3_imageView);
+            TextView image_correct_or_incorrect_3_textView = (TextView) each_problem_container.findViewById(R.id.image_correct_or_incorrect_3_textView);
+            ConstraintLayout answer_4_conLayout =(ConstraintLayout) each_problem_container.findViewById(R.id.answer_4_conLayout);
+            ImageView answer_4_imageView =(ImageView) each_problem_container.findViewById(R.id.answer_4_imageView);
+            TextView image_correct_or_incorrect_4_textView = (TextView) each_problem_container.findViewById(R.id.image_correct_or_incorrect_4_textView);
+
+            answer_1_conLayout.setVisibility(View.VISIBLE);
+            answer_2_conLayout.setVisibility(View.VISIBLE);
+            answer_3_conLayout.setVisibility(View.VISIBLE);
+            answer_4_conLayout.setVisibility(View.VISIBLE);
+
+            answer_1_imageView.setTag(1);
+            answer_2_imageView.setTag(2);
+            answer_3_imageView.setTag(3);
+            answer_4_imageView.setTag(4);
+
+            for(int k = 1; k<=4; k++){
+                String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+exam_placed_year+"_"+exam_placed_round+"_"+subject_code+"_q_"+question_number+"_a_"+k+".PNG";
+                ImageView imageView = (ImageView) each_problem_container.findViewWithTag(k);
+                getAnswerImage(imageView, url);
+            }
+
+            answer_choice( answer_1_conLayout,  answer_2_conLayout,  answer_3_conLayout,  answer_4_conLayout,
+                    image_correct_or_incorrect_1_textView,  image_correct_or_incorrect_2_textView,  image_correct_or_incorrect_3_textView,  image_correct_or_incorrect_4_textView,  correct_answer,  user_answer, icon_correct_incorrect_imageView);
+        }else{
+            //답에 이미지가 존재하지 않을경우
+            //  이미지가 존재하지 않는 답일때
+            ConstraintLayout no_image_answer_1_conLayout = (ConstraintLayout) each_problem_container.findViewById(R.id.no_image_answer_1_conLayout);
+            TextView answer_1_textView = (TextView) each_problem_container.findViewById(R.id.answer_1_textView);
+            TextView correct_or_incorrect_1_textView = (TextView) each_problem_container.findViewById(R.id.correct_or_incorrect_1_textView);
+
+            ConstraintLayout no_image_answer_2_conLayout = (ConstraintLayout) each_problem_container.findViewById(R.id.no_image_answer_2_conLayout);
+            TextView answer_2_textView = (TextView) each_problem_container.findViewById(R.id.answer_2_textView);
+            TextView correct_or_incorrect_2_textView = (TextView) each_problem_container.findViewById(R.id.correct_or_incorrect_2_textView);
+
+            ConstraintLayout no_image_answer_3_conLayout = (ConstraintLayout) each_problem_container.findViewById(R.id.no_image_answer_3_conLayout);
+            TextView answer_3_textView = (TextView) each_problem_container.findViewById(R.id.answer_3_textView);
+            TextView correct_or_incorrect_3_textView = (TextView) each_problem_container.findViewById(R.id.correct_or_incorrect_3_textView);
+
+            ConstraintLayout no_image_answer_4_conLayout = (ConstraintLayout) each_problem_container.findViewById(R.id.no_image_answer_4_conLayout);
+            TextView answer_4_textView = (TextView) each_problem_container.findViewById(R.id.answer_4_textView);
+            TextView correct_or_incorrect_4_textView = (TextView) each_problem_container.findViewById(R.id.correct_or_incorrect_4_textView);
+
+            String[] answer = question_answer.split("##");
+
+            no_image_answer_1_conLayout.setVisibility(View.VISIBLE);
+            no_image_answer_2_conLayout.setVisibility(View.VISIBLE);
+            no_image_answer_3_conLayout.setVisibility(View.VISIBLE);
+            no_image_answer_4_conLayout.setVisibility(View.VISIBLE);
+
+            answer_1_textView.setText("①"+answer[0]);
+            answer_2_textView.setText("②"+answer[1]);
+            answer_3_textView.setText("③"+answer[2]);
+            answer_4_textView.setText("④"+answer[3]);
+
+            answer_choice( no_image_answer_1_conLayout,  no_image_answer_2_conLayout,  no_image_answer_3_conLayout,  no_image_answer_4_conLayout,
+                    correct_or_incorrect_1_textView,  correct_or_incorrect_2_textView,  correct_or_incorrect_3_textView,  correct_or_incorrect_4_textView,  correct_answer,  user_answer, icon_correct_incorrect_imageView);
+        }
+
+        container.addView(each_problem_container);
+    }
+    public void answer_choice(ConstraintLayout one_conLayout, ConstraintLayout two_conLayout, ConstraintLayout three_conLayout, ConstraintLayout four_conLayout,
+                              TextView one_textView, TextView two_textView, TextView three_textView, TextView four_textView, String correct_answer, String user_answer, ImageView imageView){
+
+        int c_answer = Integer.parseInt(correct_answer);
+        int u_answer =Integer.parseInt(user_answer);
+
+        if(c_answer == u_answer) {
+            if(c_answer == 1){
+                one_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                one_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 2){
+                two_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                two_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 3){
+                three_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                three_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 4){
+                four_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                four_textView.setVisibility(View.VISIBLE);
+            }
+        }else{
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_incorrect));
+            if(c_answer == 1){
+                one_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                one_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 2){
+                two_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                two_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 3){
+                three_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                three_textView.setVisibility(View.VISIBLE);
+            }else if(c_answer == 4){
+                four_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_correct_answer_choice));
+                four_textView.setVisibility(View.VISIBLE);
+            }
+
+            if(u_answer == 1){
+                one_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_user_answer_choice));
+                one_textView.setVisibility(View.VISIBLE);
+                one_textView.setText("오답");
+            }else if(u_answer == 2){
+                two_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_user_answer_choice));
+                two_textView.setVisibility(View.VISIBLE);
+                two_textView.setText("오답");
+            }else if(u_answer == 3){
+                three_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_user_answer_choice));
+                three_textView.setVisibility(View.VISIBLE);
+                three_textView.setText("오답");
+            }else if(u_answer == 4){
+                four_conLayout.setBackground(getResources().getDrawable(R.drawable.exam_result_user_answer_choice));
+                four_textView.setVisibility(View.VISIBLE);
+                four_textView.setText("오답");
+            }
+        }
+
+    }
+
+
 
 
     public void getQuestionImage(ImageView imageView, String url){
@@ -727,6 +929,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         };
         queue.add(stringRequest);
     }
+
 
 
     @Override

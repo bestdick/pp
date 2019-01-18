@@ -66,6 +66,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/circle_conLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="64dp"

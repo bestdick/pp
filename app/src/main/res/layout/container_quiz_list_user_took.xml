@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/percent_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="50"
+            android:progressDrawable="@drawable/custom_percentbar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/quiz_date_name_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="퀴즈 날짜"
+            app:layout_constraintBottom_toTopOf="@+id/quiz_user_took_textView"
+            app:layout_constraintStart_toEndOf="@+id/percent_bar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/quiz_user_took_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="16dp"
+            android:text="내가 치룬 시험 날짜"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/percent_bar"
+            app:layout_constraintTop_toBottomOf="@+id/quiz_date_name_textView" />
+
+        <TextView
+            android:id="@+id/quiz_percent_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="퍼센트"
+            app:layout_constraintBottom_toTopOf="@+id/quiz_fraction_textView"
+            app:layout_constraintEnd_toEndOf="@+id/percent_bar"
+            app:layout_constraintStart_toStartOf="@+id/percent_bar"
+            app:layout_constraintTop_toTopOf="@+id/percent_bar" />
+
+        <TextView
+            android:id="@+id/quiz_fraction_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="fraction"
+            app:layout_constraintBottom_toBottomOf="@+id/percent_bar"
+            app:layout_constraintEnd_toEndOf="@+id/percent_bar"
+            app:layout_constraintStart_toStartOf="@+id/percent_bar"
+            app:layout_constraintTop_toBottomOf="@+id/quiz_percent_textView" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

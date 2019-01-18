@@ -72,6 +72,8 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
     Button  menu_one, menu_two, menu_three;
     TextView see_more_textView;
     View listview_footer;
+
+    ConstraintLayout my_folder_not_login_empty_conLayout;
     public static FlashcardFragment newInstance() {
         FlashcardFragment fragment = new FlashcardFragment();
         Bundle args = new Bundle();
@@ -114,10 +116,16 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
     }
 
     public void flashcardMenuButtonClicked(final View rootView){
+        my_folder_not_login_empty_conLayout = (ConstraintLayout) rootView.findViewById(R.id.my_folder_not_login_empty_conLayout);
         menu_one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //최신 순서
+                if(my_folder_not_login_empty_conLayout.getVisibility() == View.VISIBLE){
+                    my_folder_not_login_empty_conLayout.setVisibility(View.INVISIBLE);
+                    flashcardListView.setVisibility(View.VISIBLE);
+                }
+
                 menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button));
                 menu_two.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
                 menu_three.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
@@ -145,6 +153,12 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
             @Override
             public void onClick(View view) {
                 //인기순서
+                if(my_folder_not_login_empty_conLayout.getVisibility() == View.VISIBLE){
+                    my_folder_not_login_empty_conLayout.setVisibility(View.INVISIBLE);
+                    flashcardListView.setVisibility(View.VISIBLE);
+                }
+
+
                 menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
                 menu_two.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button));
                 menu_three.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));
@@ -179,15 +193,22 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                     page = 0;
                     flashcard_list.clear();
 
-                    flashcard_my_list =new ArrayList<FlashCardMyList>();
-                    flashcard_my_list_adapter = new FlashcardMyListAdapter(getActivity(), flashcard_my_list);
-                    flashcardListView.setAdapter(flashcard_my_list_adapter);
-                    flashcardListView.removeFooterView(listview_footer);
+                    if(my_folder_not_login_empty_conLayout.getVisibility() == View.INVISIBLE ||
+                            my_folder_not_login_empty_conLayout.getVisibility() == View.GONE){
+                        my_folder_not_login_empty_conLayout.setVisibility(View.VISIBLE);
+                        flashcardListView.setVisibility(View.INVISIBLE);
+                    }
 
-                    TextView textView =  new TextView(getContext());
-                    textView.setText("로그인하시면 폴더 기능을 사용할 수 있습니다.\n폴더에 플래쉬카드를 저장하여 공부 할 수 있습니다.");
-                    FlashCardMyList elements = new FlashCardMyList("null", "null", "null");
-                    flashcard_my_list.add(elements);
+
+//                    flashcard_my_list =new ArrayList<FlashCardMyList>();
+//                    flashcard_my_list_adapter = new FlashcardMyListAdapter(getActivity(), flashcard_my_list);
+//                    flashcardListView.setAdapter(flashcard_my_list_adapter);
+//                    flashcardListView.removeFooterView(listview_footer);
+//
+//                    TextView textView =  new TextView(getContext());
+//                    textView.setText("로그인하시면 폴더 기능을 사용할 수 있습니다.\n폴더에 플래쉬카드를 저장하여 공부 할 수 있습니다.");
+//                    FlashCardMyList elements = new FlashCardMyList("null", "null", "null");
+//                    flashcard_my_list.add(elements);
                 }else{
                     // 폴더 로그인 했을떄
                     menu_one.setBackground(getResources().getDrawable(R.drawable.test_fragment_navi_button_off));

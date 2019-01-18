@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,8 +16,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.eviewPager;
+
 import static com.storyvendingmachine.www.pp.MainFragment.quizUserSelectedAnswers;
 import static com.storyvendingmachine.www.pp.MainFragment.quiz_viewPager;
 
@@ -35,9 +39,11 @@ public class QuizTodayDialogFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+
     // TODO: Rename and change types of parameters
     private Bundle mParam1;
     private String mParam2; // position
+
 
     TextView subject_textView, exam_name_textView, question_textView, question_example_textView;
     ImageView question_imageView;

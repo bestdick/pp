@@ -76,6 +76,7 @@ public class StatisticFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    PieChart pieChart;
     public static StatisticFragment newInstance(String param1, String param2) {
         StatisticFragment fragment = new StatisticFragment();
         Bundle args = new Bundle();
@@ -110,9 +111,10 @@ public class StatisticFragment extends Fragment {
             }else{
                 //기본 적인 메뉴 생성
                 Initializer(rootview);
-                BackgroundTask backgroundTask = new BackgroundTask();
-                backgroundTask.rootview = rootview;
-                backgroundTask.execute();
+//                BackgroundTask backgroundTask = new BackgroundTask();
+//                backgroundTask.rootview = rootview;
+//                backgroundTask.execute();
+                getExamResultData(rootview);
                 swiper(rootview);
             }
 
@@ -157,7 +159,7 @@ public class StatisticFragment extends Fragment {
                 statistic_exam_result_container.removeAllViews();
                 subject_result_container.removeAllViews();
                 mSwipeRefreshLayout.setRefreshing(false);
-
+                pieChart.notifyDataSetChanged();
             }
         });
     }
@@ -347,15 +349,16 @@ public class StatisticFragment extends Fragment {
 
                                     if(Integer.parseInt(user_taken_exam_count) == 0){
                                         //시험을 응시한적이 없을떄
-                                        PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                         pieChart.setVisibility(View.GONE);
                                         never_took_exam_textView.setVisibility(View.VISIBLE);
                                         statistic_exam_result_container.setVisibility(View.GONE);
                                         subject_result_container.setVisibility(View.GONE);
                                     }else{
                                         //한번이라도 시험을 응시했을때
-                                        PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                         pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                        pieChart.notifyDataSetChanged();
                                     }
                                 }
                             }else if(access_token.equals("invalid")){
@@ -425,6 +428,7 @@ public class StatisticFragment extends Fragment {
         subject_pieChart.setData(data);
     }
     public void pieChart(View rootview, PieChart pieChart, int pass, int fail){
+
         pieChart.setTouchEnabled(false);
 
         pieChart.setUsePercentValues(true);
@@ -575,14 +579,14 @@ public class StatisticFragment extends Fragment {
 
                                         if (Integer.parseInt(user_taken_exam_count) == 0) {
                                             //시험을 응시한적이 없을떄
-                                            PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                             pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                             pieChart.setVisibility(View.GONE);
                                             never_took_exam_textView.setVisibility(View.VISIBLE);
                                             statistic_exam_result_container.setVisibility(View.GONE);
                                             subject_result_container.setVisibility(View.GONE);
                                         } else {
                                             //한번이라도 시험을 응시했을때
-                                            PieChart pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                             pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                             pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
                                         }
 

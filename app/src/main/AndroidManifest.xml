@@ -69,8 +69,9 @@
         <activity
             android:name=".JoinActivity"
             android:theme="@style/PersonalPageTheme" />
-        <activity android:name=".NewsActivity"
-            android:theme="@style/PersonalPageTheme"/>
+        <activity
+            android:name=".NewsActivity"
+            android:theme="@style/PersonalPageTheme" />
 
         <!-- below is yalantis activity -->
         <activity
@@ -81,6 +82,8 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".QuizResultActivity"
+            android:theme="@style/PersonalPageTheme"></activity>
     </application>
 
 </manifest>

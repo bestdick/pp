@@ -1,6 +1,7 @@
 package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +30,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,9 +133,10 @@ public class QuizTodaySubmitResultFragment extends Fragment {
 
     public JSONArray combineProblems_And_UserAnswer_And_Score(View rootview){
 //also this function compare correct and incorrect to return score
+        final ConstraintLayout circle_conLayout = (ConstraintLayout) rootview.findViewById(R.id.circle_conLayout);
         final TextView score_percent_textView = (TextView) rootview.findViewById(R.id.score_percent_textView);
         final TextView score_fraction_textView = (TextView) rootview.findViewById(R.id.score_fraction_textView);
-        JSONArray jsonArray_return = new JSONArray();
+        final JSONArray jsonArray_return = new JSONArray();
         try{
             JSONArray jsonArray = new JSONArray(mParam1);
             int count = jsonArray.length();
@@ -171,12 +175,33 @@ public class QuizTodaySubmitResultFragment extends Fragment {
             score_percent_textView.setText(percent_str+" % ");
             score_fraction_textView.setText(fraction);
 
+
+            final String current_time = currecnt_time();
+            circle_conLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getActivity(), QuizResultActivity.class);
+                    intent.putExtra("isNew", "new");
+                    intent.putExtra("quiz_date", mParam2);
+                    intent.putExtra("current_time", current_time);
+                    intent.putExtra("json_array", jsonArray_return.toString());
+                    startActivity(intent);
+                    slide_left_and_slide_in();
+                }
+            });
+
         }catch (JSONException e){
             e.printStackTrace();
         }
         return jsonArray_return;
     }
 
+    public String currecnt_time(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = df.format(c.getTime());
+        return formattedDate;
+    }
     public void uploadQuizTodayData_returnResult(final JSONArray jsonArray){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadResultOfQuizToday.php";
@@ -231,6 +256,9 @@ public class QuizTodaySubmitResultFragment extends Fragment {
     public void progressbar_invisible(){
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         progressBar.setVisibility(View.INVISIBLE);
+    }
+    public void slide_left_and_slide_in(){//opening new activity
+        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 
 //    // TODO: Rename method, update argument and hook method into UI event

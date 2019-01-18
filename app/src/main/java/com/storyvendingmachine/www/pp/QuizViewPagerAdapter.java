@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.widget.ProgressBar;
 
 import org.json.JSONArray;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import static com.storyvendingmachine.www.pp.MainFragment.quizUserSelectedAnswers;
 
 public class QuizViewPagerAdapter extends FragmentStatePagerAdapter {
+    String from;
     int count;
     JSONArray jsonArray;
     String today;

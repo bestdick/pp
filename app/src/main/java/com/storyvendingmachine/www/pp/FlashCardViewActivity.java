@@ -110,9 +110,10 @@ public class FlashCardViewActivity extends AppCompatActivity {
             backgroundTask.execute();
 
             toolbar(flashcard_title);
+            comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
             if(LoginType.equals("kakao") || LoginType.equals("normal")){
                 likeButtonClicked();
-                comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
+
                 comment_write_textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -128,6 +129,15 @@ public class FlashCardViewActivity extends AppCompatActivity {
                     }
                 });
             }else{
+                likeButtonClicked();
+                comment_write_textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String message = "로그인 후에 사용 가능한 메뉴 입니다.";
+                        String positivie_message = "확인";
+                        notifier(message, positivie_message);
+                    }
+                });
                 Toast.makeText(this, "로그인 후에 사용 가능", Toast.LENGTH_SHORT).show();
             }
         }else{
@@ -243,13 +253,32 @@ public class FlashCardViewActivity extends AppCompatActivity {
         exam_title_TextView.setText(title_message);
     }
     public void likeButtonClicked(){
-        TextView like_button = (TextView) findViewById(R.id.like_count_textView);
-        like_button.setOnClickListener(new View.OnClickListener() {
+//        TextView like_button = (TextView) findViewById(R.id.like_count_textView);
+        like_count_textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateLike();
+                if(LoginType.equals("null") || G_user_id.equals("null")){
+                    String message = "로그인 하셔야 사용할수 있는 메뉴 입니다.";
+                    String positive_message = "확인";
+                    notifier(message, positive_message);
+                }else{
+                    updateLike();
+                }
+
             }
         });
+    }
+    public void notifier(String message, String positive_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
     }
     public void notifierAddToFlashCardFolder(String message, String positive_message, String negative_message, final String folder_code, final TextView textView){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
