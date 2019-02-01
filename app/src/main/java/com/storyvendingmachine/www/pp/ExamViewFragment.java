@@ -3,7 +3,13 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -12,6 +18,9 @@ import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +52,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +77,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
  * Created by symoo on 2018-02-13.
  */
 
-public class ExamViewFragment extends Fragment {
+public class ExamViewFragment extends Fragment implements Html.ImageGetter{
     ProgressBar pb;
     View rootView;
     final int NOTE_REQUEST_CODE = 40001;
@@ -74,6 +88,7 @@ public class ExamViewFragment extends Fragment {
 
     String exam_code, exam_name, published_year, published_round;
 
+    TextView test_textView;
 
     public static ExamViewFragment newInstance(int count, Bundle bundle, String[] note) {
         ExamViewFragment fragment = new ExamViewFragment();
@@ -150,11 +165,31 @@ public class ExamViewFragment extends Fragment {
 
         if(example_exist.equals("true")){
             String[] question_question = bundle.getString("question_question").split("##");
-            question_textView.setText("[ "+(page+1)+ " ] " + question_question[0]);
-            question_example_textView.setText(question_question[1]);
+            Spanned question = Html.fromHtml(question_question[0], this, null);
+            Spanned example = Html.fromHtml(question_question[1], this, null);
+            test_textView = (TextView)  rootView.findViewById(R.id.question_textView);
+            test_textView.setText("[ "+(page+1)+ " ] " + question);
+//            question_textView.setText("[ "+(page+1)+ " ] " + question);
+
+            question_example_textView.setText(example);
+//            question_textView.setText("[ "+(page+1)+ " ] " + question_question[0]);
+//            question_example_textView.setText(question_question[1]);
         }else{
             String question_question = bundle.getString("question_question");
-            question_textView.setText("[ "+(page+1)+ " ] " + question_question);
+            question_question = question_question.replace("#_under_o_#", "<sub>");
+            question_question = question_question.replace("#_under_c_#", "</sub>");
+            String temp = TextUtils.htmlEncode(question_question);
+            String temp2 = Html.fromHtml((String) question_question).toString();
+
+            Spanned question_1 = Html.fromHtml(question_question, this, null);
+            Spanned question_2 = Html.fromHtml(temp, this, null);
+            Spanned question_3 = Html.fromHtml(temp2, this, null);
+            Spanned wk = Html.fromHtml("kjhgig<sub>7</sub>wperijn", this, null);
+
+            test_textView = (TextView)  rootView.findViewById(R.id.question_textView);
+            test_textView.setText("[ "+(page+1)+ " ] " + question_1+"\n"+question_2+"\n"+question_3+"\n"+wk);
+
+//            question_textView.setText("[ "+(page+1)+ " ] " + question_question+ "'\n" + temp + "\n"+temp2);
             question_example_textView.setVisibility(View.GONE);
         }
 
@@ -769,5 +804,57 @@ public class ExamViewFragment extends Fragment {
         }else{
         }
 
+    }
+
+
+    @Override
+    public Drawable getDrawable(String source){
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(R.drawable.icon_empty_thumbnail);
+        d.addLevel(0, 0 , empty);
+        d.setBounds(0, 0 , empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+
+        new LoadImage().execute(source, d);
+
+        return d;
+    }
+
+    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+        private final static String TAG = "TestImageGetter";
+        private LevelListDrawable mDrawable;
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+            String source = (String) params[0];
+            mDrawable = (LevelListDrawable) params[1];
+            Log.d(TAG, "doInBackground " + source);
+            try {
+                InputStream is = new URL(source).openStream();
+                return BitmapFactory.decodeStream(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d(TAG, "onPostExecute drawable " + mDrawable);
+            Log.d(TAG, "onPostExecute bitmap " + bitmap);
+            if (bitmap != null) {
+                BitmapDrawable d = new BitmapDrawable(bitmap);
+                mDrawable.addLevel(1, 1, d);
+                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                mDrawable.setLevel(1);
+                // i don't know yet a better way to refresh TextView
+                // mTv.invalidate() doesn't work as expected
+                CharSequence t = test_textView.getText();
+                test_textView.setText(t);
+            }
+        }
     }
 }

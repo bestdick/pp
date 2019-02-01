@@ -86,10 +86,12 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
     String refresh_upload_prevent;
+    Button submit_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_view);
+        submit_button = (Button) findViewById(R.id.submit_textView);
 
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
@@ -132,9 +134,29 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             String title_message = published_year+" 년도 "+published_round+" 회 "+exam_name;
             toolbar(title_message);
 
+            drawer_listener();
+
+            submit_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    boolean is = checkifAllAnswersAreSelected();
+                    if(is){
+                        String message = "채점 하시겠습니까?";
+                        String pos_message = "네";
+                        String neg_message = "아니요";
+                        notifier_examSubmitButtonProcess(message, pos_message, neg_message);
+                    }else{
+                        String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
+                        String pos_message = "네";
+                        String neg_message = "아니요";
+                        notifier_examSubmitButtonProcess(message, pos_message, neg_message);
+                    }
+                }
+            });
 
         }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
             //기출 시험 공부
+            submit_button.setVisibility(View.GONE);
             drawer = (DrawerLayout) findViewById(R.id.drawer);
 
             navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -157,6 +179,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             getExamNote(exam_code, published_year, published_round);
 
             Toast.makeText(this, "Exam selection study exam", Toast.LENGTH_SHORT).show();
+            drawer_listener();
         }
 
 
@@ -167,6 +190,51 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
+    }
+
+    public void drawer_listener(){
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+//                Toast.makeText(ExamViewActivity.this, "on slide", Toast.LENGTH_SHORT).show();
+                Log.e("drawer state ", "on slide");
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                if(navi_selection.equals("1")){
+                    // 기출 풀기
+                    makeAnswerSheet();
+                    Toast.makeText(ExamViewActivity.this, "open", Toast.LENGTH_SHORT).show();
+                }else{
+                    //기출 공부
+                    if(LoginType.equals("null")){
+                        //로그인을 하지 않은 상태
+                    }else{
+                        //로그인 한 상태
+                        progressbar_visible();
+                        answer_sheet_element_layout.removeAllViews();
+                        try {
+                            makeUserPersonalNoteSheet_renew();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                Toast.makeText(ExamViewActivity.this, "close", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                Log.e("drawer state ", "on change");
+//                Toast.makeText(ExamViewActivity.this, "on change", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -212,6 +280,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         int id = item.getItemId();
 
         if(id == R.id.answer_sheet_menu){
+            //기출 시험 응시
             // drawer
             if (drawer.isDrawerOpen(Gravity.RIGHT)) {
                 //drawer is open
@@ -221,9 +290,10 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             } else {
                 //drawer is closed
                 drawer.openDrawer(Gravity.RIGHT);
-                makeAnswerSheet();
+
             }
         }else if(id==R.id.exam_note_sheet){// backpress id
+            //기출 시험 공부
             // drawer
             if (drawer.isDrawerOpen(Gravity.RIGHT)) {
                 //drawer is open
@@ -244,9 +314,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                         e.printStackTrace();
                     }
                 }
-
-
-
             }
         }else{
             onBackPressed();
@@ -635,11 +702,23 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
             if(answer1 ==1){
                 one.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+                two.setBackground(null);
+                three.setBackground(null);
+                four.setBackground(null);
             }else if(answer1==2){
+                one.setBackground(null);
                 two.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+                three.setBackground(null);
+                four.setBackground(null);
             }else if(answer1==3){
+                one.setBackground(null);
+                two.setBackground(null);
                 three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
+                four.setBackground(null);
             }else if(answer1==4){
+                one.setBackground(null);
+                two.setBackground(null);
+                three.setBackground(null);
                 four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container));
             }
         }
@@ -754,6 +833,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             progressbar_visible();
 
             upLoadSubmittedExamData(savejsonArray, refresh_upload_prevent);
+//            upLoadSubmittedExamData(resultJSONarray, refresh_upload_prevent);
 
             Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
             intent.putExtra("from", "ExamViewActivity");

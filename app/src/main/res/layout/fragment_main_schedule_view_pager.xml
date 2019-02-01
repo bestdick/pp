@@ -38,9 +38,8 @@
         android:id="@+id/linearLayout5"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
         android:background="@color/colorWhite"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,8 +51,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:text="0000년도 시험 스케쥴이 준비되지 않았습니다. Qnet에서 확인"
-          />
+            android:text="0000년도 시험 스케쥴이 준비되지 않았습니다. Qnet에서 확인" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

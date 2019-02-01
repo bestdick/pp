@@ -136,12 +136,6 @@ public class FlashCardWriteActivity extends AppCompatActivity {
         listView.smoothScrollToPosition(flashCardWriteListAdapter.getCount());
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
     public void headerContent(){
         View headerView = getLayoutInflater().inflate(R.layout.container_flashcard_write_header, null);
         flashcard_title_editText = (EditText) headerView.findViewById(R.id.flashcard_write_title_editText);
@@ -155,6 +149,7 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 Intent intent = new Intent(FlashCardWriteActivity.this, SelectExamActivity.class);
                 intent.putExtra("from", "flashcard_write_activity");
                 startActivityForResult(intent, RESULT_CODE_SELECT_EXAM);
+                slide_left_and_slide_in();
             }
         });
         flashcard_select_subject_button.setText("과목 선택 : 전체");
@@ -166,12 +161,12 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 intent.putExtra("selected_exam_code", selected_exam_code);
                 intent.putExtra("selected_exam_name", selected_exam_name);
                 startActivityForResult(intent, RESULT_CODE_SELECT_SUBJECT);
+                slide_left_and_slide_in();
             }
         });
 
         listView.addHeaderView(headerView);
     }
-
     public void uploadButtonProcessDeco(){
         final Button upload_button = new Button(this);
         upload_button.setText("작성");
@@ -212,8 +207,12 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                             jsonObjectTotal.put("exam_code", selected_exam_code);
                             jsonObjectTotal.put("subject_number", subject_number);
                             jsonObjectTotal.put("flashcards", jsonArray);
+                            String message = "플래시카드를 업로드 하시겠습니까?";
+                            String positive_message = "확인";
+                            String negative_message = "취소";
+                            notifier_private_public( message,  positive_message,
+                                     negative_message,   jsonObjectTotal);
 
-                            uploadWrittenFlashCard(jsonObjectTotal);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -228,6 +227,25 @@ public class FlashCardWriteActivity extends AppCompatActivity {
         });
     }
 
+    public void notifier_private_public(String message, String positive_message,
+                                        String negative_message, final JSONObject jsonObjectTotal){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        uploadWrittenFlashCard(jsonObjectTotal);
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
     public void confirm_notifier(String message, String confirm_button){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(message)
@@ -264,10 +282,13 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
-                            // Toast.makeText(SelectExamActivity.this,access_token, Toast.LENGTH_SHORT).show();
-
                             if(access_token.equals("valid")){
-                                JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                String upload_result = jsonObject.getString("response");
+                                if(upload_result.equals("upload_success")){
+                                    onBackPressed();
+                                }else{
+
+                                }
 
                             }else if(access_token.equals("invalid")){
                                 Toast.makeText(FlashCardWriteActivity.this,"잘못된 접근입니다", Toast.LENGTH_SHORT).show();
@@ -302,6 +323,7 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 params.put("login_type", LoginType);
                 params.put("user_id", G_user_id);
                 params.put("flashcard_data", jsonObject_str);
+//                params.put("public_private", public_private);
                 return params;
             }
         };
@@ -340,8 +362,21 @@ public class FlashCardWriteActivity extends AppCompatActivity {
     }
 
 
+
     public String changeLineTransform(String input_str){
         String output_str = input_str.replace("\n", "<br>");
         return output_str;
+    }
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+
+    @Override
+    public void onBackPressed() {
+//        Session.getCurrentSession().removeCallback(callback);
+        super.onBackPressed();  // optional depending on your needs
+        setResult(RESULT_OK);
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

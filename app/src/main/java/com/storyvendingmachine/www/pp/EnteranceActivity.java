@@ -39,6 +39,7 @@ public class EnteranceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enterance);
+        makeQuiz(); // upload quiz~~
 //아래가 나의 !!것
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
@@ -73,14 +74,14 @@ public class EnteranceActivity extends AppCompatActivity {
                 //****************kakao login **************************
 
                 }
-            }, 1500);
+            }, 800);
         }else if(LT.equals("normal")){
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
                     LoginRemember();
                 }
-            }, 1000);
+            }, 800);
         }else{
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
@@ -90,7 +91,7 @@ public class EnteranceActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                     finish();
                 }
-            }, 1000);
+            }, 800);
         }
 
 
@@ -133,7 +134,7 @@ public class EnteranceActivity extends AppCompatActivity {
 
                 }
             }
-        }, 1500);
+        }, 800);
 
 
     }
@@ -154,6 +155,7 @@ public class EnteranceActivity extends AppCompatActivity {
                             String login_success_fail = temp.getString("call");
                             if(login_success_fail.equals("login_success")){
                                 String user_email = temp.getString("user_email");
+                                String member_level = temp.getString("member_level");
                                 String user_nickname = temp.getString("user_nickname");
                                 String user_thumbnail = temp.getString("user_thumbnail");
                                 String user_selected_last_exam_code = temp.getString("user_selected_last_exam_code");
@@ -168,6 +170,7 @@ public class EnteranceActivity extends AppCompatActivity {
                                 Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
                                 intent.putExtra("login_type", "normal");
                                 intent.putExtra("user_id", user_email);
+                                intent.putExtra("member_level", member_level);
                                 intent.putExtra("user_nickname", user_nickname);
                                 intent.putExtra("user_thumbnail", user_thumbnail);
                                 intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
@@ -182,25 +185,24 @@ public class EnteranceActivity extends AppCompatActivity {
 
 
                             }else if(login_success_fail.equals("login_fail")){
+                                editor.putString("login_type", "null");
+                                editor.putBoolean("id_pw_match", false);
+                                editor.putString("user_email", "");
+                                editor.putString("user_password", "");
+                                editor.commit();
 
-                                Toast.makeText(EnteranceActivity.this, "login fail", Toast.LENGTH_SHORT).show();
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(EnteranceActivity.this);
-//                                builder.setMessage("존재하지 않는 사용자 입니다.\n로그인 페이지로 이동합니다")
-//                                        .setPositiveButton("이동", new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                                editor.putBoolean("id_pw_match", false);
-//                                                editor.putString("user_email", "");
-//                                                editor.putString("user_password", "");
-//                                                editor.commit();
-//                                                Intent intent = new Intent(EnteranceActivity.this, LoginActivity.class);
-//                                                startActivity(intent);
-//                                                finish();
-//
-//                                            }
-//                                        })
-//                                        .create()
-//                                        .show();
+                                String str_null="null";
+                                Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
+                                intent.putExtra("login_type", str_null);
+                                intent.putExtra("user_id", str_null);
+                                intent.putExtra("member_level", str_null);
+                                intent.putExtra("user_nickname", str_null);
+                                intent.putExtra("user_thumbnail", str_null);
+                                intent.putExtra("user_selected_last_exam_code", str_null);
+                                intent.putExtra("user_selected_last_exam_name", str_null);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                finish();
 
                             }else{
                                 Log.e("알수 없는 에러 발생", "php 를 켜서 확인 하세요");
@@ -225,6 +227,41 @@ public class EnteranceActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("email", input_user_email);
                 params.put("password", input_user_password);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+    public void makeQuiz(){
+        RequestQueue queue = Volley.newRequestQueue(EnteranceActivity.this);
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadTodayQuiz_at_enteranceActivity.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("make quiz", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
                 return params;
             }
         };

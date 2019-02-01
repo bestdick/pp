@@ -82,6 +82,7 @@ public class QuizResultActivity extends AppCompatActivity {
         TextView exam_name_textView = (TextView) findViewById(R.id.exam_name_textView);
         TextView percent_textView = (TextView) findViewById(R.id.percent_textView);
         TextView fraction_textView = (TextView) findViewById(R.id.fraction_textView);
+        ProgressBar percent_bar = (ProgressBar) findViewById(R.id.percent_bar);
 
         quiz_title_textView.setText(period_between_date(quiz_date)+" 퀴즈 결과");
         quiz_took_date_textView.setText(current_time);
@@ -126,6 +127,7 @@ public class QuizResultActivity extends AppCompatActivity {
         String fraction_str = total_correct+" / "+total_questions;
         percent_textView.setText(percent_str+"%");
         fraction_textView.setText(fraction_str);
+        percent_bar.setProgress((int) Float.parseFloat(percent_str));
         progressbar_invisible();
     }
     // old quiz result retrieve
@@ -157,6 +159,7 @@ public class QuizResultActivity extends AppCompatActivity {
                                 TextView exam_name_textView = (TextView) findViewById(R.id.exam_name_textView);
                                 TextView percent_textView = (TextView) findViewById(R.id.percent_textView);
                                 TextView fraction_textView = (TextView) findViewById(R.id.fraction_textView);
+                                ProgressBar percent_bar = (ProgressBar) findViewById(R.id.percent_bar);
 
 
                                 String percent = decimal_two_digis(count_correct, count_total);
@@ -166,6 +169,7 @@ public class QuizResultActivity extends AppCompatActivity {
                                 quiz_took_date_textView.setText(quiz_took_date+" "+quiz_took_time);
                                 percent_textView.setText(percent+" %");
                                 fraction_textView.setText(count_correct+" / "+count_total);
+                                percent_bar.setProgress((int) Float.parseFloat(percent));
 
                                 String temp = Html.fromHtml((String) response_object.getString("json_data")).toString();
                                 JSONArray jsonArray = new JSONArray(temp);

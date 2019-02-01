@@ -94,7 +94,7 @@ public class MainFragment extends Fragment {
         progressBar = (ProgressBar) rootView.findViewById(R.id.main_fragment_progress_bar);
         wrapper = (LinearLayout) rootView.findViewById(R.id.fragment_main_container);
         isQuizOpened =false;
-        if(exam_selection_code == "null"){
+        if(exam_selection_code.equals("null") || exam_selection_code == null){
             //시험을 고르지 않은 상태
             //시험을 고르지 않은 상태에서는 1. 전체 시험 스케쥴과
             // 2 . 공지를 나태내준다.
@@ -360,7 +360,6 @@ public class MainFragment extends Fragment {
         queue.add(stringRequest);
 
     }
-
     // Below ---- this data fetch when user select exam
     public void getExamInfo(){
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
@@ -594,7 +593,6 @@ public class MainFragment extends Fragment {
         queue.add(stringRequest);
     }
 
-
     public String remaindays(String test_date){
 
         String hour = "01";
@@ -711,7 +709,8 @@ public class MainFragment extends Fragment {
 
     public void getShortTodayQuiz(){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getShortTodayQuiz.php";
+//        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getShortTodayQuiz.php";
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/updateQuiz.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override

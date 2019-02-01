@@ -398,7 +398,14 @@ public class FlashCardViewActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String input_folder_name = editText.getText().toString();
-                uploadNewlyCreatedFolder(input_folder_name);
+                if(input_folder_name.isEmpty()){
+                    String mess = "폴더이름을 입력해주세요";
+                    String pos_mess = "확인";
+                    notifier(mess, pos_mess);
+                }else{
+                    uploadNewlyCreatedFolder(input_folder_name);
+                }
+
             }
         });
         ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -422,9 +429,26 @@ public class FlashCardViewActivity extends AppCompatActivity {
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
                                 String result = jsonObject.getString("response");
+                                // ***********************************************
+                                // 1. success
+                                // 2. fail
+                                // 3. folder_already_exist
+                                // 4. max_folder_reached
+                                // ***********************************************
                                 if(result.equals("success")){
-                                    //성공적으로 업로드
-
+                                    String message = "폴더를 성공적으로 만들었습니다.";
+                                    String pos_message = "확인";
+                                    notifier(message, pos_message);
+                                    scrap_folder_layout.removeAllViews();
+                                    getScrapFolderName();
+                                }else if(result.equals("folder_already_exist")){
+                                    String message = "'"+folder_name +"'폴더는 이미 존재합니다. 다른 이름으로 폴더를 만들어 주세요.";
+                                    String pos_message = "확인";
+                                    notifier(message, pos_message);
+                                }else if(result.equals("max_folder_reached")){
+                                    String message = "폴더 한도 초과 하였습니다. 나의 페이지에서 한도를 늘려주세요";
+                                    String pos_message = "확인";
+                                    notifier(message, pos_message);
                                 }else{
                                     //업로드 실패
                                 }
@@ -949,6 +973,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
+        setResult(RESULT_OK);
         finish();
         overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }

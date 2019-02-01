@@ -8,6 +8,9 @@ public class TestYearOrderList {
     String exam_code;
     String exam_name;
     String published_year;
+    String max_questions;
+    String this_count;
+
     String published_num;
     String navi_selection;
 
@@ -15,6 +18,22 @@ public class TestYearOrderList {
     String pass_count;
     String fail_count;
     String percent;
+
+    public String getThis_count() {
+        return this_count;
+    }
+
+    public void setThis_count(String this_count) {
+        this.this_count = this_count;
+    }
+
+    public String getMax_questions() {
+        return max_questions;
+    }
+
+    public void setMax_questions(String max_questions) {
+        this.max_questions = max_questions;
+    }
 
     public String getExam_code() {
         return exam_code;
@@ -88,10 +107,12 @@ public class TestYearOrderList {
         this.percent = percent;
     }
 
-    public TestYearOrderList(String exam_code, String exam_name, String published_year, String published_num, String navi_selection, String total_taker, String pass_count, String fail_count, String percent) {
+    public TestYearOrderList(String exam_code, String exam_name, String published_year, String max_questions, String this_count, String published_num, String navi_selection, String total_taker, String pass_count, String fail_count, String percent) {
         this.exam_code = exam_code;
         this.exam_name = exam_name;
         this.published_year = published_year;
+        this.max_questions = max_questions;
+        this.this_count = this_count;
         this.published_num = published_num;
         this.navi_selection = navi_selection;
         this.total_taker = total_taker;

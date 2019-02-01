@@ -15,8 +15,8 @@
     *해당 메뉴는 기출 시험을 완료하신 내용을 토대로 합격률을 나타내는 통계 메뉴입니다.\n
     *또한 기출 시험을 완료하신 각각의 기출 시험 정보를 제공해드립니다.</string>
     <string name="statistic_notice_never_took_exam_string">*성적 통계가 존재하지 않습니다.</string>
-    <string name="app_name">pp</string>
-    <string name="term">수집되는 개인정보 사항
+    <string name="app_name">패스팝</string>
+    <string name="term">수집되는 개인정보 사항\n
 ◈ 패스팝은 최적의 서비스를 제공하기 위해 회원가입 할때 기본적인 필수 정보를 수집하고 있으며 필요에 따라 추가 정보를 받고 있습니다.\n
 회원가입시 기본사항\n
 1) 회원 E-mail\n
@@ -39,6 +39,22 @@
 
 위와 같은 경우, 회원정보는 재생할 수 없는 방법에 의해 하드디스크에서 완전히 삭제되며 어떠한 용도로도 열람 또는 이용할 수 없도록 처리됩니다.</string>
 
+    <string name="password_find">
+        비밀번호 찾기\n
+        이메일로 새로운 비밀번호가 전송됩니다. 새로운 비밀번호로 로그인하신 후 비밀번호를 변경해주세요.\n
+        새로운 비밀번호가 전송되는데 1분에서 10분정도 소요될 수 있습니다.\n
+        시간이 지나도 비밀번호가 전송되지 않으면 다시한번 \'비밀번호 발송\'을 눌러주세요.\n
+        (스팸 보관함 확인 요망)
+    </string>
+    <string name="verification_code_send">
+        인증코드 재발송\n
+        만약 인증코드가 발송되지 않았다면 이메일을 입력하시고 \'재발송\' 해주세요.\n
+        인증코가 전송되는데 1분에서 10분정도 소요될 수 있습니다.\n
+        (스팸 보관함 확인 요망)
+    </string>
+    <string name="flashcard_folder_manager_notice">
+        플래시카드 폴더\n*보상형 광고를 시청하시면 최대 폴더 갯수를 1개씩 영구히 증가 시킬 수 있습니다.\n*양해부탁드려요 ㅜ_ㅜ...
+    </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_news">Sign in</string>

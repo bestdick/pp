@@ -340,6 +340,7 @@ public class NewsActivity extends AppCompatActivity {
 
     }
     public void swiper(){
+        stop = false;
         quiz_view_swiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

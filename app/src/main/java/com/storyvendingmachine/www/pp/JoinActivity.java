@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,8 +32,11 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JoinActivity extends AppCompatActivity {
@@ -58,28 +62,50 @@ public class JoinActivity extends AppCompatActivity {
     TextView term_textView;
     CheckBox term_checkBox;
 
+    ScrollView scrollView, scrollView2;
 
 
     boolean isEmailOK, isNicknameOK, isPasswordOK;
+
+    int VIEW_ONE=1;// 회원 가입 뷰
+    int VIEW_TWO=2;// 인증 코드 재발송 뷰
+    int VIEW_THREE=3; // 비밀번호 찾기 뷰
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
         toolbar();
+
+
         Intent intent = getIntent();
         String intent_type = intent.getStringExtra("type");
         if(intent_type.equals("join")){
+            viewSelector(VIEW_ONE);
             initializer();
         }else if(intent_type.equals("verification_resend")){
-
+            viewSelector(VIEW_TWO);
+            initialize_resend_verificationCode(VIEW_TWO);
         }else{
-            // find pass word
-
+            // forgotten_password
+            viewSelector(VIEW_THREE);
+            initialize_resend_verificationCode(VIEW_THREE);
         }
-
-
     }
 
+    public void viewSelector(int input){
+
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        scrollView2 = (ScrollView) findViewById(R.id.scrollView2);
+
+        if (input == VIEW_ONE){
+            scrollView.setVisibility(View.VISIBLE);
+        }else if(input == VIEW_TWO){
+            scrollView2.setVisibility(View.VISIBLE);
+        }else{
+            scrollView2.setVisibility(View.VISIBLE);
+        }
+    }
     private void toolbar(){
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
@@ -87,11 +113,202 @@ public class JoinActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
         getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
     }
+    public void initialize_resend_verificationCode(int view_code){
+        if(view_code == 2){
+            TextView title_textView = (TextView) findViewById(R.id.title_textView);
+            final EditText resend_email_editText = (EditText)  findViewById(R.id.email_editText);
+            Button resend_button = (Button) findViewById(R.id.resend_button);
+            resend_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String user_email = resend_email_editText.getText().toString();
+                    if(user_email.trim().isEmpty()){
+                        String message = "이메일을 입력해주세요";
+                        String positive_message = "확인";
+                        simple_notifier(message, positive_message);
+                    }else{
+                        resendVerificationCode(user_email);
+                    }
+
+                }
+            });
+            TextView info_container = (TextView) findViewById(R.id.info_container);
+            info_container.setText(getResources().getString(R.string.verification_code_send));
+        }else{
+            //view code 3
+            TextView title_textView = (TextView) findViewById(R.id.title_textView);
+            title_textView.setText("비밀번호 찾기");
+            final EditText resend_email_editText = (EditText)  findViewById(R.id.email_editText);
+            Button resend_button = (Button) findViewById(R.id.resend_button);
+            resend_button.setText("비밀번호 발송");
+            resend_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String user_email = resend_email_editText.getText().toString();
+                    if(user_email.trim().isEmpty()){
+                        String message = "이메일을 입력해주세요";
+                        String positive_message = "확인";
+                        simple_notifier(message, positive_message);
+                    }else{
+                        send_password(user_email);
+                    }
+                }
+            });
+            TextView info_container = (TextView) findViewById(R.id.info_container);
+            info_container.setText(getResources().getString(R.string.password_find));
+        }
+    }
+    public void send_password(final String user_email){
+        String url= "http://www.joonandhoon.com/pp/PassPop/android/server/resendVerificationCodeORpassword.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("send password logcat", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")) {
+                                String response_str = jsonObject.getString("response");
+                                // *****************************************
+                                // response_str 에서 나오는 return 값
+                                // 1. email_not_verified
+                                // 2. email_not_exist
+                                // 3. password_change_fail
+                                // 4. send_email_fail
+                                // 5. send_email_success
+                                // ******************************************
+                                if(response_str.equals("send_email_success")){
+                                    String message = "비밀번호를 성공적으로 변경하였습니다.\n이메일을 확인하시고 로그인해주세요.";
+                                    String positive_message = "확인";
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
+                                    builder.setMessage(message)
+                                            .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    onBackPressed();
+                                                }
+                                            })
+                                            .create()
+                                            .show();
+                                }else if(response_str.equals("email_not_exist")){
+                                    String message = "존재하지 않는 이메일 입니다. 먼저 가입해주세요";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }else if(response_str.equals("email_not_verified")) {
+                                    String message = "인증되지 않은 이메일 입니다";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }else{
+                                    String message = "비밀번호 변경에 실패하였습니다. 다시 시도해주세요";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", "send_password");
+                params.put("user_email",user_email);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
 
 
+    public void resendVerificationCode(final String user_email){
+        String url= "http://www.joonandhoon.com/pp/PassPop/android/server/resendVerificationCodeORpassword.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("resend logcat", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")) {
+                                String response_str = jsonObject.getString("response");
+                                // *****************************************
+                                // response_str 에서 나오는 return 값
+                                // 1. email_already_verified
+                                // 2. email_not_exist
+                                // 3. update_fail
+                                // 4. send_email_fai
+                                // 5. send_email_success
+                                if (response_str.equals("send_email_success")){
+                                    String message = "인증코드 발송 성공\n이메일을 확인하시고 로그인해주세요.";
+                                    String positive_message = "확인";
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
+                                    builder.setMessage(message)
+                                            .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    onBackPressed();
+                                                }
+                                            })
+                                            .create()
+                                            .show();
+                                }else if(response_str.equals("email_not_exist")){
+                                    String message = "존재하지 않는 이메일 입니다. 먼저 가입해주세요";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }else if(response_str.equals("email_already_verified")) {
+                                    String message = "이미 인증된 이메일입니다. 로그인 해주세요";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }else{
+                                    String message = "인증코드 발송 실패\n다시 시도해 주세요.";
+                                    String positive_message = "확인";
+                                    simple_notifier(message, positive_message);
+                                }
 
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
 
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
 
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", "resend_verification");
+                params.put("user_email",user_email);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
 
 
     public void initializer(){
@@ -248,18 +465,6 @@ public class JoinActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-    private void simple_notifier(String message, String positive_message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
-        builder.setMessage(message)
-                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                })
-                .create()
-                .show();
-    }
     public void RegisterButtonClicked(){
         register_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -325,7 +530,7 @@ public class JoinActivity extends AppCompatActivity {
                                 String isDB = jsonObject.getJSONObject("response").getString("db");
                                 String isEmail = jsonObject.getJSONObject("response").getString("email");
                                 if(isDB.trim().equals("success") && isEmail.trim().equals("success")){
-                                    String message = "가입을 축하합니다!\n("+email+")으로 인정코드가 발송되었습니다.\n이메일은 최대 10분정도 소요될 수 있습니다.";
+                                    String message = "가입을 축하합니다!\n("+email+")으로 인증코드가 발송되었습니다.\n이메일은 최대 10분정도 소요될 수 있습니다.";
                                     String positive_message = "로그인";
                                     AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
                                     builder.setMessage(message)
@@ -372,6 +577,19 @@ public class JoinActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+
+    private void simple_notifier(String message, String positive_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         return super.onCreateOptionsMenu(menu);

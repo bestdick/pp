@@ -88,16 +88,31 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/quiz_title_textView" />
 
+
+
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="200dp"
                     android:layout_height="200dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="32dp"
-                    android:background="@drawable/circle_quiz_score"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/exam_name_textView">
+                    <ProgressBar
+                        android:id="@+id/percent_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:elevation="15dp"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="50"
+                        android:progressDrawable="@drawable/custom_percentbar"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/percent_textView"

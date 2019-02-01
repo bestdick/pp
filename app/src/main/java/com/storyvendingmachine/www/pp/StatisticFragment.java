@@ -77,6 +77,8 @@ public class StatisticFragment extends Fragment {
     private String mParam2;
 
     PieChart pieChart;
+
+    View rootview;
     public static StatisticFragment newInstance(String param1, String param2) {
         StatisticFragment fragment = new StatisticFragment();
         Bundle args = new Bundle();
@@ -98,13 +100,13 @@ public class StatisticFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootview =inflater.inflate(R.layout.fragment_statistic, container, false);
+        rootview =inflater.inflate(R.layout.fragment_statistic, container, false);
+        pieChart = (PieChart) rootview.findViewById(R.id.piechart);
         if(LoginType.equals("null") || G_user_id.equals("null")){
             //로그인 하지 않았을때.....
             guest_initializer(rootview);
         }else{
             //로그인 한 상태
-
             if(exam_selection_code.equals("null")){
                 //처음 가입했을때 시험을 선택하지 않았을떄...
                 no_exam_select_initializer(rootview);
@@ -130,6 +132,7 @@ public class StatisticFragment extends Fragment {
 
     }
     public void no_exam_select_initializer(View rootview){
+
         SwipeRefreshLayout swiper_layout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper_layout);
         swiper_layout.setVisibility(View.GONE);
         ConstraintLayout guest_notifier = (ConstraintLayout) rootview.findViewById(R.id.guest_notifier);
@@ -306,14 +309,16 @@ public class StatisticFragment extends Fragment {
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                SwipeRefreshLayout swiper_layout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper_layout);
+                                ConstraintLayout guest_notifier = (ConstraintLayout) rootview.findViewById(R.id.guest_notifier);
                                 if(jsonArray.length() == 0){
-                                    SwipeRefreshLayout swiper_layout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper_layout);
                                     swiper_layout.setVisibility(View.GONE);
-                                    ConstraintLayout guest_notifier = (ConstraintLayout) rootview.findViewById(R.id.guest_notifier);
                                     guest_notifier.setVisibility(View.VISIBLE);
                                     TextView guest_notifer_textView = (TextView) rootview.findViewById(R.id.guest_notifer_textView);
                                     guest_notifer_textView.setText(getResources().getString(R.string.statistic_notice_never_took_exam_string));
                                 }else{
+                                    swiper_layout.setVisibility(View.VISIBLE);
+                                    guest_notifier.setVisibility(View.INVISIBLE);
                                     JSONArray jsonArray_array_by_each_exam = jsonObject.getJSONArray("array_by_each_exam");
                                     behaveLike_expandableListview(rootview, jsonArray_array_by_each_exam);
 
@@ -349,14 +354,14 @@ public class StatisticFragment extends Fragment {
 
                                     if(Integer.parseInt(user_taken_exam_count) == 0){
                                         //시험을 응시한적이 없을떄
-                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                         pieChart.setVisibility(View.GONE);
                                         never_took_exam_textView.setVisibility(View.VISIBLE);
                                         statistic_exam_result_container.setVisibility(View.GONE);
                                         subject_result_container.setVisibility(View.GONE);
                                     }else{
                                         //한번이라도 시험을 응시했을때
-                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
                                         pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
                                         pieChart.notifyDataSetChanged();
                                     }

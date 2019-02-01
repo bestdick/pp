@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -52,6 +53,12 @@ public class MainActivity extends AppCompatActivity{
     //     intent request code    10001   ==  select exam request code
     //
 
+    final static int REQUEST_CODE_FOR_TESTFRAGMENT = 22001;
+    final static int REQUEST_CODE_FOR_FLASHCARDFRAGMENT = 22002;
+    final static int REQUEST_CODE_FOR_FLASHCARD_WRITE = 22011; // write
+
+
+
     int requestCode_flashcardwrite = 10004;
 
     SharedPreferences login_remember;
@@ -64,9 +71,11 @@ public class MainActivity extends AppCompatActivity{
 
     static String LoginType;
     static String G_user_id;
+    static String G_user_level;
     static String G_user_nickname;
     static String G_user_thumbnail;
 
+    FragmentManager MainfragmentManager;
     private MainActivityViewPagerAdapter mViewPagerAdapter;
     private ViewPager mViewPager;
 
@@ -95,12 +104,14 @@ public class MainActivity extends AppCompatActivity{
 
 
 
+        MainfragmentManager = getSupportFragmentManager();
 
-        mViewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
+        mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
         mViewPager.setPageMargin(16);
+
 
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -124,7 +135,7 @@ public class MainActivity extends AppCompatActivity{
                                     notifier(message);
                                 }else{
                                     Intent intent = new Intent(MainActivity.this, FlashCardWriteActivity.class);
-                                    startActivityForResult(intent, requestCode_flashcardwrite);
+                                    startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
                                     slide_left_and_slide_in();
                                 }
                             }
@@ -149,6 +160,7 @@ public class MainActivity extends AppCompatActivity{
             Intent getIntent = getIntent();
             LoginType = getIntent.getStringExtra("login_type");
             G_user_id = getIntent.getStringExtra("user_id");
+            G_user_level = "one";
             G_user_nickname =getIntent.getStringExtra("user_nickname");
             G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
 
@@ -177,6 +189,7 @@ public class MainActivity extends AppCompatActivity{
             Intent getIntent = getIntent();
             LoginType = getIntent.getStringExtra("login_type");
             G_user_id = getIntent.getStringExtra("user_id");
+            G_user_level = getIntent.getStringExtra("member_level");
             G_user_nickname =getIntent.getStringExtra("user_nickname");
             G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
 
@@ -202,6 +215,7 @@ public class MainActivity extends AppCompatActivity{
         }else{
             LoginType = "null";
             G_user_id = "null";
+            G_user_level = "null";
             G_user_nickname ="null";
             G_user_thumbnail = "null";
 
@@ -233,6 +247,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         UIChange();
+
     }
 
     public void UIChange(){
@@ -243,7 +258,6 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
-
     public void notifier(String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(message)
@@ -357,6 +371,7 @@ public class MainActivity extends AppCompatActivity{
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("request code", String.valueOf(requestCode)+"//"+LT);
         if (requestCode == 10001){
+            //시험을 고른 후의 setting
                 if (resultCode == RESULT_OK) {
                     Log.e("result 10001", "here???10001"+"//"+LT);
 
@@ -370,7 +385,7 @@ public class MainActivity extends AppCompatActivity{
 
                     Toast.makeText(MainActivity.this, "mainactivity : "+ exam_name+","+exam_code, Toast.LENGTH_SHORT).show();
 
-                    mViewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
+                    mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                     mViewPager = (ViewPager) findViewById(R.id.container);
                     mViewPager.setAdapter(mViewPagerAdapter);
                     mViewPager.setOffscreenPageLimit(3);
@@ -380,6 +395,7 @@ public class MainActivity extends AppCompatActivity{
                     Log.e("result 10001", "cancel");
                 }
         }else if(requestCode == 10002){
+            // 로그인 후 돌아왔을때 request
                 if (resultCode == RESULT_OK) {
                     Log.e("result 10002", "here???10002");
 
@@ -389,6 +405,7 @@ public class MainActivity extends AppCompatActivity{
 
                     LoginType=data.getStringExtra("login_type");
                     G_user_id = data.getStringExtra("user_id");
+
                     G_user_nickname = data.getStringExtra("user_nickname");
                     G_user_thumbnail = data.getStringExtra("user_thumbnail");
 
@@ -397,10 +414,15 @@ public class MainActivity extends AppCompatActivity{
 
                     exam_selection_code=exam_code;
                     exam_selection_name=exam_name;
+                    if(exam_selection_code.equals("null") || exam_selection_code ==null){
+                        exam_selection_textView.setText("전체 선택");
+                    }else{
+                        exam_selection_textView.setText(exam_selection_name);
+                    }
 
-                    exam_selection_textView.setText(exam_selection_name);
                     if(LoginType.equals("normal")){
                         //normal login 일때
+                        G_user_level = data.getStringExtra("user_level");
                         logintype_textView.setText("passpop");
                         if(G_user_thumbnail.equals("null")){
                             // if there is no thumbnail
@@ -409,6 +431,7 @@ public class MainActivity extends AppCompatActivity{
                         }
                     }else{
                         //kakao login 일때
+                        G_user_level = "one";
                         logintype_textView.setText(LoginType);
                         if(G_user_thumbnail.equals("null")){
                             // if there is no thumbnail
@@ -425,7 +448,7 @@ public class MainActivity extends AppCompatActivity{
                         }
                     });
 
-                    mViewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
+                    mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                     mViewPager = (ViewPager) findViewById(R.id.container);
                     mViewPager.setAdapter(mViewPagerAdapter);
                     mViewPager.setOffscreenPageLimit(3);
@@ -435,6 +458,7 @@ public class MainActivity extends AppCompatActivity{
                 }
         }else if(requestCode == 10003){
             //this requestCode is from LoggedInActivity
+            // 로그아웃 후 리퀘스트코드
             Log.e("result 10003", String.valueOf(requestCode));
 
             if (resultCode == RESULT_OK) {
@@ -458,7 +482,8 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
 
-                mViewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
+
+                mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                 mViewPager = (ViewPager) findViewById(R.id.container);
                 mViewPager.setAdapter(mViewPagerAdapter);
                 mViewPager.setOffscreenPageLimit(3);
@@ -471,8 +496,35 @@ public class MainActivity extends AppCompatActivity{
                     getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
                 }
             }
-        }else if(resultCode == RESULT_OK){
-            
+        }else if(requestCode == REQUEST_CODE_FOR_TESTFRAGMENT){
+            // 기출시험을 보고나왔을때 이창이 켜진다
+                //시험을 채점 까지 마친상태
+
+            removeFragmentInSupportManager();
+                Log.e("size of supportfragment", String.valueOf(MainfragmentManager.getFragments().size()));
+                mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+                mViewPager = (ViewPager) findViewById(R.id.container);
+                mViewPager.setAdapter(mViewPagerAdapter);
+                mViewPager.setOffscreenPageLimit(3);
+                mViewPager.setCurrentItem(1);
+
+        }else if(requestCode == REQUEST_CODE_FOR_FLASHCARDFRAGMENT || requestCode == REQUEST_CODE_FOR_FLASHCARD_WRITE){
+            //플래시카드 공부 또는
+            //플래시카드 작성 후....
+            //단 플래시 카드 폴더는 여기서 업데이트 하지 않는다.
+            mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+            mViewPager = (ViewPager) findViewById(R.id.container);
+            mViewPager.setAdapter(mViewPagerAdapter);
+            mViewPager.setOffscreenPageLimit(3);
+            mViewPager.setCurrentItem(2);
+              Log.e("from fragment", "fragment or write");
+        }else{
+
+        }
+    }
+    public void removeFragmentInSupportManager(){
+        for(int i = 0 ; i< MainfragmentManager.getFragments().size(); i++){
+            MainfragmentManager.getFragments().remove(i);
         }
     }
     private void loginCheck(final String input_user_email, final String input_user_password){
@@ -491,6 +543,7 @@ public class MainActivity extends AppCompatActivity{
                             String login_success_fail = temp.getString("call");
                             if(login_success_fail.equals("login_success")){
                                 String user_email = temp.getString("user_email");
+                                String user_level = temp.getString("member_level");
                                 String user_nickname = temp.getString("user_nickname");
                                 String user_thumbnail = temp.getString("user_thumbnail");
 
@@ -511,6 +564,7 @@ public class MainActivity extends AppCompatActivity{
 
                                 LoginType = "normal";
                                 G_user_id = user_email;
+                                G_user_level = user_level;
                                 G_user_nickname=user_nickname;
                                 G_user_thumbnail = user_thumbnail;
 

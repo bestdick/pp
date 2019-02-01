@@ -63,6 +63,8 @@ public class TestFragment extends Fragment {
     SwipeRefreshLayout mSwipeRefreshLayout;
     LinearLayout menu_layout;
     ConstraintLayout no_exam_conLayout;
+
+    View rootView;
     public static TestFragment newInstance() {
         TestFragment fragment = new TestFragment();
         Bundle args = new Bundle();
@@ -72,7 +74,7 @@ public class TestFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_test, container, false);
+         rootView = inflater.inflate(R.layout.fragment_test, container, false);
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.testfragment_progress_bar);
         menu_layout = (LinearLayout) rootView.findViewById(R.id.linearLayout);
@@ -86,7 +88,7 @@ public class TestFragment extends Fragment {
 
         FragmentTestListView = (ListView) rootView.findViewById(R.id.FragmentTestListView);
         adaptListView();
-        swiper(rootView);
+        swiper();
 
         testYearOrderList.clear();
         getExamList(navi_selection);
@@ -129,10 +131,11 @@ public class TestFragment extends Fragment {
         testYearOrderList =new ArrayList<TestYearOrderList>();
         testYearOrderAdapter = new TestYearOrderAdapter(getActivity(), testYearOrderList);
         FragmentTestListView.setAdapter(testYearOrderAdapter);
+
     }
 
-    public void swiper(View RootView){
-        mSwipeRefreshLayout = (SwipeRefreshLayout) RootView.findViewById(R.id.FragmentTestSwiperLayout);
+    public void swiper(){
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.FragmentTestSwiperLayout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -166,19 +169,21 @@ public class TestFragment extends Fragment {
                                         String exam_name = jsonArray.getJSONObject(i).getString("exam_name");
                                         String exam_code = jsonArray.getJSONObject(i).getString("exam_code");
                                         String published_year = jsonArray.getJSONObject(i).getString("published_year");
+                                        String max_questions = jsonArray.getJSONObject(i).getString("max_questions");
                                         String empty = "empty";
-                                        TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, empty, String.valueOf(navi_selection), empty,empty,empty,empty);
+                                        TestYearOrderList element_outer = new TestYearOrderList(exam_code, exam_name, published_year, max_questions, empty, empty, String.valueOf(navi_selection), empty,empty,empty,empty);
                                         testYearOrderList.add(element_outer);
 
                                         JSONArray statistic_jsonArray = jsonArray.getJSONObject(i).getJSONArray("published_data_by_round");
                                         for(int k = 0 ; k <statistic_jsonArray.length(); k++){
                                             String published_round = statistic_jsonArray.getJSONObject(k).getString("published_round");
+                                            String this_count = statistic_jsonArray.getJSONObject(k).getString("this_count_questions");
                                             String total = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("total");
                                             String pass = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("pass");
                                             String fail = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("fail");
                                             String percent = statistic_jsonArray.getJSONObject(k).getJSONObject("statistic").getString("percent");
 
-                                            TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, published_round, String.valueOf(navi_selection), total, pass, fail, percent);
+                                            TestYearOrderList element = new TestYearOrderList(exam_code, exam_name, published_year, max_questions, this_count, published_round, String.valueOf(navi_selection), total, pass, fail, percent);
                                             testYearOrderList.add(element);
                                         }
 

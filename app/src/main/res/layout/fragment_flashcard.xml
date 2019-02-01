@@ -34,17 +34,25 @@
             android:id="@+id/testFragment_bottom_btn1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight=".33"
+            android:layout_weight=".25"
             android:background="@drawable/test_fragment_navi_button"
-            android:text="최신 순서"
+            android:text="최신"
             android:textColor="@color/colorBlack" />
         <Button
-            android:id="@+id/testFragment_bottom_btn2"
+        android:id="@+id/testFragment_bottom_btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight=".25"
+        android:background="@drawable/test_fragment_navi_button_off"
+        android:text="인기"
+        android:textColor="@color/colorBlack" />
+        <Button
+            android:id="@+id/testFragment_bottom_btn4"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight=".33"
+            android:layout_weight=".25"
             android:background="@drawable/test_fragment_navi_button_off"
-            android:text="인기 순서"
+            android:text="내 플래시 카드"
             android:textColor="@color/colorBlack" />
         <Button
             android:id="@+id/testFragment_bottom_btn3"
@@ -52,7 +60,7 @@
             android:layout_height="match_parent"
             android:layout_weight=".33"
             android:background="@drawable/test_fragment_navi_button_off"
-            android:text="내폴더"
+            android:text="내 폴더"
             android:textColor="@color/colorBlack" />
     </LinearLayout>
 
@@ -124,7 +132,7 @@
         app:layout_constraintTop_toTopOf="@+id/FragmentFlashcardSwiperLayout">
 
         <TextView
-            android:id="@+id/textView233"
+            android:id="@+id/flashcard_empty_title_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -135,14 +143,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/flashcard_empty_notice_textView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:text="* 플래시 카드 폴더는 로그인 후 사용이 가능합니다."
             android:textColor="@color/colorBlack"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView233" />
+            app:layout_constraintTop_toBottomOf="@+id/flashcard_empty_title_textView" />
     </android.support.constraint.ConstraintLayout>
 
 

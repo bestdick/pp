@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -85,9 +86,13 @@ public class LoginActivity extends AppCompatActivity {
 
         Button loginButton = (Button) findViewById(R.id.login_button);
         Button joinButton = (Button) findViewById(R.id.join_button);
-
+        TextView verificationButton = (TextView) findViewById(R.id.resend_verification_code_textView);
+        TextView forgottonPasswordButton = (TextView) findViewById(R.id.password_find_textView);
         loginButtonFunction(loginButton);
         joinButtonClicked(joinButton);
+        verificationResendClicked(verificationButton);
+        forgotton_passsword(forgottonPasswordButton);
+
 
         toolbar();
     }
@@ -121,12 +126,23 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    public void verificationResendClicked(Button verificationResendButton){
+    public void verificationResendClicked(TextView verificationResendButton){
         verificationResendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, JoinActivity.class);
                 intent.putExtra("type", "verification_resend");
+                startActivity(intent);
+                slide_left_and_slide_in();
+            }
+        });
+    }
+    public void forgotton_passsword(TextView forgottonPasswordButton){
+        forgottonPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, JoinActivity.class);
+                intent.putExtra("type", "forgotten_password");
                 startActivity(intent);
                 slide_left_and_slide_in();
             }
@@ -175,6 +191,7 @@ public class LoginActivity extends AppCompatActivity {
                             String login_success_fail = temp.getString("call");
                             if(login_success_fail.equals("login_success")){
                                 String user_email = temp.getString("user_email");
+                                String user_level = temp.getString("member_level");
                                 String user_nickname = temp.getString("user_nickname");
                                 String user_thumbnail = temp.getString("user_thumbnail");
                                 String user_selected_last_exam_code = temp.getString("user_selected_last_exam_code");
@@ -199,6 +216,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("login_type", "normal");
                                 intent.putExtra("user_id", user_email);
+                                intent.putExtra("user_level", user_level);
                                 intent.putExtra("user_nickname", user_nickname);
                                 intent.putExtra("user_thumbnail", user_thumbnail);
                                 intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);

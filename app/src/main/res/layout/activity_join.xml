@@ -21,10 +21,108 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/verification_resend_conLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+            <TextView
+                android:id="@+id/title_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="인증코드 재발송"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/constraintLayout18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title_textView">
+
+                <EditText
+                    android:id="@+id/email_editText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:gravity="center"
+                    android:hint="이메일"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/resend_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="재발송"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/email_editText" />
+            </android.support.constraint.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/info_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                android:background="@color/colorWhiteSmoke"
+                android:padding="16dp"
+                android:text="인증 코드 재발송"
+                app:layout_constraintBottom_toTopOf="@+id/textView31"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout18" />
+
+            <TextView
+                android:id="@+id/textView31"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:text="@string/footer_string"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -103,9 +201,9 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
-                android:padding="8dp"
-                android:lineSpacingMultiplier="1.2"
                 android:background="@color/colorWhiteSmoke"
+                android:lineSpacingMultiplier="1.2"
+                android:padding="8dp"
                 android:text="@string/register_message"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +219,7 @@
                 android:layout_marginEnd="32dp"
                 android:ems="12"
                 android:hint="이메일 주소를 입력해주세요"
-                android:padding="5dp"
+
                 android:textAlignment="center"
                 android:textColorHint="@color/colorHint"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -147,12 +245,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginRight="32dp"
                 android:ems="12"
                 android:hint="비밀번호를 입력해주세요"
                 android:inputType="textPassword"
-                android:padding="5dp"
+
                 android:textAlignment="center"
                 android:textColorHint="@color/colorHint"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -165,12 +263,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginRight="32dp"
                 android:ems="12"
                 android:hint="비밀번호를 다시 한번 입력 해주세요"
                 android:inputType="textPassword"
-                android:padding="5dp"
+
                 android:textAlignment="center"
                 android:textColorHint="@color/colorHint"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -178,29 +276,29 @@
                 app:layout_constraintTop_toBottomOf="@+id/r_userPasswordTextbox" />
 
             <!--<TextView-->
-                <!--android:id="@+id/r_passwordCheck"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center_horizontal"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:text="비밀번호 확인"-->
-                <!--android:textSize="12dp"-->
-                <!--app:layout_constraintLeft_toLeftOf="parent"-->
-                <!--app:layout_constraintRight_toRightOf="parent"-->
-                <!--app:layout_constraintTop_toBottomOf="@+id/r_userPasswordConfirm" />-->
+            <!--android:id="@+id/r_passwordCheck"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:text="비밀번호 확인"-->
+            <!--android:textSize="12dp"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/r_userPasswordConfirm" />-->
 
             <EditText
                 android:id="@+id/r_userCellNumber"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="32dp"
                 android:ems="12"
-                android:inputType="number"
                 android:hint="휴대폰 번호를 입력해주세요"
-                android:textColorHint="@color/colorHint"
+                android:inputType="number"
                 android:textAlignment="center"
+                android:textColorHint="@color/colorHint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/r_userPasswordConfirm" />
@@ -211,11 +309,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginTop="5dp"
-                android:hint="이름을 입력해 주세요"
-                android:padding="5dp"
+                android:layout_marginRight="32dp"
                 android:ems="12"
+                android:hint="이름을 입력해 주세요"
+
                 android:textAlignment="center"
                 android:textColorHint="@color/colorHint"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -228,11 +326,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginRight="32dp"
                 android:ems="12"
                 android:hint="별명을 입력해 주세요"
-                android:padding="5dp"
+
                 android:textAlignment="center"
                 android:textColorHint="@color/colorHint"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -271,11 +369,11 @@
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:gravity="center"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/r_nicknamecheck">
@@ -303,14 +401,14 @@
 
             <LinearLayout
                 android:id="@+id/term_text_container"
-                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
-                android:orientation="vertical"
                 android:background="@color/colorWhiteSmoke"
+                android:orientation="vertical"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
@@ -318,22 +416,24 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="약관 내용(개인정보취급방침)"
-                    android:textColor="@color/colorBlack"
                     android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
                     android:paddingTop="16dp"
-                    android:paddingBottom="16dp"/>
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:text="약관 내용(개인정보취급방침)"
+                    android:textColor="@color/colorBlack" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/term"
-                    android:textColor="@color/colorBlack"
                     android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
                     android:paddingTop="16dp"
-                    android:paddingBottom="16dp"/>
+                    android:paddingRight="8dp"
+                    android:paddingBottom="16dp"
+                    android:text="@string/term"
+                    android:textColor="@color/colorBlack" />
             </LinearLayout>
+
             <TextView
                 android:id="@+id/textView21"
                 android:layout_width="wrap_content"

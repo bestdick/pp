@@ -21,7 +21,6 @@ public class MainActivityViewPagerAdapter extends FragmentStatePagerAdapter{
     public Fragment getItem(int position) {
 
        if (position == 0)
-
            return MainFragment.newInstance();
        else if(position == 1)
            return TestFragment.newInstance();

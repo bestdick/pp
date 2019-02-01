@@ -2,6 +2,7 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,6 +64,7 @@ public class QuizTodaySubmitResultFragment extends Fragment {
 
 
     ProgressBar progressBar;
+    ProgressBar percent_bar;
 //    private OnFragmentInteractionListener mListener;
 
     public QuizTodaySubmitResultFragment() {
@@ -102,6 +104,8 @@ public class QuizTodaySubmitResultFragment extends Fragment {
         // Inflate the layout for this fragment
          View rootview = inflater.inflate(R.layout.fragment_quiz_today_submit_result, container, false);
          progressBar =  (ProgressBar) rootview.findViewById(R.id.quiz_progressBar);
+         percent_bar = (ProgressBar) rootview.findViewById(R.id.percent_bar);
+
 
         whenQuizSubmitButtonClick(rootview);
         return rootview;
@@ -125,7 +129,7 @@ public class QuizTodaySubmitResultFragment extends Fragment {
                         JSONArray jsonArray = combineProblems_And_UserAnswer_And_Score(rootview);//여기서 점수까지 한번에 계산
                         uploadQuizTodayData_returnResult(jsonArray);
                     }
-                }, 1000); // 2.5초 후에 실행됨
+                }, 500); // 2.5초 후에 실행됨
 
             }
         });
@@ -171,6 +175,7 @@ public class QuizTodaySubmitResultFragment extends Fragment {
             float percent  =  (float_correct/float_count)*100;
             String percent_str =  String.format("%.2f", percent);
             String fraction = correct+" / "+count;
+            percent_bar.setProgress((int) percent);
 
             score_percent_textView.setText(percent_str+" % ");
             score_fraction_textView.setText(fraction);
@@ -299,4 +304,11 @@ public class QuizTodaySubmitResultFragment extends Fragment {
 //        // TODO: Update argument type and name
 //        void onFragmentInteraction(Uri uri);
 //    }
+
+    public static int getScreenWidth() {
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
+    }
+    public static int getScreenHeight() {
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
+    }
 }

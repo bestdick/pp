@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -59,6 +60,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
     LinearLayout linearLayout_inner; // ExamResultActivity inner container :::
     LinearLayout linearLayout_inner_second;
 
+    String identifier;
     String exam_name, exam_code, published_year, published_round, refresh_upload_prevent, date_user_took_exam, time_user_took_exam;
 
     TextView wrong_question_textView;
@@ -73,7 +75,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         if(LoginType.equals("kakao") || LoginType.equals("normal")){
             //로그인 상태
             Intent getIntent = getIntent();
-            String identifier = getIntent.getStringExtra("from");
+            identifier = getIntent.getStringExtra("from");
             if(identifier.equals("StatisticFragment")){
                 //StatisticFragment 에서 받은 intent
                 Log.e("from see", "from see more");
@@ -92,6 +94,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
             }else{
                 //ExamViewActivity 에서 받은 intent
                 String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
+
                 exam_code = getIntent.getStringExtra("exam_code");
                 exam_name = getIntent.getStringExtra("exam_name");
                 published_year = getIntent.getStringExtra("published_year");
@@ -108,6 +111,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
             //로그인을 안한 상태
             Intent getIntent = getIntent();
             String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
+
             exam_code = getIntent.getStringExtra("exam_code");
             exam_name = getIntent.getStringExtra("exam_name");
             published_year = getIntent.getStringExtra("published_year");
@@ -134,7 +138,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                             if(access.equals("valid")) {
                                 String json_date_string = jsonObject.getString("response");
                                 String rewarded = jsonObject.getString("rewarded");
-                                sendExamResultToServerForCalculator(json_date_string, exam_code, exam_placed_year, exam_placed_round, ORDER_NOT_FIRST_TIME, rewarded);
+                                sendExamResultToServerForCalculator(Html.fromHtml((String) json_date_string).toString(), exam_code, exam_placed_year, exam_placed_round, ORDER_NOT_FIRST_TIME, rewarded);
                                 Log.e("what", response);
                             }
 
@@ -301,7 +305,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
     }
 
     public void sendExamResultToServerForCalculator(final String ExamResult, final String exam_code, final String published_year, final String published_round, final int order, final String rewarded){
-
         RequestQueue queue = Volley.newRequestQueue(ExamResultActivity.this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/CalculateResult.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -309,6 +312,8 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                     @Override
                     public void onResponse(String response) {
                         Log.e("exam result json", response);
+//                        TextView temp_textView = (TextView) findViewById(R.id.temp_textView);
+//                        temp_textView.setText(response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String access = jsonObject.getString("access");
@@ -387,92 +392,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                                     subject_code,  subject_name,  question_number1,  question_question,  question_answer,
                                                     correct_answer1, question_image_exist,  answer_image_exist,  example_exist1,
                                                     user_answer1, problem_result_container);
-//                                            String compared = compared_array.getString(j);// identify correct or incorrect
-//                                            if(compared.equals("incorrect")){
-//                                                View view_incorrect =View.inflate(ExamResultActivity.this, R.layout.exam_result_wrong_question_element, null);
-//
-//                                                TextView subject_name_inner_textView = view_incorrect.findViewById(R.id.subject_name_textView);
-//                                                TextView exam_name_inner_textView = view_incorrect.findViewById(R.id.exam_name_textView);
-//                                                TextView question_textView = view_incorrect.findViewById(R.id.question_textView);
-//                                                TextView question_example_textView = view_incorrect.findViewById(R.id.question_example_textView);
-//                                                ImageView question_imageView = view_incorrect.findViewById(R.id.question_imageView);
-//
-//                                                TextView answer_1_textView = view_incorrect.findViewById(R.id.answer_1_textView);
-//                                                TextView answer_2_textView = view_incorrect.findViewById(R.id.answer_2_textView);
-//                                                TextView answer_3_textView = view_incorrect.findViewById(R.id.answer_3_textView);
-//                                                TextView answer_4_textView = view_incorrect.findViewById(R.id.answer_4_textView);
-//
-//                                                ConstraintLayout answer_1_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_1_conLayout);
-//                                                ConstraintLayout answer_2_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_2_conLayout);
-//                                                ConstraintLayout answer_3_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_3_conLayout);
-//                                                ConstraintLayout answer_4_conLayout = (ConstraintLayout) view_incorrect.findViewById(R.id.answer_4_conLayout);
-//
-//
-//
-//                                                if(example_exist.getString(j).equals("true")){
-//                                                    String[] question_question = question_array.getString(j).split("##");
-//                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question[0].replace("<br>", "\n"));
-//                                                    question_example_textView.setText(question_question[1].replace("<br>", "\n"));
-//                                                }else{
-//                                                    String question_question = question_array.getString(j);
-//                                                    question_textView.setText("[ "+(j+1)+ " ] " + question_question);
-//                                                    question_example_textView.setVisibility(View.GONE);
-//                                                }
-//
-//                                                if(question_image.getString(j).equals("true")){
-//                                                    String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+".PNG";
-//                                                    getQuestionImage(question_imageView, url);
-//                                                }else{
-//                                                    question_imageView.setVisibility(View.GONE);
-//                                                }
-//
-//                                                String c_answer = correct_answer.getString(j);
-//                                                String u_answer = user_answer.getString(j);
-//
-//                                                int c_answer_int = Integer.parseInt(c_answer);
-//                                                int u_answer_int = Integer.parseInt(u_answer);
-//
-//                                                if(answer_image.getString(j).equals("true")){
-//                                                    answer_1_conLayout.setVisibility(View.VISIBLE);
-//                                                    answer_2_conLayout.setVisibility(View.VISIBLE);
-//                                                    answer_3_conLayout.setVisibility(View.VISIBLE);
-//                                                    answer_4_conLayout.setVisibility(View.VISIBLE);
-//
-//                                                    ImageView answer_1_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_1_imageView);
-//                                                    answer_1_imageView.setTag(1);
-//                                                    ImageView answer_2_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_2_imageView);
-//                                                    answer_2_imageView.setTag(2);
-//                                                    ImageView answer_3_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_3_imageView);
-//                                                    answer_3_imageView.setTag(3);
-//                                                    ImageView answer_4_imageView = (ImageView) view_incorrect.findViewById(R.id.answer_4_imageView);
-//                                                    answer_4_imageView.setTag(4);
-//
-//                                                    for(int k = 1; k<=4; k++){
-//                                                        String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number.getString(j)+"_a_"+k+".PNG";
-//                                                        ImageView imageView = (ImageView) view_incorrect.findViewWithTag(k);
-//                                                        getAnswerImage(imageView, url);
-//                                                    }
-//                                                    higlight_user_and_correct_answer_image(answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout, c_answer_int, u_answer_int);
-//                                                }else{
-//                                                    answer_1_textView.setVisibility(View.VISIBLE);
-//                                                    answer_2_textView.setVisibility(View.VISIBLE);
-//                                                    answer_3_textView.setVisibility(View.VISIBLE);
-//                                                    answer_4_textView.setVisibility(View.VISIBLE);
-//
-//                                                    String[] answer = answer_array.getString(j).split("##");
-//                                                    answer_1_textView.setText("①."+answer[0]);
-//                                                    answer_2_textView.setText("②."+answer[1]);
-//                                                    answer_3_textView.setText("③."+answer[2]);
-//                                                    answer_4_textView.setText("④."+answer[3]);
-//
-//
-//                                                     highlight_user_and_correct_answer(answer_1_textView, answer_2_textView,
-//                                                        answer_3_textView, answer_4_textView, c_answer_int, u_answer_int);
-//                                                }
-//                                                subject_name_inner_textView.setText(subject_name);
-//                                                exam_name_inner_textView.setText(exam_name);
-//                                                linearLayout_inner_second.addView(view_incorrect);
-//                                            }
 
                                         }
                                     }
@@ -542,9 +461,11 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                             }else{
                                 //when access invalid
                                 Toast.makeText(ExamResultActivity.this, "access::"+access, Toast.LENGTH_SHORT).show();
+                                progressbar_invisible();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            progressbar_invisible();
                         }
                     }
                 },
@@ -555,6 +476,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
 //                        toast(message);
 //                        getExamNameAndCode(input_exam_name); // 인터넷 에러가 났을시 다시 한번 시도한다.
+                        progressbar_invisible();
                     }
                 }
         ) {
@@ -562,7 +484,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
-                params.put("result_data", ExamResult);
+                params.put("result_data", TextUtils.htmlEncode(ExamResult));
                 return params;
             }
         };
@@ -935,6 +857,12 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if(LoginType.equals("kakao") || LoginType.equals("normal")){
+            if(identifier.equals("StatisticFragment")){
+            }else{
+                setResult(RESULT_OK);
+            }
+        }
         finish();
         overridePendingTransition(R.anim.slide_right_bit,R.anim.slide_out);// first entering // second exiting
     }

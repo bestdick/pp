@@ -14,6 +14,8 @@ import android.widget.Toast;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_level;
+import static com.storyvendingmachine.www.pp.MainActivity.REQUEST_CODE_FOR_TESTFRAGMENT;
 
 
 /**
@@ -54,6 +56,8 @@ public class TestYearOrderAdapter extends BaseAdapter {
         final String published_year = list.get(i).getPublished_year();
         final String published_num = list.get(i).getPublished_num();
         final String navi_selection = list.get(i).getNavi_selection();
+        String max_questions = list.get(i).getMax_questions();
+        String this_count = list.get(i).getThis_count();
 
         String total = list.get(i).getTotal_taker();
         String pass = list.get(i).getPass_count();
@@ -67,58 +71,107 @@ public class TestYearOrderAdapter extends BaseAdapter {
             ExamEachNameTextView.setText(text);
 
             return v2;
-        }else{
+        }else {
 
 
-            TextView ExamEachNameTextView =(TextView) v.findViewById(R.id.ExamEachListTextView);
-
+            TextView ExamEachNameTextView = (TextView) v.findViewById(R.id.ExamEachListTextView);
             TextView total_textView = (TextView) v.findViewById(R.id.total_taker_textView);
             TextView percent_textView = (TextView) v.findViewById(R.id.percent_textView);
 
+            int int_max_questions = Integer.parseInt(max_questions);
+            int int_this_count = Integer.parseInt(this_count);
 
-            if(navi_selection.equals("1")){
+            if (navi_selection.equals("1")) {
                 //1 눌러졌을때   == > 기출시험 시험보기
-                String text = "기출 시험 문제 풀이\n"+exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
-                ExamEachNameTextView.setText(text);
-                total_textView.setText("응시횟수 : "+total+" 회");
-                percent_textView.setText("합격률 : "+percent+" %");
+                if (int_max_questions == int_this_count) {
+                    String text = "기출 시험 문제 풀이\n" + exam_name + "   " + published_year + "  년도  " + published_num + " 회차";
+                    ExamEachNameTextView.setText(text);
+                    total_textView.setText("응시횟수 : " + total + " 회");
+                    percent_textView.setText("합격률 : " + percent + " %");
 
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, ExamViewActivity.class);
-                        intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
-                        intent.putExtra("exam_code", exam_code);
-                        intent.putExtra("exam_name", exam_name);
-                        intent.putExtra("published_year",published_year);
-                        intent.putExtra("published_round", published_num);
-                        context.startActivity(intent);
-                        slide_left_and_slide_in();
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(context, ExamViewActivity.class);
+                            intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
+                            intent.putExtra("exam_code", exam_code);
+                            intent.putExtra("exam_name", exam_name);
+                            intent.putExtra("published_year", published_year);
+                            intent.putExtra("published_round", published_num);
+                            ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_TESTFRAGMENT);
+//                            context.startActivity(intent);
+                            slide_left_and_slide_in();
+                        }
+                    });
+                }else{
+                    String text = "(복원중) 기출 시험 문제 풀이\n" + exam_name + "   " + published_year + "  년도  " + published_num + " 회차";
+                    ExamEachNameTextView.setText(text);
+                    total_textView.setText("응시횟수 : " + total + " 회");
+                    percent_textView.setText("합격률 : " + percent + " %");
+                    if(G_user_level.equals("admin")){
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(context, ExamViewActivity.class);
+                                intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
+                                intent.putExtra("exam_code", exam_code);
+                                intent.putExtra("exam_name", exam_name);
+                                intent.putExtra("published_year", published_year);
+                                intent.putExtra("published_round", published_num);
+                                ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_TESTFRAGMENT);
+//                                context.startActivity(intent);
+                                slide_left_and_slide_in();
+                            }
+                        });
                     }
-                });
-            }else {
+                }
+            } else {
                 // 1외의 다른 번호가 눌러졌을떄 ( 현재는 1외는 2밖에없다 )
                 // 기출시험공부 하는 페이지가 불려온다
-                String text = "기출 시험 시험지 공부\n"+ exam_name + "   "+ published_year +"  년도  "+published_num+" 회차";
-                ExamEachNameTextView.setText(text);
-                total_textView.setText("응시횟수 : "+total+" 회");
-                percent_textView.setText("합격률 : "+percent+" %");
+                if (int_max_questions == int_this_count) {
+                    String text = "기출 시험 시험지 공부\n" + exam_name + "   " + published_year + "  년도  " + published_num + " 회차";
+                    ExamEachNameTextView.setText(text);
+                    total_textView.setText("응시횟수 : " + total + " 회");
+                    percent_textView.setText("합격률 : " + percent + " %");
 
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, ExamViewActivity.class);
-                        intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
-                        intent.putExtra("exam_code", exam_code);
-                        intent.putExtra("exam_name", exam_name);
-                        intent.putExtra("published_year",published_year);
-                        intent.putExtra("published_round", published_num);
-                        context.startActivity(intent);
-                        slide_left_and_slide_in();
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(context, ExamViewActivity.class);
+                            intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
+                            intent.putExtra("exam_code", exam_code);
+                            intent.putExtra("exam_name", exam_name);
+                            intent.putExtra("published_year", published_year);
+                            intent.putExtra("published_round", published_num);
+                            ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_TESTFRAGMENT);
+//                            context.startActivity(intent);
+                            slide_left_and_slide_in();
 
+                        }
+                    });
+                }else{
+                    String text = "(복원중) 기출 시험 시험지 공부\n" + exam_name + "   " + published_year + "  년도  " + published_num + " 회차";
+                    ExamEachNameTextView.setText(text);
+                    total_textView.setText("응시횟수 : " + total + " 회");
+                    percent_textView.setText("합격률 : " + percent + " %");
+                    if(G_user_level.equals("admin")){
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(context, ExamViewActivity.class);
+                                intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
+                                intent.putExtra("exam_code", exam_code);
+                                intent.putExtra("exam_name", exam_name);
+                                intent.putExtra("published_year", published_year);
+                                intent.putExtra("published_round", published_num);
+                                ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_TESTFRAGMENT);
+//                                context.startActivity(intent);
+                                slide_left_and_slide_in();
+
+                            }
+                        });
                     }
-                });
-
+                }
             }
 
 

@@ -18,6 +18,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.storyvendingmachine.www.pp.MainActivity.REQUEST_CODE_FOR_FLASHCARDFRAGMENT;
+import static com.storyvendingmachine.www.pp.MainActivity.REQUEST_CODE_FOR_TESTFRAGMENT;
+
 /**
  * Created by Administrator on 2018-10-23.
  */
@@ -107,7 +110,8 @@ public class FlashcardAdapter extends BaseAdapter {
                 intent.putExtra("subject_name", subject);
                 intent.putExtra("flashcard_title", flashcard_title);
                 intent.putExtra("flashcard_db_id", flashcard_db_id);
-                context.startActivity(intent);
+                ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARDFRAGMENT);
+//                context.startActivity(intent);
                 slide_left_and_slide_in();
             }
         });

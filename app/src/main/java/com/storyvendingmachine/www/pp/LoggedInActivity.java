@@ -1,5 +1,6 @@
 package com.storyvendingmachine.www.pp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -56,6 +57,7 @@ import java.util.Map;
 import static com.storyvendingmachine.www.pp.LoginActivity.callback;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_level;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_nickname;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_thumbnail;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
@@ -63,6 +65,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 
 
 public class LoggedInActivity extends AppCompatActivity {
+    final int FOLDER_MANAGER_RESULT = 2211;
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
 
@@ -131,41 +134,44 @@ public class LoggedInActivity extends AppCompatActivity {
         TextView user_nickname_textView = (TextView) findViewById(R.id.user_nickname_textView);
         TextView join_date_textView = (TextView) findViewById(R.id.join_date_textView);
         TextView study_exam_name_textView = (TextView) findViewById(R.id.study_exam_name_textView);
+        TextView flashcard_folder_count_textView = (TextView) findViewById(R.id.flashcard_folder_count_textView);
 
-        user_kakao_normal_info(login_type_textView, user_nickname_textView, join_date_textView, study_exam_name_textView, user_thumbnail_imageView);
+        user_kakao_normal_info(login_type_textView, user_nickname_textView, join_date_textView, study_exam_name_textView, flashcard_folder_count_textView, user_thumbnail_imageView);
         toolbar();
-        logoutProcess();
-
-
 
     }
-
-    public void user_kakao_normal_info(TextView login_type_textView, TextView user_nickname_textView, TextView join_date_textView, TextView study_exam_name_textView, ImageView user_thumbnail_imageView){
+    public void user_kakao_normal_info(TextView login_type_textView, TextView user_nickname_textView, TextView join_date_textView,
+                                       TextView study_exam_name_textView, TextView flashcard_folder_count_textView, ImageView user_thumbnail_imageView){
         if(LoginType.equals("kakao")){
             login_type_textView.setText("카카오 계정");
             user_nickname_textView.setText(G_user_nickname);
             getThumbnailImageForAuthor(user_thumbnail_imageView, G_user_thumbnail);
-            getUserInfo(join_date_textView, study_exam_name_textView);
+            getUserInfo(join_date_textView, study_exam_name_textView,flashcard_folder_count_textView);
+            logoutProcess();
+            changePasswordProcess("kakao");
+            folderManageProcess();
         }else if(LoginType.equals("normal")){
             login_type_textView.setText("패스팝 계정");
             user_nickname_textView.setText(G_user_nickname+" ( "+ G_user_id +" ) ");
             getThumbnailImageForAuthor(user_thumbnail_imageView, G_user_thumbnail);
-            getUserInfo(join_date_textView, study_exam_name_textView);
+            getUserInfo(join_date_textView, study_exam_name_textView, flashcard_folder_count_textView);
 
             user_thumbnail_imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                    photoPickerIntent.setType("image/*");                    startActivityForResult(photoPickerIntent, REQUEST_CODE_IMAGE);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, REQUEST_CODE_IMAGE);
                 }
             });
+            logoutProcess();
+            changePasswordProcess("normal");
+            folderManageProcess();
         }else{
             //로그인 타입 // 정해지지 않음
         }
     }
-
-
-    public void getUserInfo(final TextView join_date_textView, final TextView study_exam_name_textView){
+    public void getUserInfo(final TextView join_date_textView, final TextView study_exam_name_textView, final TextView flashcard_folder_count_textView){
         RequestQueue queue = Volley.newRequestQueue(LoggedInActivity.this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getUserInfo.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -179,10 +185,13 @@ public class LoggedInActivity extends AppCompatActivity {
                             if(access.equals("valid")){
                                 String exam_name = jsonObject.getJSONArray("response").getJSONObject(0).getString("last_exam");
                                 String[] join_date = jsonObject.getJSONArray("response").getJSONObject(0).getString("join_date").split(" ");
-
+                                String user_max_folder = jsonObject.getJSONObject("response_folder").getString("max_folder");
+                                String user_created_folder = jsonObject.getJSONObject("response_folder").getString("user_created_folder");
 
                                 join_date_textView.setText("가입 일자 : "+join_date[0]);
                                 study_exam_name_textView.setText("공부 중 인 시험 : "+exam_name);
+
+                                flashcard_folder_count_textView.setText("플래시 카드 폴더 :"+user_created_folder+"/"+user_max_folder);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -243,37 +252,86 @@ public class LoggedInActivity extends AppCompatActivity {
         logout_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                LoginType = "null";
-
-                G_user_id = "null";
-                G_user_nickname = "null";
-                G_user_thumbnail = "null";
-
-                exam_selection_name ="null";
-                exam_selection_code ="null";
-
-                login_remember = getSharedPreferences("setting", 0);
-                editor = login_remember.edit();
-                editor.putString("login_type", "null");
-                editor.putBoolean("id_pw_match", false);
-                editor.putString("user_email", "");
-                editor.putString("user_password", "");
-                editor.commit();
-
-                Session.getCurrentSession().removeCallback(callback);
-                Session.getCurrentSession().clearCallbacks();
-                Session.getCurrentSession().close();
-
-                Intent intent = new Intent(LoggedInActivity.this, MainActivity.class);
-                setResult(RESULT_OK, intent);
-//                finish();
-                onBackPressed();
+                String message = "로그아웃 하시겠습니까?";
+                String postive_message = "네";
+                String negative_message = "아니요";
+                logout_notifier(message, postive_message, negative_message);
             }
         });
 
     }
+    public void changePasswordProcess(String login_type){
+        Button change_password_button = (Button) findViewById(R.id.change_password_button);
+        if(login_type.equals("kakao")){
+            change_password_button.setVisibility(View.GONE);
+        }else{
+            //normal login
+            change_password_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(LoggedInActivity.this, LoggedInSettingsActivity.class);
+                    intent.putExtra("type", "change_password");
+                    startActivity(intent);
+                    slide_left_and_slide_in();
+                }
+            });
+        }
+    }
+    public void folderManageProcess(){
+        Button folder_manage_button = (Button) findViewById(R.id.folder_manage_button);
+        folder_manage_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoggedInActivity.this, LoggedInSettingsActivity.class);
+                intent.putExtra("type", "flashcard_folder_manager");
+                startActivityForResult(intent, FOLDER_MANAGER_RESULT);
+                slide_left_and_slide_in();
+            }
+        });
+    }
+    private void logout_notifier(String message, String positive_message, String negative_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInActivity.this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        LoginType = "null";
 
+                        G_user_id = "null";
+                        G_user_level = "null";
+                        G_user_nickname = "null";
+                        G_user_thumbnail = "null";
+
+                        exam_selection_name ="null";
+                        exam_selection_code ="null";
+
+                        login_remember = getSharedPreferences("setting", 0);
+                        editor = login_remember.edit();
+                        editor.putString("login_type", "null");
+                        editor.putBoolean("id_pw_match", false);
+                        editor.putString("user_email", "");
+                        editor.putString("user_password", "");
+                        editor.commit();
+
+                        Session.getCurrentSession().removeCallback(callback);
+                        Session.getCurrentSession().clearCallbacks();
+                        Session.getCurrentSession().close();
+
+                        Intent intent = new Intent(LoggedInActivity.this, MainActivity.class);
+                        setResult(RESULT_OK, intent);
+
+                        onBackPressed();
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -313,6 +371,14 @@ public class LoggedInActivity extends AppCompatActivity {
                 //아래 handleCropResult 가 그 처리를 한다.
                 handleCropResult(data);
                 Log.e("e", "selected handling crop result ");
+            } else if(requestCode == FOLDER_MANAGER_RESULT){
+                //************************************
+                // this result for activity
+                //      플래시 카드 폴더 매니저 세팅에 들어갔다 나왔을때.....
+                TextView join_date_textView = (TextView) findViewById(R.id.join_date_textView);
+                TextView study_exam_name_textView = (TextView) findViewById(R.id.study_exam_name_textView);
+                TextView flashcard_folder_count_textView = (TextView) findViewById(R.id.flashcard_folder_count_textView);
+                getUserInfo( join_date_textView,  study_exam_name_textView,  flashcard_folder_count_textView);
             }
         }
         if (resultCode == UCrop.RESULT_ERROR) {
@@ -320,7 +386,6 @@ public class LoggedInActivity extends AppCompatActivity {
             Toast.makeText(this, "crop error", Toast.LENGTH_SHORT).show();
         }
     }
-
     private void startCropActivity(@NonNull Uri uri) {
         UCrop uCrop = UCrop.of(uri, mDestinationUri);
 //        uCrop = _setRatio(uCrop, RATIO_ORIGIN, 0, 0);
@@ -330,7 +395,7 @@ public class LoggedInActivity extends AppCompatActivity {
     }
 
 //    private void handleCropResult(@NonNull final Intent result) {
-private void handleCropResult(final Intent result) {
+    private void handleCropResult(final Intent result) {
         final Uri resultUri = UCrop.getOutput(result);
         if (resultUri != null) {
             // ResultActivity.startWithUri(MainActivity.this, resultUri);
@@ -383,7 +448,6 @@ private void handleCropResult(final Intent result) {
 //            user_thumbnail_imageView.setImageURI(resultUri);
         }
     }
-
     public void upload_user_thumbnail(JSONObject jsonObject){
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/UploadUserThumbnail.php";
         JsonObjectRequest jsonObjectRequest =new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -408,6 +472,9 @@ private void handleCropResult(final Intent result) {
 
 
 
+    public void slide_left_and_slide_in(){//opening new activity
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         return super.onCreateOptionsMenu(menu);
