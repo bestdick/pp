@@ -1,6 +1,8 @@
 package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
+
+import static android.text.Html.fromHtml;
 
 public class NewsActivityAdapter extends BaseExpandableListAdapter {
     private Context context;
@@ -52,7 +56,7 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
         String upload_date = item.getUpload_date();
         String upload_time = item.getUpload_time();
         String title = item.getTitle();
-
+        Spanned html_content = Html.fromHtml(content);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -64,7 +68,7 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
 
         title_textView.setText(title);
         upload_date_time_textView.setText(upload_date+" "+upload_time);
-        content_textView.setText(content);
+        content_textView.setText(html_content);
         return convertView;
     }
 
