@@ -514,7 +514,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
                             public void run() {
                                 getFlashcardList(exam_selection_code);
                             }
-                        }, 800);
+                        }, 500);
                     }
                 }else{
 

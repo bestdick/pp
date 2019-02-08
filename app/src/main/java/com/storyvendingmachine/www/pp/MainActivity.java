@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity{
                                     notifier(message);
                                 }else{
                                     Intent intent = new Intent(MainActivity.this, FlashCardWriteActivity.class);
+                                    intent.putExtra("type", "new");
                                     startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
                                     slide_left_and_slide_in();
                                 }
@@ -384,7 +385,7 @@ public class MainActivity extends AppCompatActivity{
     //                getSupportActionBar().setSubtitle(exam_selection_name);
 
                     Toast.makeText(MainActivity.this, "mainactivity : "+ exam_name+","+exam_code, Toast.LENGTH_SHORT).show();
-
+                    removeFragmentInSupportManager();
                     mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                     mViewPager = (ViewPager) findViewById(R.id.container);
                     mViewPager.setAdapter(mViewPagerAdapter);
@@ -447,7 +448,7 @@ public class MainActivity extends AppCompatActivity{
                             slide_left_and_slide_in();
                         }
                     });
-
+                    removeFragmentInSupportManager();
                     mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                     mViewPager = (ViewPager) findViewById(R.id.container);
                     mViewPager.setAdapter(mViewPagerAdapter);
@@ -482,7 +483,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
 
-
+                removeFragmentInSupportManager();
                 mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
                 mViewPager = (ViewPager) findViewById(R.id.container);
                 mViewPager.setAdapter(mViewPagerAdapter);
@@ -499,32 +500,86 @@ public class MainActivity extends AppCompatActivity{
         }else if(requestCode == REQUEST_CODE_FOR_TESTFRAGMENT){
             // 기출시험을 보고나왔을때 이창이 켜진다
                 //시험을 채점 까지 마친상태
+            if(resultCode==RESULT_OK){
+                TestFragment testFragment = (TestFragment) MainfragmentManager.getFragments().get(1);
+                int menu_selection = testFragment.navi_selection;
+                testFragment.testYearOrderList.clear();
+                testFragment.getExamList(menu_selection);
 
-            removeFragmentInSupportManager();
+                StatisticFragment statisticFragment = (StatisticFragment) MainfragmentManager.getFragments().get(3);
+                View rootview = statisticFragment.rootview;
+                if(LoginType.equals("null") || G_user_id.equals("null")){
+                    //로그인 하지 않았을때.....
+                    statisticFragment.guest_initializer(rootview);
+                }else{
+                    //로그인 한 상태
+                    if(exam_selection_code.equals("null")){
+                        //처음 가입했을때 시험을 선택하지 않았을떄...
+                        statisticFragment.no_exam_select_initializer(rootview);
+                    }else{
+                        //기본 적인 메뉴 생성
+                        statisticFragment.statistic_exam_result_container.removeAllViews();
+                        statisticFragment.subject_result_container.removeAllViews();
+                        statisticFragment.piechart_container.removeAllViews();
+                        statisticFragment.Initializer(rootview);
+                        statisticFragment.getExamResultData(rootview);
+                    }
+                }
+                Log.e("test fragment", "result ok");
+            }else if (resultCode == RESULT_CANCELED){
+                Log.e("test fragment", "result cancel");
+            }else{
+                Log.e("test fragment", "result else");
+            }
+
+
+
                 Log.e("size of supportfragment", String.valueOf(MainfragmentManager.getFragments().size()));
-                mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
-                mViewPager = (ViewPager) findViewById(R.id.container);
-                mViewPager.setAdapter(mViewPagerAdapter);
-                mViewPager.setOffscreenPageLimit(3);
-                mViewPager.setCurrentItem(1);
 
-        }else if(requestCode == REQUEST_CODE_FOR_FLASHCARDFRAGMENT || requestCode == REQUEST_CODE_FOR_FLASHCARD_WRITE){
-            //플래시카드 공부 또는
-            //플래시카드 작성 후....
+        }else if(requestCode == REQUEST_CODE_FOR_FLASHCARD_WRITE ||
+                requestCode == REQUEST_CODE_FOR_FLASHCARDFRAGMENT){
+            //플래시카드 공부 또는   requestCode == REQUEST_CODE_FOR_FLASHCARDFRAGMENT  이때는 리프레쉬 시키지 않는다.
+            //플래시카드 작성 후.... 작성후에만 리프레시ㅣ 시킨다.
             //단 플래시 카드 폴더는 여기서 업데이트 하지 않는다.
-            mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
-            mViewPager = (ViewPager) findViewById(R.id.container);
-            mViewPager.setAdapter(mViewPagerAdapter);
-            mViewPager.setOffscreenPageLimit(3);
-            mViewPager.setCurrentItem(2);
-              Log.e("from fragment", "fragment or write");
-        }else{
+            if(resultCode==RESULT_OK){
+                FlashcardFragment flashcardFragment = (FlashcardFragment) MainfragmentManager.getFragments().get(2);
+                int menu_selection = flashcardFragment.flashcard_menu;
+                if(menu_selection==0){
+                    flashcardFragment.flashcard_list.clear();
+                    flashcardFragment.AddHeader();
+                    flashcardFragment.getFlashcardList(exam_selection_code);
+
+                }else if (menu_selection == 1){
+                    flashcardFragment.flashcard_list.clear();
+                    flashcardFragment.AddHeader();
+                    flashcardFragment.getFlashcardList(exam_selection_code);
+                }else if(menu_selection == 2){
+
+                }else {
+                    flashcardFragment.flashcard_list.clear();
+                    flashcardFragment.AddHeader();
+                    flashcardFragment.getFlashcardList(exam_selection_code);
+                }
+            }else if(resultCode==RESULT_CANCELED){
+                Log.e("flashcard fragment", "result cancel");
+            }else{
+                Log.e("flashcard fragment", "result other");
+            }
+
+//            mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+//            mViewPager = (ViewPager) findViewById(R.id.container);
+//            mViewPager.setAdapter(mViewPagerAdapter);
+//            mViewPager.setOffscreenPageLimit(3);
+//            mViewPager.setCurrentItem(2);
+//              Log.e("from fragment", "fragment or write");
+        }else {
+
 
         }
     }
     public void removeFragmentInSupportManager(){
         for(int i = 0 ; i< MainfragmentManager.getFragments().size(); i++){
-            MainfragmentManager.getFragments().remove(i);
+            MainfragmentManager.beginTransaction().remove(MainfragmentManager.getFragments().get(i)).commit();
         }
     }
     private void loginCheck(final String input_user_email, final String input_user_password){

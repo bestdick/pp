@@ -2,12 +2,19 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
+import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,7 +47,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +62,7 @@ import java.util.zip.Inflater;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 
-public class ExamResultActivity extends AppCompatActivity implements RewardedVideoAdListener {
+public class ExamResultActivity extends AppCompatActivity implements RewardedVideoAdListener, Html.ImageGetter{
     final int ORDER_FIRST_TIME = 1;
     final int ORDER_NOT_FIRST_TIME = -1;
 
@@ -65,6 +77,8 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
     TextView wrong_question_textView;
     private RewardedVideoAd mRewardedVideoAd;
+
+    TextView test_textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -495,11 +509,11 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         View each_problem_container = getLayoutInflater().inflate(R.layout.container_quiz_result_each_problem, null);
         TextView exam_name_year_round_textView = (TextView) each_problem_container.findViewById(R.id.exam_name_year_round_textView);
         TextView subject_name_number_textView = (TextView) each_problem_container.findViewById(R.id.subject_name_number_textView);
-        TextView question_textView = (TextView) each_problem_container.findViewById(R.id.question_textView);
+//        TextView question_textView = (TextView) each_problem_container.findViewById(R.id.question_textView);
         TextView question_example_textView = (TextView) each_problem_container.findViewById(R.id.question_example_textView);
         ImageView question_imageView = (ImageView) each_problem_container.findViewById(R.id.question_imageView);
         ImageView icon_correct_incorrect_imageView = (ImageView) each_problem_container.findViewById(R.id.icon_correct_incorrect_imageView);
-
+        test_textView = (TextView)  each_problem_container.findViewById(R.id.question_textView);
 
 
         exam_name_year_round_textView.setText(exam_placed_year+"년 "+exam_placed_round+"회 "+exam_name);
@@ -510,22 +524,41 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
             question_example_textView.setVisibility(View.GONE); // 보기 텍스트뷰를 안보이게 하는 것
 
             String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+exam_placed_year+"_"+exam_placed_round+"_"+subject_code+"_q_"+question_number+".PNG";
-            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
+//            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
             getQuestionImage(question_imageView, url);
+
+            String question_new = "[ "+(position+1)+ " ] " + question_question;
+            Spanned question = Html.fromHtml(question_new, this, null);
+//            test_textView = (TextView)  findViewById(R.id.question_textView);
+            test_textView.setText(question);
         }else if(question_image_exist.equals("false") && example_exist.equals("true")){
             question_imageView.setVisibility(View.GONE);// 문제 이미지뷰 안보이게 하기
 
 //            String[] temp = question_question.split("#_SPLIT_#");
             String[] temp = question_question.split("##");
-            String question = Html.fromHtml((String) temp[0]).toString().replaceAll("<br>", "\n");
-            String example =  Html.fromHtml((String) temp[1]).toString().replaceAll("<br>", "\n");
-            question_textView.setText("["+(position+1)+"]"+question);
+//            String question = Html.fromHtml((String) temp[0]).toString().replaceAll("<br>", "\n");
+//            String example =  Html.fromHtml((String) temp[1]).toString().replaceAll("<br>", "\n");
+//            question_textView.setText("["+(position+1)+"]"+question);
+//            question_example_textView.setText(example);
+
+            String question_make = "[ "+(position+1)+ " ] " + temp[0];
+            Spanned question = Html.fromHtml(question_make, this, null);
+            Spanned example = Html.fromHtml(temp[1], this, null);
+
+//            test_textView = (TextView)  findViewById(R.id.question_textView);
+            test_textView.setText(question);
             question_example_textView.setText(example);
         }else{
             // question image and example does not exist
             question_example_textView.setVisibility(View.GONE); // 보기 텍스트뷰를 안보이게 하는 것
             question_imageView.setVisibility(View.GONE);// 문제 이미지뷰 안보이게 하기
-            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
+//            question_textView.setText("["+(position+1)+"]"+ Html.fromHtml((String) question_question).toString());
+
+
+            String question_new = "[ "+(position+1)+ " ] " + question_question;
+            Spanned question = Html.fromHtml(question_new, this, null);
+//            test_textView = (TextView)  findViewById(R.id.question_textView);
+            test_textView.setText(question);
         }
 
         if(answer_image_exist.equals("true")){
@@ -588,10 +621,24 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
             no_image_answer_3_conLayout.setVisibility(View.VISIBLE);
             no_image_answer_4_conLayout.setVisibility(View.VISIBLE);
 
-            answer_1_textView.setText("①"+answer[0]);
-            answer_2_textView.setText("②"+answer[1]);
-            answer_3_textView.setText("③"+answer[2]);
-            answer_4_textView.setText("④"+answer[3]);
+//            answer_1_textView.setText("①"+answer[0]);
+//            answer_2_textView.setText("②"+answer[1]);
+//            answer_3_textView.setText("③"+answer[2]);
+//            answer_4_textView.setText("④"+answer[3]);
+
+            String temp_one = "① "+answer[0];
+            Spanned one = Html.fromHtml(temp_one);
+            String temp_two = "② "+answer[1];
+            Spanned two = Html.fromHtml(temp_two);
+            String temp_three= "③ "+answer[2];
+            Spanned three = Html.fromHtml(temp_three);
+            String temp_four= "④ "+answer[3];
+            Spanned four = Html.fromHtml(temp_four);
+
+            answer_1_textView.setText(one);
+            answer_2_textView.setText(two);
+            answer_3_textView.setText(three);
+            answer_4_textView.setText(four);
 
             answer_choice( no_image_answer_1_conLayout,  no_image_answer_2_conLayout,  no_image_answer_3_conLayout,  no_image_answer_4_conLayout,
                     correct_or_incorrect_1_textView,  correct_or_incorrect_2_textView,  correct_or_incorrect_3_textView,  correct_or_incorrect_4_textView,  correct_answer,  user_answer, icon_correct_incorrect_imageView);
@@ -852,6 +899,56 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         queue.add(stringRequest);
     }
 
+    @Override
+    public Drawable getDrawable(String source){
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(R.drawable.icon_empty_thumbnail);
+        d.addLevel(0, 0 , empty);
+        d.setBounds(0, 0 , empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+
+        new LoadImage().execute(source, d);
+
+        return d;
+    }
+
+    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+        private final static String TAG = "TestImageGetter";
+        private LevelListDrawable mDrawable;
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+            String source = (String) params[0];
+            mDrawable = (LevelListDrawable) params[1];
+            Log.d(TAG, "doInBackground " + source);
+            try {
+                InputStream is = new URL(source).openStream();
+                return BitmapFactory.decodeStream(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d(TAG, "onPostExecute drawable " + mDrawable);
+            Log.d(TAG, "onPostExecute bitmap " + bitmap);
+            if (bitmap != null) {
+                BitmapDrawable d = new BitmapDrawable(bitmap);
+                mDrawable.addLevel(1, 1, d);
+                mDrawable.setBounds(0, 0,  bitmap.getWidth()*2, bitmap.getHeight()*2);
+                mDrawable.setLevel(1);
+                // i don't know yet a better way to refresh TextView
+                // mTv.invalidate() doesn't work as expected
+                CharSequence t = test_textView.getText();
+                test_textView.setText(t);
+            }
+        }
+    }
 
 
     @Override
@@ -859,6 +956,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         super.onBackPressed();
         if(LoginType.equals("kakao") || LoginType.equals("normal")){
             if(identifier.equals("StatisticFragment")){
+                setResult(RESULT_CANCELED);
             }else{
                 setResult(RESULT_OK);
             }

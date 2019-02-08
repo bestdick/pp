@@ -48,8 +48,10 @@ import java.util.Map;
 
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.REQUESTCODES.REQUEST_CODE_FLASHCARD_REVISE;
 
 public class FlashCardViewActivity extends AppCompatActivity {
+
     DrawerLayout drawer;
     NavigationView navigationView;
 
@@ -71,6 +73,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
     String flashcard_title, flashcard_db_id, flashcard_exam_name, flashcard_subject_name;//regular 일때 사용하는 변수들
     String folder_name, folder_code, folder_flashcard_length; // my_folder일때 사용하는 변수
 
+    String author_of_this_flashcard ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +96,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 public void run() {
                     progressbar_invisible();
                 }
-            }, 2500); // 2.5초 후에 실행됨
+            }, 800); // 2.5초 후에 실행됨
 
             comment_layout = findViewById(R.id.flashcard_comment_layout);
             scrap_folder_layout = findViewById(R.id.scrap_folder_layout);
@@ -163,7 +166,89 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
 
     }
+    public void initializer(Intent intent){
+        if(flashcard_view_type.equals("regular")){
+            flashcard_exam_name =  intent.getStringExtra("exam_name");
+            flashcard_subject_name = intent.getStringExtra("subject_name");
+            flashcard_title = intent.getStringExtra("flashcard_title");
+            flashcard_db_id = intent.getStringExtra("flashcard_db_id");
 
+            pb = findViewById(R.id.flashcard_activity_progress_bar);
+            progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
+            progressbar_visible();
+            new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                @Override
+                public void run() {
+                    progressbar_invisible();
+                }
+            }, 800); // 2.5초 후에 실행됨
+
+            comment_layout = findViewById(R.id.flashcard_comment_layout);
+            scrap_folder_layout = findViewById(R.id.scrap_folder_layout);
+
+            hit_count_textView = (TextView) findViewById(R.id.hit_count_textView);
+            like_count_textView = (TextView) findViewById(R.id.like_count_textView);
+            scrap_count_textView = (TextView) findViewById(R.id.scrap_count_textView);
+            flashcard_author_textView = (TextView) findViewById(R.id.flashcard_author_textView);
+            flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
+
+            drawer = (DrawerLayout) findViewById(R.id.drawer);
+
+            BackgroundTask backgroundTask  = new BackgroundTask();
+            backgroundTask.execute();
+
+            toolbar(flashcard_title);
+            comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
+            if(LoginType.equals("kakao") || LoginType.equals("normal")){
+                likeButtonClicked();
+
+                comment_write_textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
+                        intent.putExtra("type", "flashcard_comment");
+                        intent.putExtra("flashcard_exam_name", flashcard_exam_name);
+                        intent.putExtra("flashcard_subject_name", flashcard_subject_name);
+                        intent.putExtra("flashcard_title", flashcard_title);
+                        intent.putExtra("flashcard_db_id", flashcard_db_id);
+//                        startActivity(intent);
+                        startActivityForResult(intent, 20001);//20001 mean flashcard comment change result.
+                        slide_left_and_slide_in();
+                    }
+                });
+            }else{
+                likeButtonClicked();
+                comment_write_textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String message = "로그인 후에 사용 가능한 메뉴 입니다.";
+                        String positivie_message = "확인";
+                        notifier(message, positivie_message);
+                    }
+                });
+                Toast.makeText(this, "로그인 후에 사용 가능", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            //----------------my_folder--my_folder--my_folder---my_folder--my_folder--my_folder------------
+            Toast.makeText(this, "folder 접속", Toast.LENGTH_SHORT).show();
+            folder_name = intent.getStringExtra("folder_name");
+            folder_code = intent.getStringExtra("folder_code");
+            folder_flashcard_length = intent.getStringExtra("flashcard_length");
+
+            ConstraintLayout like_scrap_hit_layout = (ConstraintLayout) findViewById(R.id.like_scrap_hit_layout);
+            LinearLayout flashcard_comment_layout = (LinearLayout) findViewById(R.id.flashcard_comment_layout);
+            like_scrap_hit_layout.setVisibility(View.GONE);
+            flashcard_comment_layout.setVisibility(View.GONE);
+//
+//            ViewPager flashcard_container = (ViewPager) findViewById(R.id.flashcard_container);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+//            flashcard_container.setLayoutParams(params);
+            ConstraintLayout outter_most_layout = (ConstraintLayout) findViewById(R.id.outter_most_layout);
+            outter_most_layout.setBackgroundColor(getResources().getColor(R.color.colorWhiteSmoke));
+            toolbar(folder_name);
+            getSelectedMyFlashCard();
+        }
+    }
     public void getSelectedMyFlashCard(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getSelectedMyFlashCard.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
@@ -199,6 +284,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                 fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
                                 fviewPager.setAdapter(fViewPagerAdapter);
                                 fviewPager.setOffscreenPageLimit(count);
+
 
 //                                String author_nickname = jsonObject.getJSONObject("response").getString("author_nickname");
 //                                String upload_date = jsonObject.getJSONObject("response").getString("upload_date");
@@ -827,6 +913,8 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
                                 flashcard_author_textView.setText("작성자 "+author_nickname);
                                 flashcard_written_date_textView.setText("작성일 "+upload_date);
+
+                                author_of_this_flashcard = jsonObject.getJSONObject("response").getString("author_id");
                             }else if(access_token.equals("invalid")){
 
                             }else{
@@ -859,19 +947,85 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 20001){
-            if (resultCode == RESULT_OK) {
-                comment_layout.removeAllViews();
-                getSelectedFlashCardComments_And_Others();
-            }else if(resultCode == RESULT_CANCELED){
+    public void getUpdatedFlashCard(){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getSelectedFlashCard.php";
+        RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.e("flashcard_response", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                global_flashcard_jsonObject = jsonObject.getJSONObject("response");
+                                String title = jsonObject.getJSONObject("response").getString("title");
+                                toolbar(title);
+                                JSONArray flashcard_json = jsonObject.getJSONObject("response").getJSONArray("flashcards");
+                                int count = (jsonObject.getJSONObject("response").getJSONArray("flashcards").length()*2);//앞뒤가 있기때문에 2장을 만들어야한다.
+
+                                ArrayList<String> flashcards = new ArrayList<>();
+                                for(int i = 0 ; i<flashcard_json.length(); i++){
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
+                                }
+
+                                fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
+                                fViewPagerAdapter.count = count;
+                                fViewPagerAdapter.flashcard_array = flashcards;
+                                fViewPagerAdapter.exam_name = flashcard_exam_name;
+                                fViewPagerAdapter.subject_name = flashcard_subject_name;
+                                fViewPagerAdapter.solo_page = true;
+                                fViewPagerAdapter.flashcard_or_folder = "flashcard";
+
+
+
+                                fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
+                                fviewPager.setAdapter(fViewPagerAdapter);
+                                fviewPager.setOffscreenPageLimit(count);
+
+                                String author_nickname = jsonObject.getJSONObject("response").getString("author_nickname");
+                                String upload_date = jsonObject.getJSONObject("response").getString("upload_date");
+
+                                flashcard_author_textView.setText("작성자 "+author_nickname);
+                                flashcard_written_date_textView.setText("작성일 "+upload_date);
+
+                                author_of_this_flashcard = jsonObject.getJSONObject("response").getString("author_id");
+                            }else if(access_token.equals("invalid")){
+
+                            }else{
+
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
 
             }
-        }else{
-        }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("flashcard_db_id", flashcard_db_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
+
 
 
 
@@ -935,8 +1089,28 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 20001){
+            if (resultCode == RESULT_OK) {
+                comment_layout.removeAllViews();
+                getSelectedFlashCardComments_And_Others();
+            }else if(resultCode == RESULT_CANCELED){
 
+            }
+        }else if(requestCode == REQUEST_CODE_FLASHCARD_REVISE){
+            if(resultCode ==RESULT_OK){
+                getUpdatedFlashCard();
 
+                Log.e("revise", "result ok");
+            }else if(resultCode == RESULT_CANCELED){
+                Log.e("revise", "result cancel");
+            }else{
+                Log.e("revise else", String.valueOf(resultCode));
+            }
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -950,14 +1124,14 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 //drawer is closed
                 drawer.openDrawer(Gravity.RIGHT);
             }
-        }else if(id == R.id.solo_view_menu){
-            if(flashcard_view_type.equals("regular")){
+        }else if(id == R.id.solo_view_menu) {
+            if (flashcard_view_type.equals("regular")) {
                 Intent intent = new Intent(this, FlashcardSoloViewActivity.class);
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "flashcard");
                 startActivity(intent);
                 slide_left_and_slide_in();
-            }else{
+            } else {
                 Intent intent = new Intent(this, FlashcardSoloViewActivity.class);
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "folder");
@@ -965,6 +1139,39 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 slide_left_and_slide_in();
             }
 
+        }else if(id == R.id.flashcard_more_options){
+
+        }else if(id == R.id.delete_flashcard_option){
+            if(author_of_this_flashcard.equals(G_user_id)){
+                // the user is the author of this flashcard
+                String mes = "이 플래시 카드를 정말 삭제하시겠습니까?";
+                String pos_mes = "확인";
+                String neg_mes = "취소";
+                notifier_delete(mes, pos_mes, neg_mes);
+                Log.e("who is the author", "im the author");
+            }else{
+                String mes = "본인이 작성하신 플래시카드만 삭제가 가능합니다";
+                String pos_mes = "확인";
+                notifier(mes, pos_mes);
+                Log.e("who is the author", author_of_this_flashcard);
+            }
+        }else if(id == R.id.revise_flashcard_option){
+            if(author_of_this_flashcard.equals(G_user_id)){
+                // the user is the author of this flashcard
+                // when this click change page to revise
+                Intent intent = new Intent(FlashCardViewActivity.this, FlashCardWriteActivity.class);
+                intent.putExtra("type", "revise");
+                intent.putExtra("flashcard_db_id", flashcard_db_id);
+                startActivityForResult(intent, REQUEST_CODE_FLASHCARD_REVISE);
+//                startActivity(intent);
+                slide_left_and_slide_in();
+                Log.e("who is the author", "im the author");
+            }else{
+                String mes = "본인이 작성하신 플래시카드만 수정이 가능합니다";
+                String pos_mes = "확인";
+                notifier(mes, pos_mes);
+                Log.e("who is the author", author_of_this_flashcard);
+            }
         }else{
             onBackPressed();
         }
@@ -973,7 +1180,8 @@ public class FlashCardViewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        setResult(RESULT_OK);
+//        setResult(RESULT_OK);
+        setResult(RESULT_CANCELED);
         finish();
         overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
@@ -1010,6 +1218,77 @@ public class FlashCardViewActivity extends AppCompatActivity {
     }
     public void slide_left_and_slide_in(){//opening new activity
         overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+
+    public void notifier_delete(String message, String positive_message, String negative_message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        flashcard_delete();
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+    public void flashcard_delete(){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/flashcard_delete.php";
+        RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("scrap response", response);
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                boolean result = jsonObject.getBoolean("response");
+                                if(result == true){
+                                    setResult(RESULT_OK);
+                                    finish();
+                                    slide_left_and_slide_in();
+//                                    onBackPressed();
+                                }else{
+                                    Toast.makeText(FlashCardViewActivity.this, "삭제 실패", Toast.LENGTH_SHORT).show();
+                                }
+                            }else{
+                                //access invalid
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                params.put("flashcard_db_id", flashcard_db_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
 //    static com.melnykov.fab.FloatingActionButton fab;

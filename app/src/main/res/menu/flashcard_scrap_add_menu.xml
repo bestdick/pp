@@ -2,15 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/flashcard_scrap_add_menu"
+        android:title="scrap_add_menu"
+        android:icon="@drawable/icon_scrap_add"
+        app:showAsAction="ifRoom">
+    </item>
+    <item
         android:id="@+id/solo_view_menu"
         android:title="solo_view_menu"
         android:icon="@drawable/icon_solo_view"
         app:showAsAction="ifRoom">
     </item>
     <item
-        android:id="@+id/flashcard_scrap_add_menu"
-        android:title="scrap_add_menu"
-        android:icon="@drawable/icon_scrap_add"
+        android:id="@+id/flashcard_more_options"
+        android:title="flashcard_scrap_more_options"
+        android:icon="@drawable/icon_more"
         app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/delete_flashcard_option"
+                android:title="삭제"/>
+            <item
+                android:id="@+id/revise_flashcard_option"
+                android:title="수정"/>
+
+        </menu>
     </item>
+
 </menu>

@@ -1,12 +1,19 @@
 package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +23,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
@@ -33,7 +45,7 @@ import static com.storyvendingmachine.www.pp.MainFragment.quiz_viewPager;
 // * Use the {@link QuizTodayDialogFragment#newInstance} factory method to
 // * create an instance of this fragment.
 // */
-public class QuizTodayDialogFragment extends Fragment {
+public class QuizTodayDialogFragment extends Fragment implements  Html.ImageGetter{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -49,7 +61,7 @@ public class QuizTodayDialogFragment extends Fragment {
     ImageView question_imageView;
 
 
-
+    TextView test_textView;
 //    private OnFragmentInteractionListener mListener;
     public QuizTodayDialogFragment() {
         // Required empty public constructor
@@ -121,33 +133,44 @@ public class QuizTodayDialogFragment extends Fragment {
     }
     public void if_example_exist(View rootview, String question_question, String example_exist){
         if(example_exist.equals("true")){
-            String[] question = Html.fromHtml((String) question_question).toString().split("#_SPLIT_#");
-            question_textView = (TextView)rootview.findViewById(R.id.question_textView);
+            String[] question_temp = Html.fromHtml((String) question_question).toString().split("#_SPLIT_#");
+//            question_textView = (TextView)rootview.findViewById(R.id.question_textView);
+            test_textView = (TextView) rootview.findViewById(R.id.question_textView);
             question_example_textView = (TextView)rootview.findViewById(R.id.question_example_textView);
             question_example_textView.setVisibility(View.VISIBLE);
-            question_textView.setText("["+(Integer.parseInt(mParam2)+1)+"] " +question[0]);
-            question_example_textView.setText(question[1]);
+
+            String question_make = (Integer.parseInt(mParam2)+1) + question_temp[0];
+            Spanned question = Html.fromHtml(question_make, this, null);
+            Spanned example = Html.fromHtml(question_temp[1], this, null);
+            test_textView.setText(question);
+//            question_textView.setText("["+(Integer.parseInt(mParam2)+1)+"] " +question[0]);
+//            question_example_textView.setText(question[1]);
+            question_example_textView.setText(example);
         }else{
-            String question = Html.fromHtml((String) question_question).toString();
-            question_textView = (TextView)rootview.findViewById(R.id.question_textView);
+//            String question = Html.fromHtml((String) question_question).toString();
+//            question_textView = (TextView)rootview.findViewById(R.id.question_textView);
+            test_textView = (TextView) rootview.findViewById(R.id.question_textView);
             question_example_textView = (TextView)rootview.findViewById(R.id.question_example_textView);
             question_example_textView.setVisibility(View.GONE);
-            question_textView.setText((Integer.parseInt(mParam2)+1)+" " +question);
+
+            String question_make = (Integer.parseInt(mParam2)+1) +" "+ question_question;
+            Spanned question = Html.fromHtml(question_make, this, null);
+            test_textView.setText(question);
         }
     }
     public void if_question_image_exist(View rootview, String question_question, String question_image_exist, String exam_code, String published_year, String published_round, String subject_code, String question_number){
         if(question_image_exist.equals("true")){
-            String question = Html.fromHtml((String) question_question).toString();
-            question_textView = (TextView) rootview.findViewById(R.id.question_textView);
-            question_textView.setText((Integer.parseInt(mParam2)+1)+" " +question);
+//            String question = Html.fromHtml((String) question_question).toString();
+//            question_textView = (TextView) rootview.findViewById(R.id.question_textView);
+//            question_textView.setText((Integer.parseInt(mParam2)+1)+" " +question);
             question_imageView = (ImageView) rootview.findViewById(R.id.question_imageView);
             question_imageView.setVisibility(View.VISIBLE);
             String url = "http://www.joonandhoon.com/pp/PassPop/exam_images/"+exam_code+"/"+exam_code+"_"+published_year+"_"+published_round+"_"+subject_code+"_q_"+question_number+".PNG";
             getQuestionImage(question_imageView, url);
         }else{
-            String question = Html.fromHtml((String) question_question).toString();
-            question_textView = (TextView) rootview.findViewById(R.id.question_textView);
-            question_textView.setText((Integer.parseInt(mParam2)+1)+" " +question);
+//            String question = Html.fromHtml((String) question_question).toString();
+//            question_textView = (TextView) rootview.findViewById(R.id.question_textView);
+//            question_textView.setText((Integer.parseInt(mParam2)+1)+" " +question);
             question_imageView = (ImageView) rootview.findViewById(R.id.question_imageView);
             question_imageView.setVisibility(View.GONE);
         }
@@ -193,10 +216,24 @@ public class QuizTodayDialogFragment extends Fragment {
             answer_3_textView.setVisibility(View.VISIBLE);
             answer_4_textView.setVisibility(View.VISIBLE);
 
-            answer_1_textView.setText("①."+answers[0]);
-            answer_2_textView.setText("②."+answers[1]);
-            answer_3_textView.setText("③."+answers[2]);
-            answer_4_textView.setText("④."+answers[3]);
+
+            String temp_one = "① "+answers[0];
+            Spanned one = Html.fromHtml(temp_one);
+            String temp_two = "② "+answers[1];
+            Spanned two = Html.fromHtml(temp_two);
+            String temp_three= "③ "+answers[2];
+            Spanned three = Html.fromHtml(temp_three);
+            String temp_four= "④ "+answers[3];
+            Spanned four = Html.fromHtml(temp_four);
+
+            answer_1_textView.setText(one);
+            answer_2_textView.setText(two);
+            answer_3_textView.setText(three);
+            answer_4_textView.setText(four);
+//            answer_1_textView.setText("①."+answers[0]);
+//            answer_2_textView.setText("②."+answers[1]);
+//            answer_3_textView.setText("③."+answers[2]);
+//            answer_4_textView.setText("④."+answers[3]);
 
             answerChoice(answer_1_textView, answer_2_textView, answer_3_textView, answer_4_textView);
         }
@@ -343,6 +380,56 @@ public class QuizTodayDialogFragment extends Fragment {
                 });
     }
 
+
+    @Override
+    public Drawable getDrawable(String source){
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(R.drawable.icon_empty_thumbnail);
+        d.addLevel(0, 0 , empty);
+        d.setBounds(0, 0 , empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+
+        new LoadImage().execute(source, d);
+
+        return d;
+    }
+    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+        private final static String TAG = "TestImageGetter";
+        private LevelListDrawable mDrawable;
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+            String source = (String) params[0];
+            mDrawable = (LevelListDrawable) params[1];
+            Log.d(TAG, "doInBackground " + source);
+            try {
+                InputStream is = new URL(source).openStream();
+                return BitmapFactory.decodeStream(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d(TAG, "onPostExecute drawable " + mDrawable);
+            Log.d(TAG, "onPostExecute bitmap " + bitmap);
+            if (bitmap != null) {
+                BitmapDrawable d = new BitmapDrawable(bitmap);
+                mDrawable.addLevel(1, 1, d);
+                mDrawable.setBounds(0, 0,  bitmap.getWidth()*2, bitmap.getHeight()*2);
+                mDrawable.setLevel(1);
+                // i don't know yet a better way to refresh TextView
+                // mTv.invalidate() doesn't work as expected
+                CharSequence t = test_textView.getText();
+                test_textView.setText(t);
+            }
+        }
+    }
 //    // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {

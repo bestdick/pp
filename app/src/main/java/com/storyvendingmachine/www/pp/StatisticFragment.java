@@ -79,6 +79,8 @@ public class StatisticFragment extends Fragment {
     PieChart pieChart;
 
     View rootview;
+
+    LinearLayout piechart_container;
     public static StatisticFragment newInstance(String param1, String param2) {
         StatisticFragment fragment = new StatisticFragment();
         Bundle args = new Bundle();
@@ -102,6 +104,7 @@ public class StatisticFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_statistic, container, false);
         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+        piechart_container = (LinearLayout) rootview.findViewById(R.id.piechart_container);
         if(LoginType.equals("null") || G_user_id.equals("null")){
             //로그인 하지 않았을때.....
             guest_initializer(rootview);
@@ -162,6 +165,7 @@ public class StatisticFragment extends Fragment {
                 statistic_exam_result_container.removeAllViews();
                 subject_result_container.removeAllViews();
                 mSwipeRefreshLayout.setRefreshing(false);
+                piechart_container.removeAllViews();
                 pieChart.notifyDataSetChanged();
             }
         });
@@ -355,6 +359,8 @@ public class StatisticFragment extends Fragment {
                                     if(Integer.parseInt(user_taken_exam_count) == 0){
                                         //시험을 응시한적이 없을떄
 //                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                        LinearLayout piechart_container = (LinearLayout) rootview.findViewById(R.id.piechart_container);
+                                        piechart_container.setVisibility(View.INVISIBLE);
                                         pieChart.setVisibility(View.GONE);
                                         never_took_exam_textView.setVisibility(View.VISIBLE);
                                         statistic_exam_result_container.setVisibility(View.GONE);
@@ -362,8 +368,14 @@ public class StatisticFragment extends Fragment {
                                     }else{
                                         //한번이라도 시험을 응시했을때
 //                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
-                                        pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
-                                        pieChart.notifyDataSetChanged();
+//                                        LinearLayout piechart_container = rootview.findViewById(R.id.piechart_container);
+                                        View container_pie_chart = getLayoutInflater().inflate(R.layout.container_pie_chart, null);
+                                        PieChart pie_chart = container_pie_chart.findViewById(R.id.piechart);
+                                        pieChart(rootview, pie_chart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                        piechart_container.addView(container_pie_chart);
+
+//                                        pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+//                                        pieChart.notifyDataSetChanged();
                                     }
                                 }
                             }else if(access_token.equals("invalid")){
@@ -582,17 +594,38 @@ public class StatisticFragment extends Fragment {
                                         String percent_pass = jsonObject_for_pie.getString("percent_pass");
                                         String percent_fail = jsonObject_for_pie.getString("percent_fail");
 
-                                        if (Integer.parseInt(user_taken_exam_count) == 0) {
+//                                            if (Integer.parseInt(user_taken_exam_count) == 0) {
+//                                                //시험을 응시한적이 없을떄
+//                                                 pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                                pieChart.setVisibility(View.GONE);
+//                                                never_took_exam_textView.setVisibility(View.VISIBLE);
+//                                                statistic_exam_result_container.setVisibility(View.GONE);
+//                                                subject_result_container.setVisibility(View.GONE);
+//                                            } else {
+//                                                //한번이라도 시험을 응시했을때
+//                                                 pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                                pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+//                                            }
+                                        if(Integer.parseInt(user_taken_exam_count) == 0){
                                             //시험을 응시한적이 없을떄
-                                             pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+//                                            LinearLayout piechart_container = (LinearLayout) rootview.findViewById(R.id.piechart_container);
+                                            piechart_container.setVisibility(View.INVISIBLE);
                                             pieChart.setVisibility(View.GONE);
                                             never_took_exam_textView.setVisibility(View.VISIBLE);
                                             statistic_exam_result_container.setVisibility(View.GONE);
                                             subject_result_container.setVisibility(View.GONE);
-                                        } else {
+                                        }else{
                                             //한번이라도 시험을 응시했을때
-                                             pieChart = (PieChart) rootview.findViewById(R.id.piechart);
-                                            pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+//                                         pieChart = (PieChart) rootview.findViewById(R.id.piechart);
+                                            LinearLayout piechart_container = rootview.findViewById(R.id.piechart_container);
+                                            View container_pie_chart = getLayoutInflater().inflate(R.layout.container_pie_chart, null);
+                                            PieChart pie_chart = container_pie_chart.findViewById(R.id.piechart);
+                                            pieChart(rootview, pie_chart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+                                            piechart_container.addView(container_pie_chart);
+
+//                                        pieChart(rootview, pieChart, Integer.parseInt(percent_pass), Integer.parseInt(percent_fail));
+//                                        pieChart.notifyDataSetChanged();
                                         }
 
                                         }

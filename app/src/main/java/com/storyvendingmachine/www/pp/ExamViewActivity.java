@@ -254,9 +254,10 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed(){
-    super.onBackPressed();
-    finish();
-    overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
 
     @Override
@@ -845,6 +846,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             intent.putExtra("refresh_upload_prevent", refresh_upload_prevent);
             startActivity(intent);
 //            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+            setResult(RESULT_OK);
             finish();
             slide_left_and_slide_in();
 //            onBackPressed();
@@ -858,6 +860,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             intent.putExtra("refresh_upload_prevent", refresh_upload_prevent);
             startActivity(intent);
 //            overridePendingTransition(R.anim.slide_in,R.anim.slide_left_bit);// first entering // second exiting
+            setResult(RESULT_OK);
             finish();
             slide_left_and_slide_in();
 //            onBackPressed();
@@ -885,7 +888,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 //                                progressbar_invisible();
                                 Toast.makeText(ExamViewActivity.this,"error", Toast.LENGTH_SHORT).show();
                             }
-
+                                progressbar_invisible();
                         } catch (JSONException e) {
                             e.printStackTrace();
 

@@ -49,13 +49,21 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
 
         NewsActivityItemList item = (NewsActivityItemList) getChild(listPosition, expandedListPosition);
         String content = item.getContent();
+        String upload_date = item.getUpload_date();
+        String upload_time = item.getUpload_time();
+        String title = item.getTitle();
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.container_for_news_item_element, null);
         }
+        TextView title_textView = (TextView) convertView.findViewById(R.id.textView27);
+        TextView upload_date_time_textView = (TextView) convertView.findViewById(R.id.upload_date_time_textView);
         TextView content_textView = (TextView) convertView.findViewById(R.id.content_textView);
+
+        title_textView.setText(title);
+        upload_date_time_textView.setText(upload_date+" "+upload_time);
         content_textView.setText(content);
         return convertView;
     }
@@ -115,7 +123,7 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
             new_title_type_textView.setText("[업데이트]");
         }
         if(isNew.equals("old")) {
-            isNew_imageView.setVisibility(View.INVISIBLE);
+            isNew_imageView.setVisibility(View.GONE);
         }
         new_title_textView.setText(news_title);
         upload_date_textView.setText(upload_date);

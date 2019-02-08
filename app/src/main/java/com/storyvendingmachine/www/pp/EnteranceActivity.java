@@ -39,7 +39,7 @@ public class EnteranceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enterance);
-        makeQuiz(); // upload quiz~~
+//        makeQuiz(); // upload quiz~~ wait to see what happen
 //아래가 나의 !!것
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");

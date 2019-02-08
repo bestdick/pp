@@ -165,31 +165,31 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
 
         if(example_exist.equals("true")){
             String[] question_question = bundle.getString("question_question").split("##");
-            Spanned question = Html.fromHtml(question_question[0], this, null);
+            String question_make = "[ "+(page+1)+ " ] " + question_question[0];
+            Spanned question = Html.fromHtml(question_make, this, null);
             Spanned example = Html.fromHtml(question_question[1], this, null);
+
+
             test_textView = (TextView)  rootView.findViewById(R.id.question_textView);
-            test_textView.setText("[ "+(page+1)+ " ] " + question);
+//            test_textView.setText("[ "+(page+1)+ " ] " + question);
+            test_textView.setText(question);
 //            question_textView.setText("[ "+(page+1)+ " ] " + question);
 
+//            test_textView = (TextView) rootView.findViewById(R.id.question_example_textView);
+//            test_textView.setText(example);
             question_example_textView.setText(example);
 //            question_textView.setText("[ "+(page+1)+ " ] " + question_question[0]);
 //            question_example_textView.setText(question_question[1]);
         }else{
             String question_question = bundle.getString("question_question");
-            question_question = question_question.replace("#_under_o_#", "<sub>");
-            question_question = question_question.replace("#_under_c_#", "</sub>");
-            String temp = TextUtils.htmlEncode(question_question);
-            String temp2 = Html.fromHtml((String) question_question).toString();
+            String question_new = "[ "+(page+1)+ " ] " + question_question;
+            Spanned question = Html.fromHtml(question_new, this, null);
 
-            Spanned question_1 = Html.fromHtml(question_question, this, null);
-            Spanned question_2 = Html.fromHtml(temp, this, null);
-            Spanned question_3 = Html.fromHtml(temp2, this, null);
-            Spanned wk = Html.fromHtml("kjhgig<sub>7</sub>wperijn", this, null);
 
             test_textView = (TextView)  rootView.findViewById(R.id.question_textView);
-            test_textView.setText("[ "+(page+1)+ " ] " + question_1+"\n"+question_2+"\n"+question_3+"\n"+wk);
+            test_textView.setText(question);
 
-//            question_textView.setText("[ "+(page+1)+ " ] " + question_question+ "'\n" + temp + "\n"+temp2);
+//            question_textView.setText(question);
             question_example_textView.setVisibility(View.GONE);
         }
 
@@ -218,10 +218,19 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
             answer_3_textView.setVisibility(View.VISIBLE);
             answer_4_textView.setVisibility(View.VISIBLE);
 
-            answer_1_textView.setText("① "+question_answer[0]);
-            answer_2_textView.setText("② "+question_answer[1]);
-            answer_3_textView.setText("③ "+question_answer[2]);
-            answer_4_textView.setText("④ "+question_answer[3]);
+            String temp_one = "① "+question_answer[0];
+            Spanned one = Html.fromHtml(temp_one);
+            String temp_two = "② "+question_answer[1];
+            Spanned two = Html.fromHtml(temp_two);
+            String temp_three= "③ "+question_answer[2];
+            Spanned three = Html.fromHtml(temp_three);
+            String temp_four= "④ "+question_answer[3];
+            Spanned four = Html.fromHtml(temp_four);
+
+            answer_1_textView.setText(one);
+            answer_2_textView.setText(two);
+            answer_3_textView.setText(three);
+            answer_4_textView.setText(four);
 
             no_image_navi_selection_function(rootView, answer_1_textView, answer_2_textView, answer_3_textView, answer_4_textView,
                     correct_answer, exam_code, exam_name, published_round, published_year);
@@ -848,7 +857,7 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
             if (bitmap != null) {
                 BitmapDrawable d = new BitmapDrawable(bitmap);
                 mDrawable.addLevel(1, 1, d);
-                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                mDrawable.setBounds(0, 0,  bitmap.getWidth()*2, bitmap.getHeight()*2);
                 mDrawable.setLevel(1);
                 // i don't know yet a better way to refresh TextView
                 // mTv.invalidate() doesn't work as expected

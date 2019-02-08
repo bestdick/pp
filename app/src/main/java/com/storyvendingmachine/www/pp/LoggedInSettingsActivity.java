@@ -197,8 +197,10 @@ public class LoggedInSettingsActivity extends AppCompatActivity implements Rewar
         queue.add(stringRequest);
     }
     private void initialize_flashcard_folder_manager(){
-        ScrollView foler_manager_scrollView = (ScrollView) findViewById(R.id.manager_scrollView);
-        foler_manager_scrollView.setVisibility(View.VISIBLE);
+//        ScrollView foler_manager_scrollView = (ScrollView) findViewById(R.id.manager_scrollView);
+//        foler_manager_scrollView.setVisibility(View.VISIBLE);
+        ConstraintLayout folder_increase_conLayout = (ConstraintLayout) findViewById(R.id.folder_increase_conLayout);
+        folder_increase_conLayout.setVisibility(View.VISIBLE);
 
         TextView folder_count_fraction_textview = (TextView) findViewById(R.id.folder_count_fraction_textview);
         Button increase_flashcard_folder_button = (Button) findViewById(R.id.increase_flashcard_folder_button);
