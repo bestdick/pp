@@ -33,6 +33,10 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
     final String STRING_NEWS = "news";
     final String STRING_ANNOUNCEMENT = "announcement";
     final String STRING_UPDATE = "update";
+
+    final String STRING_SUGGESTION = "suggestion";
+    final String STRING_FEDDBACK = "feedback";
+    final String STRING_ERROR = "error";
     // -------------여기서부터는 item adaper--------------------
     @Override
     public Object getChild(int listPosition, int expandedListPosition) {
@@ -123,8 +127,15 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
             new_title_type_textView.setText("[뉴스]");
         }else if (type.equals(STRING_ANNOUNCEMENT)){
             new_title_type_textView.setText("[공지]");
-        }else{
+        }else if (type.equals(STRING_UPDATE)){
             new_title_type_textView.setText("[업데이트]");
+        }else if(type.equals(STRING_FEDDBACK)){
+            new_title_type_textView.setText("[피드백]");
+        }else if(type.equals(STRING_SUGGESTION)){
+            new_title_type_textView.setText("[건의및개선]");
+        }else{
+//            type.equals(STRING_ERROR)
+            new_title_type_textView.setText("[오류]");
         }
         if(isNew.equals("old")) {
             isNew_imageView.setVisibility(View.GONE);

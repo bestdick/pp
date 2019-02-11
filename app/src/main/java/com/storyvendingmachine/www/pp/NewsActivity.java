@@ -38,6 +38,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,9 +56,11 @@ import static com.storyvendingmachine.www.pp.MainFragment.quiz_viewPager;
 import static com.storyvendingmachine.www.pp.MainFragment.quizUserSelectedAnswers;
 
 public class NewsActivity extends AppCompatActivity {
-    final String ENTER_METHOD_TYPE_ALL = "ALL";
+    final String ENTER_METHOD_TYPE_ALL = "NEWS";
     final String ENTER_METHOD_TYPE_ONE = "ONE";
     final String ENTER_METHOD_TYPE_QUIZ = "QUIZ";
+    final String ENTER_METHOD_TYPE_SUGGESTION_ALL = "SUGGESTION_ALL";
+    final String ENTER_METHOD_TYPE_SUGGESTION_SELECT = "SUGGESTION_SELECT";
 
     Toolbar tb;
 
@@ -82,6 +85,7 @@ public class NewsActivity extends AppCompatActivity {
     boolean stop;
     boolean isQuizOpened;
 
+    FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,20 +105,24 @@ public class NewsActivity extends AppCompatActivity {
         expandableListView = (ExpandableListView) findViewById(R.id.expandable_listView);
         progressBar = (ProgressBar) findViewById(R.id.NewsActivityProgressBar);
         empty_quiz_conLayout = (ConstraintLayout) findViewById(R.id.empty_quiz_conLayout);
+        fab=(FloatingActionButton) findViewById(R.id.floating_action_button);
         toolbar();
-        progressbar_visible();
+
+//        progressbar_visible();
         Intent intent = getIntent();
         String enter_method =  intent.getStringExtra("enter_method");
         if(enter_method.equals(ENTER_METHOD_TYPE_ALL)){
             // "더보기" 메뉴를 타고 들어왔을떄...
             ad();
-            getNewsAnnouncement(-1);
+            String type = "news_announcements";
+            getNewsAnnouncement(-1, type);
         }else if(enter_method.equals(ENTER_METHOD_TYPE_ONE)){
             // 하나의 "제목" aka 뉴스, 업데이트, 소식 을 타고 들어왔을떄....
             ad();
             String key = intent.getStringExtra("key");
-            getNewsAnnouncement(Integer.parseInt(key));
-        }else{
+            String type = "news_announcements";
+            getNewsAnnouncement(Integer.parseInt(key), type);
+        }else if(enter_method.equals(ENTER_METHOD_TYPE_QUIZ)){
             // today quiz start under here
             QUIZ_MENU_NAVI = Integer.parseInt(intent.getStringExtra("quiz_menu"));
             quiz_view_swiper = (SwipeRefreshLayout) findViewById(R.id.quiz_view_swiper);
@@ -129,8 +137,37 @@ public class NewsActivity extends AppCompatActivity {
                 //2
                 navi_two();
             }
+        }else if(enter_method.equals(ENTER_METHOD_TYPE_SUGGESTION_ALL)){
+            fab.setVisibility(View.VISIBLE);
+            fab.attachToListView(expandableListView);
+            ad();
+            appbar_title_textView.setText("피드백/건의및개선/오류");
+            String type = "suggestions";
+            getNewsAnnouncement(-1, type);
+            fabOnclickController();
+        }else{
+            //enter_method.equals(ENTER_METHOD_TYPE_SUGGESTION_SELECT)
+            fab.setVisibility(View.VISIBLE);
+            fab.attachToListView(expandableListView);
+            ad();
+            appbar_title_textView.setText("피드백/건의및개선/오류");
+            String key = intent.getStringExtra("key");
+            String type = "suggestions";
+            getNewsAnnouncement(Integer.parseInt(key), type);
+            fabOnclickController();
         }
     }
+
+    public void fabOnclickController(){
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent(NewsActivity.this,);
+                Toast.makeText(NewsActivity.this, "fab clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     // ALL THE MOTHODS UNDER THIS LINE REPRESENTS METHODS THOSE ARE RELEVANT TO QUIZ
     public void navi_one(){
@@ -586,8 +623,10 @@ public class NewsActivity extends AppCompatActivity {
         return temp;
     }
 
+
+
     // ALL THE METHODS UNDER THIS LINE REPRESENTS ONLY NEWS AND ANNOUNCEMENT -----------------------------------------
-    public void getNewsAnnouncement(final int key){
+    public void getNewsAnnouncement(final int key, final String type){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getNewsAndAnnouncement.php";
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
@@ -649,11 +688,13 @@ public class NewsActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
                 params.put("limit", "false");
+                params.put("type", type);
                 return params;
             }
         };
         queue.add(stringRequest);
     }
+
 
     // ALL THE METHOD UNDER THIS LINE REPRESENTS GLOBAL METHOD THAT CAN BE USED COMMONLY ON NEW OR QUIZ
     private void toolbar(){

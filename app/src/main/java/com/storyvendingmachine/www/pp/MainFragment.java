@@ -100,7 +100,6 @@ public class MainFragment extends Fragment {
             // 2 . 공지를 나태내준다.
             wrapper.removeAllViews();
             getWithOutChoosingExamDate();//스캐쥴을 가져오는 function
-
         }else{
             //시험을 고른 상태이다.
             //시험을 고른 상태에서는 1. 전체 시험 스케쥴과
@@ -108,8 +107,6 @@ public class MainFragment extends Fragment {
             // 3. today quiz 를 만들어준다.
             wrapper.removeAllViews();
             getExamInfo();
-
-
         }
         return rootView;
     }
@@ -359,7 +356,7 @@ public class MainFragment extends Fragment {
         };
         queue.add(stringRequest);
 
-    }
+    } // THIS MUST BE CHANGE WHEN DIFFERENT KINDS OF EXAM UPLOADS
     // Below ---- this data fetch when user select exam
     public void getExamInfo(){
         RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
@@ -592,7 +589,6 @@ public class MainFragment extends Fragment {
         };
         queue.add(stringRequest);
     }
-
     public String remaindays(String test_date){
 
         String hour = "01";
@@ -625,87 +621,6 @@ public class MainFragment extends Fragment {
         }
 
     }
-    public View dDayCountView(String testtype, String[][] data_string){
-            View exam_d_day_container = getLayoutInflater().inflate(R.layout.exam_d_day_container, null);
-            TextView testtype_textView = (TextView) exam_d_day_container.findViewById(R.id.testtype_TextView);
-            TextView testround_TextView = (TextView) exam_d_day_container.findViewById(R.id.testround_TextView);
-            TextView ddaycount_TextView = (TextView) exam_d_day_container.findViewById(R.id.ddaycount_TextView);
-            TextView sub_one_remaindaystitleTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_one_remaindaystitleTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 횟차 1
-            TextView sub_one_remaindaysTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_one_remaindaysTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 일수 1
-            TextView sub_two_remaindaystitleTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_two_remaindaystitleTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 횟차 1
-            TextView sub_two_remaindaysTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_two_remaindaysTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 일수 1
-
-            for(int i =0; i<data_string.length; i++){
-                if(i==0 && Integer.parseInt(data_string[i][1])>=0){
-                    testtype_textView.setText(testtype);
-                    testround_TextView.setText(data_string[i][0]);
-                    ddaycount_TextView.setText(data_string[i][1]);
-
-                    sub_one_remaindaystitleTextView.setText(data_string[1][0]);
-                    sub_one_remaindaysTextView.setText(data_string[1][1]);
-                    sub_two_remaindaystitleTextView.setText(data_string[2][0]);
-                    sub_two_remaindaysTextView.setText(data_string[2][1]);
-                    break;
-                }else if(i==1 && Integer.parseInt(data_string[i][1])>=0){
-                    testtype_textView.setText(testtype);
-                    testround_TextView.setText(data_string[i][0]);
-                    ddaycount_TextView.setText(data_string[i][1]);
-
-                    sub_one_remaindaystitleTextView.setText(data_string[0][0]);
-                    sub_one_remaindaysTextView.setText(data_string[0][1]);
-
-                    sub_two_remaindaystitleTextView.setText(data_string[2][0]);
-                    sub_two_remaindaysTextView.setText(data_string[2][1]);
-                    break;
-                }else if(i==2 && Integer.parseInt(data_string[i][1])>=0){
-                    testtype_textView.setText(testtype);
-                    testround_TextView.setText(data_string[i][0]);
-                    ddaycount_TextView.setText(data_string[i][1]);
-
-                    sub_one_remaindaystitleTextView.setText(data_string[0][0]);
-                    sub_one_remaindaysTextView.setText(data_string[0][1]);
-                    sub_two_remaindaystitleTextView.setText(data_string[1][0]);
-                    sub_two_remaindaysTextView.setText(data_string[1][1]);
-
-                    break;
-                }
-            }
-            return exam_d_day_container;
-        }
-    public void examInfoDropDown(TextView examName, final ImageView examInfoDrop, final LinearLayout innerWrapper){
-
-            examName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(infoView_visible == -1){
-                        innerWrapper.setVisibility(View.VISIBLE);
-                        examInfoDrop.setImageResource(R.drawable.icon_fold);
-                        infoView_visible = 1;
-                    }else if(infoView_visible ==1){
-                        innerWrapper.setVisibility(View.GONE);
-                        examInfoDrop.setImageResource(R.drawable.icon_drop_down);
-                        infoView_visible = -1;
-                    }
-
-                }
-            });
-            examInfoDrop.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(infoView_visible == -1){
-                        innerWrapper.setVisibility(View.VISIBLE);
-                        examInfoDrop.setImageResource(R.drawable.icon_fold);
-                        infoView_visible = 1;
-                    }else if(infoView_visible ==1){
-                        innerWrapper.setVisibility(View.GONE);
-                        examInfoDrop.setImageResource(R.drawable.icon_drop_down);
-                        infoView_visible = -1;
-                    }
-
-                }
-            });
-    }
-
 
     public void getShortTodayQuiz(){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
@@ -839,8 +754,7 @@ public class MainFragment extends Fragment {
         };
         queue.add(stringRequest);
     }
-
-    public void getNewsAndAnnouncement(){
+    public void getNewsAndAnnouncement_Suggestion(){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getNewsAndAnnouncement.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -861,7 +775,7 @@ public class MainFragment extends Fragment {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(), NewsActivity.class);
-                                        intent.putExtra("enter_method", "ALL");
+                                        intent.putExtra("enter_method", "NEWS");
                                         startActivity(intent);
                                         slide_left_and_slide_in();
                                     }
@@ -875,6 +789,7 @@ public class MainFragment extends Fragment {
                                     TextView type_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_type_textView);
                                     TextView new_title_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_textView);
                                     TextView upload_date_textView = (TextView) container_news_inner_element.findViewById(R.id.upload_date_textView);
+
 
                                     final String key = jsonArray.getJSONObject(i).getString("key");
                                     String type = jsonArray.getJSONObject(i).getString("type");
@@ -914,6 +829,73 @@ public class MainFragment extends Fragment {
 
                                     ll.addView(container_news_inner_element);
                                 }
+
+                                View container_suggestion = getLayoutInflater().inflate(R.layout.container_news, null);
+                                LinearLayout ll_suggestion = container_suggestion.findViewById(R.id.news_announcement_linearLayout);
+                                TextView suggestion_title_textView = (TextView) container_suggestion.findViewById(R.id.title_textView);
+                                TextView suggestion_see_more_textView = (TextView) container_suggestion.findViewById(R.id.see_more_textView);
+                                suggestion_title_textView.setText("피드백/건의및개선/오류신고");
+                                suggestion_see_more_textView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                        intent.putExtra("enter_method", "SUGGESTION_ALL");
+                                        startActivity(intent);
+                                        slide_left_and_slide_in();
+                                    }
+                                });
+                                wrapper.addView(container_suggestion);
+
+                                JSONArray suggestion_jsonArray = jsonObject.getJSONArray("response_2");
+                                for(int j = 0 ; j < suggestion_jsonArray.length(); j++){
+                                    View container_suggestion_inner_element = getLayoutInflater().inflate(R.layout.container_news_inner_element, null);
+                                    ImageView new_imageView = (ImageView) container_suggestion_inner_element.findViewById(R.id.new_imageView);
+                                    TextView type_textView = (TextView) container_suggestion_inner_element.findViewById(R.id.new_title_type_textView);
+                                    TextView new_title_textView = (TextView) container_suggestion_inner_element.findViewById(R.id.new_title_textView);
+                                    TextView upload_date_textView = (TextView) container_suggestion_inner_element.findViewById(R.id.upload_date_textView);
+
+                                    final String key = suggestion_jsonArray.getJSONObject(j).getString("key");
+                                    String login_type = suggestion_jsonArray.getJSONObject(j).getString("login_type");
+                                    String user_id = suggestion_jsonArray.getJSONObject(j).getString("user_id");
+                                    String user_nickname = suggestion_jsonArray.getJSONObject(j).getString("user_nickname");
+                                    String type = suggestion_jsonArray.getJSONObject(j).getString("type");
+                                    String title = suggestion_jsonArray.getJSONObject(j).getString("title");
+                                    String content = suggestion_jsonArray.getJSONObject(j).getString("content");
+                                    String upload_date = suggestion_jsonArray.getJSONObject(j).getString("upload_date");
+                                    String upload_time = suggestion_jsonArray.getJSONObject(j).getString("upload_time");
+                                    String suggestioon_new = suggestion_jsonArray.getJSONObject(j).getString("new");
+
+                                    if(suggestioon_new.equals("old")){
+                                        //마약 해당 공지 또는 뉴스가 1주일 안에 발표된 공지가 아닌 오래된 공지일때
+                                        new_imageView.setVisibility(View.GONE);
+                                    }
+                                    if(type.equals("feedback")){
+                                        type_textView.setText("[피드백]");
+                                    }else if(type.equals("suggestion")){
+                                        type_textView.setText("[건의및개선]");
+                                    }else{
+                                        type_textView.setText("[오류]");
+                                    }
+                                    new_title_textView.setText(title);
+                                    upload_date_textView.setText(upload_date);
+
+                                    final String temp_j = String.valueOf(j);
+                                    container_suggestion_inner_element.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                            intent.putExtra("enter_method", "SUGGESTION_SELECT  ");
+                                            intent.putExtra("key", temp_j);
+                                            startActivity(intent);
+                                            slide_left_and_slide_in();
+                                        }
+                                    });
+
+                                    ll_suggestion.addView(container_suggestion_inner_element);
+                                }
+
+
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -941,19 +923,8 @@ public class MainFragment extends Fragment {
         queue.add(stringRequest);
     }
 
-    public String period_between_date(String date){
-        String temp = "";
-        for(int i = 0 ; i < date.length(); i++){
-            if(i == 3 || i ==5){
-                temp += date.charAt(i)+".";
-            }else {
-                temp += date.charAt(i);
-            }
-        }
-        return temp;
-    }
 //    background task
-public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
+    public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
 
     @Override
     protected void onPreExecute() {
@@ -962,7 +933,7 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
 
     @Override
     protected Integer doInBackground(Void... integers) {
-        getNewsAndAnnouncement();
+        getNewsAndAnnouncement_Suggestion();
         return -1;
     }
 
@@ -978,15 +949,27 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
 }
 
 
-//        여기 아래부터는 overrid 만 넣는다.
+// ******************** OVERRIDE FUNCTIONS *********************************
     @Override
     public void onResume(){
         super.onResume();
 
 
     }
+
     public void refresh_frg(){
         getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+    public String period_between_date(String date){
+        String temp = "";
+        for(int i = 0 ; i < date.length(); i++){
+            if(i == 3 || i ==5){
+                temp += date.charAt(i)+".";
+            }else {
+                temp += date.charAt(i);
+            }
+        }
+        return temp;
     }
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
@@ -994,7 +977,6 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
-
     public void slideUp(View view){
         view.setVisibility(View.VISIBLE);
         TranslateAnimation animate = new TranslateAnimation(
@@ -1029,4 +1011,85 @@ public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    // deprecated function
+    public View dDayCountView(String testtype, String[][] data_string){
+        View exam_d_day_container = getLayoutInflater().inflate(R.layout.exam_d_day_container, null);
+        TextView testtype_textView = (TextView) exam_d_day_container.findViewById(R.id.testtype_TextView);
+        TextView testround_TextView = (TextView) exam_d_day_container.findViewById(R.id.testround_TextView);
+        TextView ddaycount_TextView = (TextView) exam_d_day_container.findViewById(R.id.ddaycount_TextView);
+        TextView sub_one_remaindaystitleTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_one_remaindaystitleTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 횟차 1
+        TextView sub_one_remaindaysTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_one_remaindaysTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 일수 1
+        TextView sub_two_remaindaystitleTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_two_remaindaystitleTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 횟차 1
+        TextView sub_two_remaindaysTextView = (TextView) exam_d_day_container.findViewById(R.id.sub_two_remaindaysTextView);//현재 upcoming 시험이아닌 지난 시험이나 다음 시험의 일수 1
+
+        for(int i =0; i<data_string.length; i++){
+            if(i==0 && Integer.parseInt(data_string[i][1])>=0){
+                testtype_textView.setText(testtype);
+                testround_TextView.setText(data_string[i][0]);
+                ddaycount_TextView.setText(data_string[i][1]);
+
+                sub_one_remaindaystitleTextView.setText(data_string[1][0]);
+                sub_one_remaindaysTextView.setText(data_string[1][1]);
+                sub_two_remaindaystitleTextView.setText(data_string[2][0]);
+                sub_two_remaindaysTextView.setText(data_string[2][1]);
+                break;
+            }else if(i==1 && Integer.parseInt(data_string[i][1])>=0){
+                testtype_textView.setText(testtype);
+                testround_TextView.setText(data_string[i][0]);
+                ddaycount_TextView.setText(data_string[i][1]);
+
+                sub_one_remaindaystitleTextView.setText(data_string[0][0]);
+                sub_one_remaindaysTextView.setText(data_string[0][1]);
+
+                sub_two_remaindaystitleTextView.setText(data_string[2][0]);
+                sub_two_remaindaysTextView.setText(data_string[2][1]);
+                break;
+            }else if(i==2 && Integer.parseInt(data_string[i][1])>=0){
+                testtype_textView.setText(testtype);
+                testround_TextView.setText(data_string[i][0]);
+                ddaycount_TextView.setText(data_string[i][1]);
+
+                sub_one_remaindaystitleTextView.setText(data_string[0][0]);
+                sub_one_remaindaysTextView.setText(data_string[0][1]);
+                sub_two_remaindaystitleTextView.setText(data_string[1][0]);
+                sub_two_remaindaysTextView.setText(data_string[1][1]);
+
+                break;
+            }
+        }
+        return exam_d_day_container;
+    }
+    public void examInfoDropDown(TextView examName, final ImageView examInfoDrop, final LinearLayout innerWrapper){
+
+        examName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(infoView_visible == -1){
+                    innerWrapper.setVisibility(View.VISIBLE);
+                    examInfoDrop.setImageResource(R.drawable.icon_fold);
+                    infoView_visible = 1;
+                }else if(infoView_visible ==1){
+                    innerWrapper.setVisibility(View.GONE);
+                    examInfoDrop.setImageResource(R.drawable.icon_drop_down);
+                    infoView_visible = -1;
+                }
+
+            }
+        });
+        examInfoDrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(infoView_visible == -1){
+                    innerWrapper.setVisibility(View.VISIBLE);
+                    examInfoDrop.setImageResource(R.drawable.icon_fold);
+                    infoView_visible = 1;
+                }else if(infoView_visible ==1){
+                    innerWrapper.setVisibility(View.GONE);
+                    examInfoDrop.setImageResource(R.drawable.icon_drop_down);
+                    infoView_visible = -1;
+                }
+
+            }
+        });
+    }
 }

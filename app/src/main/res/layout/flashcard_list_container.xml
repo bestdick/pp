@@ -82,7 +82,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/flashcard_upload_date_textView"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                app:layout_constraintTop_toBottomOf="@+id/title_textView" />
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout

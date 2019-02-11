@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -29,16 +30,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.storyvendingmachine.www.pp.LoginActivity.callback;
+import static com.storyvendingmachine.www.pp.VERSION.THIS_APP_VERSION;
 
 public class EnteranceActivity extends AppCompatActivity {
 
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
-
+    static String LATEST_VERSION;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enterance);
+        TextView version_textView = (TextView) findViewById(R.id.version_textView);
+        version_textView.setText("beta "+ THIS_APP_VERSION);
+        getLatestVersion();//getVersion
 //        makeQuiz(); // upload quiz~~ wait to see what happen
 //아래가 나의 !!것
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
@@ -244,6 +249,49 @@ public class EnteranceActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
 
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    public void getLatestVersion(){
+        RequestQueue queue = Volley.newRequestQueue(EnteranceActivity.this);
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getLatestVersion.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("version", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access = jsonObject.getString("access");
+                            if(access.equals("valid")){
+                                String version = jsonObject.getJSONObject("response").getString("version");
+                                String upload_date = jsonObject.getJSONObject("response").getString("upload_date");
+                                String upload_time = jsonObject.getJSONObject("response").getString("upload_time");
+                                LATEST_VERSION = version;
+                            }else{
+
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

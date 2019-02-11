@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/title_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -35,7 +35,7 @@
             android:layout_marginEnd="16dp"
             android:text="더보기 》"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            app:layout_constraintBaseline_toBaselineOf="@+id/textView11"
+            app:layout_constraintBaseline_toBaselineOf="@+id/title_textView"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <LinearLayout
@@ -50,7 +50,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView11">
+            app:layout_constraintTop_toBottomOf="@+id/title_textView">
 
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>

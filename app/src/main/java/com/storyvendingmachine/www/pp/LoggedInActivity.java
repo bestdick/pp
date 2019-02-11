@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.storyvendingmachine.www.pp.EnteranceActivity.LATEST_VERSION;
 import static com.storyvendingmachine.www.pp.LoginActivity.callback;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
@@ -62,6 +63,7 @@ import static com.storyvendingmachine.www.pp.MainActivity.G_user_nickname;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_thumbnail;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
+import static com.storyvendingmachine.www.pp.VERSION.THIS_APP_VERSION;
 
 
 public class LoggedInActivity extends AppCompatActivity {
@@ -125,6 +127,7 @@ public class LoggedInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_in);
+        versionControll();
 
         mDestinationUri = Uri.fromFile(new File(getCacheDir(), SAMPLE_CROPPED_IMAGE_NAME));
 
@@ -138,6 +141,13 @@ public class LoggedInActivity extends AppCompatActivity {
 
         user_kakao_normal_info(login_type_textView, user_nickname_textView, join_date_textView, study_exam_name_textView, flashcard_folder_count_textView, user_thumbnail_imageView);
         toolbar();
+
+    }
+    public void versionControll(){
+        TextView this_app_version_textView = (TextView) findViewById(R.id.this_app_version_textView);
+        TextView latest_version_textView = (TextView) findViewById(R.id.latest_app_version_textView);
+        this_app_version_textView.setText("(beta) 현재 앱 버전 " + THIS_APP_VERSION);
+        latest_version_textView.setText("(beta) 업데이트 가능 앱 버전 "+ LATEST_VERSION);
 
     }
     public void user_kakao_normal_info(TextView login_type_textView, TextView user_nickname_textView, TextView join_date_textView,
