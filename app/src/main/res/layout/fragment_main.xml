@@ -133,12 +133,35 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/fragment_main_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-
+            <LinearLayout
+                android:id="@+id/fragment_main_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/today_quiz_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/news_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/suggestion_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
         </LinearLayout>
+
+
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

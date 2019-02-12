@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity{
     final static int REQUEST_CODE_FOR_FLASHCARDFRAGMENT = 22002;
     final static int REQUEST_CODE_FOR_FLASHCARD_WRITE = 22011; // write
 
+    final static int REQUEST_CODE_FOR_SUGGESTION = 22022;
+
 
 
     int requestCode_flashcardwrite = 10004;
@@ -531,9 +533,6 @@ public class MainActivity extends AppCompatActivity{
             }else{
                 Log.e("test fragment", "result else");
             }
-
-
-
                 Log.e("size of supportfragment", String.valueOf(MainfragmentManager.getFragments().size()));
 
         }else if(requestCode == REQUEST_CODE_FOR_FLASHCARD_WRITE ||
@@ -572,9 +571,16 @@ public class MainActivity extends AppCompatActivity{
 //            mViewPager.setOffscreenPageLimit(3);
 //            mViewPager.setCurrentItem(2);
 //              Log.e("from fragment", "fragment or write");
-        }else {
-
-
+        }else if(requestCode == REQUEST_CODE_FOR_SUGGESTION){
+            MainFragment mainFragment = (MainFragment) MainfragmentManager.getFragments().get(0);
+            mainFragment.today_quiz_wrapper.removeAllViews();
+            mainFragment.suggestion_wrapper.removeAllViews();
+            mainFragment.news_wrapper.removeAllViews();
+            mainFragment.getShortTodayQuiz();
+//            mainFragment.getNewsAndAnnouncement_Suggestion();
+            Log.e("suggestion ", "result other_!");
+        }else{
+            Log.e("suggestion ", "result other_2");
         }
     }
     public void removeFragmentInSupportManager(){

@@ -217,9 +217,9 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         time_user_took_exam="null";
     }
     private void rewardAdInitialize(){
-//          MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+          MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
         //tester
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         //tester
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
@@ -232,11 +232,11 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 //                .build();
 //        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026", adRequest); // device tester
 
-//        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026",
-//                new AdRequest.Builder().build());
-//        google tester
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026",
                 new AdRequest.Builder().build());
+//        google tester
+//        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+//                new AdRequest.Builder().build());
     }
     public void wrongQuestionAdReward_notifier(String message, String positive_message, String negative_message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1023,6 +1023,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
         Toast.makeText(this, "onRewardedVideoAdFailedToLoad-"+String.valueOf(errorCode), Toast.LENGTH_SHORT).show();
+        linearLayout_inner_second.setVisibility(View.VISIBLE);
         progressbar_invisible();
     }
 

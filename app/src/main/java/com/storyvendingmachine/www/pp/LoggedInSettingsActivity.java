@@ -401,9 +401,9 @@ public class LoggedInSettingsActivity extends AppCompatActivity implements Rewar
     //***************************************
     //rewarded ad
     private void rewardAdInitialize(){
-//          MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+          MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
         //tester
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         //tester
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
@@ -416,11 +416,11 @@ public class LoggedInSettingsActivity extends AppCompatActivity implements Rewar
 //                .build();
 //        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026", adRequest); // device tester
 
-//        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026",
-//                new AdRequest.Builder().build());
-//        google tester
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+        mRewardedVideoAd.loadAd("ca-app-pub-9203333069147351/2841207026",
                 new AdRequest.Builder().build());
+//        google tester
+//        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+//                new AdRequest.Builder().build());
     }
 
     //안드로이드 앱 자체의 수기주기에 대하여 이 리워드 비디오를 시작하고 없앤다.

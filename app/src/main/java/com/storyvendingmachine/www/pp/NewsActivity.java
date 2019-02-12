@@ -62,6 +62,8 @@ public class NewsActivity extends AppCompatActivity {
     final String ENTER_METHOD_TYPE_SUGGESTION_ALL = "SUGGESTION_ALL";
     final String ENTER_METHOD_TYPE_SUGGESTION_SELECT = "SUGGESTION_SELECT";
 
+    final int REQUEST_CODE_WRITE_SUGGESTION = 44001;
+
     Toolbar tb;
 
 
@@ -162,8 +164,15 @@ public class NewsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(NewsActivity.this,);
-                Toast.makeText(NewsActivity.this, "fab clicked", Toast.LENGTH_SHORT).show();
+                if(LoginType.equals("null") || G_user_id.equals("null")){
+                    String mes = "로그인 하셔야 이용가능합니다";
+                    String pos = "확인";
+                    notifier(mes, pos);
+                }else{
+                    Intent intent = new Intent(NewsActivity.this, WriteSomethingActivity.class);
+                    intent.putExtra("intent_type", "write_suggestion");
+                    startActivityForResult(intent, REQUEST_CODE_WRITE_SUGGESTION);
+                }
             }
         });
     }
@@ -768,8 +777,23 @@ public class NewsActivity extends AppCompatActivity {
             isQuizOpened = false;
         }else{
             super.onBackPressed();
+            setResult(RESULT_CANCELED);
             finish();
             overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_CODE_WRITE_SUGGESTION){
+            if(resultCode==RESULT_OK){
+                initializer();
+            }else if(resultCode==RESULT_CANCELED){
+
+            }else{
+
+            }
         }
     }
 

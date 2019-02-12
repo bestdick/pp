@@ -46,10 +46,12 @@ public class EnteranceActivity extends AppCompatActivity {
         getLatestVersion();//getVersion
 //        makeQuiz(); // upload quiz~~ wait to see what happen
 //아래가 나의 !!것
+        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
 //        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
-//        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+
         // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+        //under sample
+//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
         //full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

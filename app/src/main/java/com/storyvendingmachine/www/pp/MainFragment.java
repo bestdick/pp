@@ -62,6 +62,7 @@ import static com.storyvendingmachine.www.pp.Allurl.url_getExamInfo;
 import static com.storyvendingmachine.www.pp.Allurl.url_getExamList;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.MainActivity.REQUEST_CODE_FOR_SUGGESTION;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 
@@ -72,7 +73,7 @@ public class MainFragment extends Fragment {
     ProgressBar progressBar;
 
     int infoView_visible =-1;
-    LinearLayout wrapper;
+    LinearLayout wrapper, today_quiz_wrapper, news_wrapper, suggestion_wrapper;
 
     View rootView;
     boolean isQuizOpened;
@@ -93,6 +94,10 @@ public class MainFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         progressBar = (ProgressBar) rootView.findViewById(R.id.main_fragment_progress_bar);
         wrapper = (LinearLayout) rootView.findViewById(R.id.fragment_main_container);
+        today_quiz_wrapper = (LinearLayout) rootView.findViewById(R.id.today_quiz_container);
+        news_wrapper = (LinearLayout) rootView.findViewById(R.id.news_container);
+        suggestion_wrapper = (LinearLayout) rootView.findViewById(R.id.suggestion_container);
+
         isQuizOpened =false;
         if(exam_selection_code.equals("null") || exam_selection_code == null){
             //시험을 고르지 않은 상태
@@ -649,7 +654,8 @@ public class MainFragment extends Fragment {
 
                                     Log.e("percent taker", String.valueOf(average_percent)+"//"+String.valueOf(total_takers));
                                     View container_today_quiz = getLayoutInflater().inflate(R.layout.container_today_quiz, null);
-                                    wrapper.addView(container_today_quiz);
+//                                    wrapper.addView(container_today_quiz);
+                                    today_quiz_wrapper.addView(container_today_quiz);
                                     TextView today_quiz_date_textView = (TextView) container_today_quiz.findViewById(R.id.today_quiz_date_textView);
                                     TextView see_more_textView = (TextView) container_today_quiz.findViewById(R.id.see_more_textView);
                                     TextView today_quiz_exam_title_textview = (TextView) container_today_quiz.findViewById(R.id.today_quiz_exam_title_textview);
@@ -780,7 +786,8 @@ public class MainFragment extends Fragment {
                                         slide_left_and_slide_in();
                                     }
                                 });
-                                wrapper.addView(container_news);
+//                                wrapper.addView(container_news);
+                                news_wrapper.addView(container_news);
 
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
                                 for(int i = 0 ; i<jsonArray.length(); i++){
@@ -840,11 +847,12 @@ public class MainFragment extends Fragment {
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(), NewsActivity.class);
                                         intent.putExtra("enter_method", "SUGGESTION_ALL");
-                                        startActivity(intent);
+//                                        startActivity(intent);
+                                        getActivity().startActivityForResult(intent, REQUEST_CODE_FOR_SUGGESTION);
                                         slide_left_and_slide_in();
                                     }
                                 });
-                                wrapper.addView(container_suggestion);
+                                suggestion_wrapper.addView(container_suggestion);
 
                                 JSONArray suggestion_jsonArray = jsonObject.getJSONArray("response_2");
                                 for(int j = 0 ; j < suggestion_jsonArray.length(); j++){
@@ -886,7 +894,8 @@ public class MainFragment extends Fragment {
                                             Intent intent = new Intent(getActivity(), NewsActivity.class);
                                             intent.putExtra("enter_method", "SUGGESTION_SELECT  ");
                                             intent.putExtra("key", temp_j);
-                                            startActivity(intent);
+//                                            startActivity(intent);
+                                            getActivity().startActivityForResult(intent, REQUEST_CODE_FOR_SUGGESTION);
                                             slide_left_and_slide_in();
                                         }
                                     });
