@@ -177,8 +177,8 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
 
 //            test_textView = (TextView) rootView.findViewById(R.id.question_example_textView);
 //            test_textView.setText(example);
+
             question_example_textView.setText(example);
-//            question_textView.setText("[ "+(page+1)+ " ] " + question_question[0]);
 //            question_example_textView.setText(question_question[1]);
         }else{
             String question_question = bundle.getString("question_question");
