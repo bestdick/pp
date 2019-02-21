@@ -130,7 +130,8 @@ SharedPreferences.Editor editor;
                 Log.e("닉네임", nickname);
 
                 RequestQueue queue = Volley.newRequestQueue(context);
-                String url = "http://www.storyvendingmachine.com/android/kakao_id_to_db.php";
+//                String url = "http://www.storyvendingmachine.com/android/kakao_id_to_db.php";
+                String url = "http://www.joonandhoon.com/pp/PassPop/android/server/kakao_id_to_db.php";
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
                             @Override
@@ -145,9 +146,12 @@ SharedPreferences.Editor editor;
                                         //처음 로그인 했을때
                                         if(fromActivity.equals("login_activity")){
                                             Intent intent = new Intent();
-                                            intent.putExtra("kakao_id", Integer.toString((int) userProfile.getId()));
-                                            intent.putExtra("thumb_nail", userProfile.getThumbnailImagePath());
-                                            intent.putExtra("nickname", userProfile.getNickname());
+                                            intent.putExtra("login_type", "kakao");
+                                            intent.putExtra("user_id", Integer.toString((int) userProfile.getId()));
+                                            intent.putExtra("user_thumbnail", userProfile.getThumbnailImagePath());
+                                            intent.putExtra("user_nickname", userProfile.getNickname());
+                                            intent.putExtra("user_selected_last_exam_code", "null");
+                                            intent.putExtra("user_selected_last_exam_name", "null");
 
                                             ((LoginActivity)context).setResult(RESULT_OK, intent);
                                             ((LoginActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -158,9 +162,9 @@ SharedPreferences.Editor editor;
                                         }else if(fromActivity.equals("enterance_activity")){
                                             Intent intent = new Intent(context, MainActivity.class);
                                             intent.putExtra("login_type", "kakao");
-                                            intent.putExtra("kakao_id", Integer.toString((int) userProfile.getId()));
-                                            intent.putExtra("thumb_nail", userProfile.getThumbnailImagePath());
-                                            intent.putExtra("nickname", userProfile.getNickname());
+                                            intent.putExtra("user_id", Integer.toString((int) userProfile.getId()));
+                                            intent.putExtra("user_thumbnail", userProfile.getThumbnailImagePath());
+                                            intent.putExtra("user_nickname", userProfile.getNickname());
                                             //Toast.makeText(LoginActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
                                             Log.e("almost", "almost success");
                                             context.startActivity(intent);

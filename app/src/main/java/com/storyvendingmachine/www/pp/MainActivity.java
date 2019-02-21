@@ -407,10 +407,10 @@ public class MainActivity extends AppCompatActivity{
                     LT = login_remember.getString("login_type", "");
 
                     LoginType=data.getStringExtra("login_type");
-                    G_user_id = data.getStringExtra("user_id");
-
-                    G_user_nickname = data.getStringExtra("user_nickname");
-                    G_user_thumbnail = data.getStringExtra("user_thumbnail");
+//                    G_user_id = data.getStringExtra("user_id");
+//
+//                    G_user_nickname = data.getStringExtra("user_nickname");
+//                    G_user_thumbnail = data.getStringExtra("user_thumbnail");
 
                     String  exam_code = data.getStringExtra("user_selected_last_exam_code");
                     String exam_name = data.getStringExtra("user_selected_last_exam_name");
@@ -425,6 +425,9 @@ public class MainActivity extends AppCompatActivity{
 
                     if(LoginType.equals("normal")){
                         //normal login 일때
+                        G_user_id = data.getStringExtra("user_id");
+                        G_user_nickname = data.getStringExtra("user_nickname");
+                        G_user_thumbnail = data.getStringExtra("user_thumbnail");
                         G_user_level = data.getStringExtra("user_level");
                         logintype_textView.setText("passpop");
                         if(G_user_thumbnail.equals("null")){
@@ -434,6 +437,9 @@ public class MainActivity extends AppCompatActivity{
                         }
                     }else{
                         //kakao login 일때
+                        G_user_id = data.getStringExtra("user_id");
+                        G_user_nickname = data.getStringExtra("user_nickname");
+                        G_user_thumbnail = data.getStringExtra("user_thumbnail");
                         G_user_level = "one";
                         logintype_textView.setText(LoginType);
                         if(G_user_thumbnail.equals("null")){

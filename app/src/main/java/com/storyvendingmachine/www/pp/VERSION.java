@@ -5,5 +5,5 @@ package com.storyvendingmachine.www.pp;
  */
 
 public class VERSION {
-    static final String THIS_APP_VERSION= "v1.00.01";
+    static final String THIS_APP_VERSION= "v1.00.03";
 }
