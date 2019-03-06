@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity{
     String LT;
 
     static FloatingActionButton fab;
+
+    static String major_exam_type_code;
     static String exam_selection_code;
     static String exam_selection_name;
 
@@ -90,77 +92,21 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        permission_global_instance();
 
-
-
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, 1);
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 0);
-
-
-        logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
-        exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
-        user_thumbnail = (ImageView) findViewById(R.id.user_thumbnail_imageView);
         toolbar();
-
-
-
-        MainfragmentManager = getSupportFragmentManager();
-
-        mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(3);
-        mViewPager.setPageMargin(16);
-
-
-
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                fab = (FloatingActionButton) findViewById(R.id.floating_action_button);
-                fab.setImageResource(R.drawable.floating_button);
-                if(position==2){
-                        fab.setVisibility(View.VISIBLE);
-                        fab.attachToListView(flashcardListView);
-                        fab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                if(LoginType.equals("null") || G_user_id.equals("null")){
-                                    String message = "플래시카드 작성을 하시려면 로그인 후 작성해주시기 바람니다.";
-                                    notifier(message);
-                                }else{
-                                    Intent intent = new Intent(MainActivity.this, FlashCardWriteActivity.class);
-                                    intent.putExtra("type", "new");
-                                    startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
-                                    slide_left_and_slide_in();
-                                }
-                            }
-                        });
-                   }else{
-                        fab.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-
         login_remember = getSharedPreferences("setting", 0);
         editor = login_remember.edit();
-
         LT = login_remember.getString("login_type", "");
         if(LT.equals("kakao")){
             Intent getIntent = getIntent();
+            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
+            if(major_exam_type_code.equals("lawyer")){
+
+            }else{
+                sugs_gs_viewPagerControll();
+            }
+
             LoginType = getIntent.getStringExtra("login_type");
             G_user_id = getIntent.getStringExtra("user_id");
             G_user_level = "one";
@@ -190,6 +136,13 @@ public class MainActivity extends AppCompatActivity{
 
         }else if(LT.equals("normal")){
             Intent getIntent = getIntent();
+            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
+            if(major_exam_type_code.equals("lawyer")){
+
+            }else{
+                sugs_gs_viewPagerControll();
+            }
+
             LoginType = getIntent.getStringExtra("login_type");
             G_user_id = getIntent.getStringExtra("user_id");
             G_user_level = getIntent.getStringExtra("member_level");
@@ -216,6 +169,14 @@ public class MainActivity extends AppCompatActivity{
                 exam_selection_textView.setText(exam_selection_name);
             }
         }else{
+            Intent getIntent = getIntent();
+            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
+            if(major_exam_type_code.equals("lawyer")){
+
+            }else{
+                sugs_gs_viewPagerControll();
+            }
+
             LoginType = "null";
             G_user_id = "null";
             G_user_level = "null";
@@ -239,6 +200,93 @@ public class MainActivity extends AppCompatActivity{
         }
 
 
+
+
+
+
+
+    }
+
+
+    public void permission_global_instance(){
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, 1);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 0);
+    }
+    private void toolbar(){
+        Toolbar tb = (Toolbar) findViewById(R.id.MainToolBar);
+        setSupportActionBar(tb);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_exam_select);
+        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+        getSupportActionBar().setSubtitle("시험 선택");
+
+        logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
+        exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
+        user_thumbnail = (ImageView) findViewById(R.id.user_thumbnail_imageView);
+
+    }
+    public void UIChange(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mViewPagerAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
+    public void sugs_gs_viewPagerControll(){
+
+        MainfragmentManager = getSupportFragmentManager();
+        mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mViewPagerAdapter);
+        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setPageMargin(16);
+
+
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                fab = (FloatingActionButton) findViewById(R.id.floating_action_button);
+                fab.setImageResource(R.drawable.floating_button);
+                if(position==2){
+                    fab.setVisibility(View.VISIBLE);
+                    fab.attachToListView(flashcardListView);
+                    fab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(LoginType.equals("null") || G_user_id.equals("null")){
+                                String message = "플래시카드 작성을 하시려면 로그인 후 작성해주시기 바람니다.";
+                                notifier(message);
+                            }else{
+                                Intent intent = new Intent(MainActivity.this, FlashCardWriteActivity.class);
+                                intent.putExtra("type", "new");
+                                startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
+                                slide_left_and_slide_in();
+                            }
+                        }
+                    });
+                }else{
+                    fab.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.MainActivityTabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -248,18 +296,7 @@ public class MainActivity extends AppCompatActivity{
         tabLayout.getTabAt(2).setIcon(R.drawable.icon_flashcard);
         tabLayout.getTabAt(3).setIcon(R.drawable.icon_mypage);
 
-
         UIChange();
-
-    }
-
-    public void UIChange(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mViewPagerAdapter.notifyDataSetChanged();
-            }
-        });
     }
     public void notifier(String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -288,7 +325,6 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
     }
-
     public void LoginRemember(){
         login_remember = getSharedPreferences("setting", 0);
         editor = login_remember.edit();
@@ -326,18 +362,6 @@ public class MainActivity extends AppCompatActivity{
 
 
     }
-
-
-    private void toolbar(){
-        Toolbar tb = (Toolbar) findViewById(R.id.MainToolBar);
-        setSupportActionBar(tb);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_exam_select);
-        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
-        getSupportActionBar().setSubtitle("시험 선택");
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
 //        getMenuInflater().inflate(R.menu.user_login_menu, menu);
@@ -368,7 +392,6 @@ public class MainActivity extends AppCompatActivity{
 
         return true;
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -699,7 +722,6 @@ public class MainActivity extends AppCompatActivity{
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
-
     public void slide_left_and_slide_in(){//opening new activity
         overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }

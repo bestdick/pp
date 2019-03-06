@@ -164,7 +164,6 @@ public class EnteranceActivity extends AppCompatActivity {
 
     }
     private void loginCheck(final String input_user_email, final String input_user_password){
-
         RequestQueue queue = Volley.newRequestQueue(EnteranceActivity.this);
 //        String url = "http://www.storyvendingmachine.com/android/front_page_normal_login_check.php";
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/front_page_normal_login_check.php";

@@ -288,6 +288,8 @@ import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
             }
         });
     }
+
+
     public void flashcard_folder_select_process(){
         flashcardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

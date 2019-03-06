@@ -55,17 +55,18 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
                                     exam_type_view.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            if(exam_type_code.equals("sugs_1001") || exam_type_code.equals("gs_2001")){
+//                                            if(exam_type_code.equals("sugs_1001") || exam_type_code.equals("gs_2001")){
                                                 Intent intent = new Intent(MajorExamTypeSelectorActivity.this, MainActivity.class);
+                                                intent.putExtra("exam_major_type", exam_type_code);
                                                 startActivity(intent);
                                                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                                                 finish();
-                                            }else{
-                                                Intent intent = new Intent(MajorExamTypeSelectorActivity.this, LawMainActivity.class);
-                                                startActivity(intent);
-                                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
-                                                finish();
-                                            }
+//                                            }else{
+//                                                Intent intent = new Intent(MajorExamTypeSelectorActivity.this, LawMainActivity.class);
+//                                                startActivity(intent);
+//                                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+//                                                finish();
+//                                            }
 
                                         }
                                     });
