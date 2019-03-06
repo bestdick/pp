@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "398042551426",
+    "firebase_url": "https://passpop-45ac1.firebaseio.com",
+    "project_id": "passpop-45ac1",
+    "storage_bucket": "passpop-45ac1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398042551426:android:806eb6a32bc8da19",
+        "android_client_info": {
+          "package_name": "com.storyvendingmachine.www.pp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398042551426-lvkp2ulojd5a32274nq978qqh7e26agv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.storyvendingmachine.www.pp",
+            "certificate_hash": "d3077f52a3c435fd3a2e89b2e6e4b28b8f05d0bf"
+          }
+        },
+        {
+          "client_id": "398042551426-f7km2a0coa939obkquffu5k0m5m0c7mu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIP2kddd3BsvbaLhUmOjns6qCv0WDpZYw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398042551426-f7km2a0coa939obkquffu5k0m5m0c7mu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
