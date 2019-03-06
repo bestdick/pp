@@ -127,7 +127,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             navigationView = (NavigationView) findViewById(R.id.nav_view);
 
             navigationView.setNavigationItemSelectedListener(this);
-            answer_sheet_element_layout = (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
+             answer_sheet_element_layout= (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
 
             answer = new ArrayList<Integer>();
             getSelectedExam();
@@ -769,7 +769,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 }
             }
         });
-
     }
     public boolean checkifAllAnswersAreSelected(){
         boolean isEverythingSelected = true;

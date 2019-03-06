@@ -6,7 +6,7 @@ android {
         applicationId "com.storyvendingmachine.www.pp"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 8
+        versionCode 9
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -55,7 +55,7 @@ dependencies {
     compile 'com.github.PhilJay:MpAndroidChart:v3.0.2'
 
     //admob
-    implementation 'com.google.android.gms:play-services-ads:17.1.1'
+    implementation 'com.google.android.gms:play-services-ads:17.1.2'
 
     //프레그먼트에서 보낸 intent를 다 시 fragment 에서 받을수 있게해주는 것
 //    compile 'com.inthecheesefactory.thecheeselibraray:stated-fragment-support-v4:0.9.3'
@@ -65,4 +65,11 @@ dependencies {
     compile 'com.github.yalantis:ucrop:2.2.2-native'
     //image cropper
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
+
+    //filebase
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
 }
+//firebase
+apply plugin: 'com.google.gms.google-services'
+com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

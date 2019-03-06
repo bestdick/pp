@@ -25,7 +25,6 @@ public class FlashCardViewActivityViewPagerAdapter extends FragmentStatePagerAda
     public FlashCardViewActivityViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
-
     @Override
     public Fragment getItem(int position) {
         int length_of_flashcard = flashcard_array.size();

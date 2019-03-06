@@ -4,11 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,21 +40,15 @@ public class EnteranceActivity extends AppCompatActivity {
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
     static String LATEST_VERSION;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enterance);
-        TextView version_textView = (TextView) findViewById(R.id.version_textView);
-        version_textView.setText("beta "+ THIS_APP_VERSION);
+        initializer_element();
+        initializer_ad();
         getLatestVersion();//getVersion
-//        makeQuiz(); // upload quiz~~ wait to see what happen
-//아래가 나의 !!것
-        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
-//        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
 
-        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
-        //under sample
-//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
 
         //full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -81,28 +78,49 @@ public class EnteranceActivity extends AppCompatActivity {
                 //****************kakao login **************************
 
                 }
-            }, 800);
+            }, 500);
         }else if(LT.equals("normal")){
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
                     LoginRemember();
                 }
-            }, 800);
+            }, 500);
         }else{
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
-                    Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
+                    Intent intent = new Intent(EnteranceActivity.this, MajorExamTypeSelectorActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                     finish();
+
+
                 }
-            }, 800);
+            }, 1500);
         }
 
 
     }
+    public void initializer_ad(){
+        //        makeQuiz(); // upload quiz~~ wait to see what happen
+//아래가 나의 !!것
+        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+//        MobileAds.initialize(this, "ca-app-pub-9203333069147351~3494839374");
+
+        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
+        //under sample
+//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+    }
+    public void initializer_element(){
+        TextView version_textView = (TextView) findViewById(R.id.version_textView);
+        version_textView.setText("beta "+ THIS_APP_VERSION);
+    }
+
+
+
+
+
 
 
     public void LoginRemember(){
@@ -239,42 +257,6 @@ public class EnteranceActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-    public void makeQuiz(){
-        RequestQueue queue = Volley.newRequestQueue(EnteranceActivity.this);
-        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/uploadTodayQuiz_at_enteranceActivity.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("make quiz", response);
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("token", "passpop");
-                return params;
-            }
-        };
-        queue.add(stringRequest);
-    }
-
     public void getLatestVersion(){
         RequestQueue queue = Volley.newRequestQueue(EnteranceActivity.this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getLatestVersion.php";
@@ -316,5 +298,9 @@ public class EnteranceActivity extends AppCompatActivity {
             }
         };
         queue.add(stringRequest);
+    }
+
+    public void select_exam_type(){
+
     }
 }

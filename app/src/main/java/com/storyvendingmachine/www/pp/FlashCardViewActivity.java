@@ -366,6 +366,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
     public void notifierAddToFlashCardFolder(String message, String positive_message, String negative_message, final String folder_code, final TextView textView){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
@@ -714,6 +715,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+
     public void updateLike(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/updateLike.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
@@ -1063,30 +1065,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
             super.onPostExecute(result);
         }
     }
-    public class BackgroundTaskMyFolderFlashCard extends AsyncTask<Void, Void, Integer> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Integer doInBackground(Void... integers) {
-
-            return -1;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... params) {
-            super.onProgressUpdate(params);
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            super.onPostExecute(result);
-        }
-    }
-
 
 
     @Override

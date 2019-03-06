@@ -613,10 +613,11 @@ public class MainFragment extends Fragment {
     //        Log.e("date :::", String.valueOf(testtimeInMilliseconds) +"///"+ String.valueOf(timeInMilliseconds));
     //        Log.e("Date in milli :: ", String.valueOf((testtimeInMilliseconds - timeInMilliseconds)/oneDay));
 
-            if((((testtimeInMilliseconds - timeInMilliseconds)/oneDay)+one) < 0 ){
+//            if((((testtimeInMilliseconds - timeInMilliseconds)/oneDay)+one) < 0 ){
+            if((((testtimeInMilliseconds - timeInMilliseconds)/oneDay)) < 0 ){
                 return "end_exam";
             }else{
-                return String.valueOf(((testtimeInMilliseconds - timeInMilliseconds)/oneDay)+one);
+                return String.valueOf(((testtimeInMilliseconds - timeInMilliseconds)/oneDay));
             }
 
 
