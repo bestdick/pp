@@ -11,4 +11,7 @@ final static String url_getExamInfo = "http://www.joonandhoon.com/pp/PassPop/and
 final static String url_getAllExamSchedule = "http://www.joonandhoon.com/pp/PassPop/android/server/getAllExamSchedule.php";
 //final static String url_login = "http://www.storyvendingmachine.com/android/front_page_normal_login_check.php";
 
+
+    static String base_url = "http://www.joonandhoon.com/pp/passpop_law/android/server/";
+
 }

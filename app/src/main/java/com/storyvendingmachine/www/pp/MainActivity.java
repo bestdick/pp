@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission_global_instance();
+
         logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
         exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
         user_thumbnail = (ImageView) findViewById(R.id.user_thumbnail_imageView);
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity{
                 exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
                 lawyer_toolbar();
+                app_start_fragment_initializer();
             }else{
                 toolbar();
                 sugs_gs_viewPagerControll();
@@ -164,6 +166,7 @@ public class MainActivity extends AppCompatActivity{
                 exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
                 lawyer_toolbar();
+                app_start_fragment_initializer();
 
             }else{
                 toolbar();
@@ -209,7 +212,9 @@ public class MainActivity extends AppCompatActivity{
 
 
                 lawyer_toolbar();
+                app_start_fragment_initializer();
             }else{
+                toolbar();
                 sugs_gs_viewPagerControll();
                 LoginType = "null";
                 G_user_id = "null";
@@ -253,16 +258,141 @@ public class MainActivity extends AppCompatActivity{
         logintype_textView.setTextColor(getResources().getColor(R.color.colorCrimsonRed));
         if(LoginType.equals("kakao")){
             logintype_textView.setText("kakao");
+            user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
+                    startActivityForResult(intent, 10003);
+                    slide_left_and_slide_in();
+                }
+            });
         }else if(LoginType.equals("normal")){
             logintype_textView.setText("passpop");
+            getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+            user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
+                    startActivityForResult(intent, 10003);
+                    slide_left_and_slide_in();
+                }
+            });
         }else{
             logintype_textView.setText("guest");
+            user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent =new Intent(MainActivity.this, LoginActivity.class);
+                    startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
+                    slide_left_and_slide_in();
+                }
+            });
         }
+        if(G_user_thumbnail.equals("null") || G_user_thumbnail == null){
+            user_thumbnail.setImageDrawable(getResources().getDrawable(R.drawable.icon_law_thumbnail));
+        }else{
+            getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+        }
+        exam_selection_textView.setText("#변호사시험");
+        exam_selection_textView.setTextColor(getResources().getColor(R.color.colorCrimsonRed));
 
-//        exam_selection_textView
-        getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+        law_view_pager_control();
+    }
+    public void app_start_fragment_initializer(){
+        LawHomeFragment homeFragment = new LawHomeFragment();
+        homeFragment.setArguments(null);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, homeFragment)
+                .commit();
 
     }
+    public void law_view_pager_control(){
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.MainActivityTabs);
+        tabLayout.removeAllTabs();
+        tabLayout.addTab(tabLayout.newTab().setText("Home"));
+        tabLayout.addTab(tabLayout.newTab().setText("Exam"));
+        tabLayout.addTab(tabLayout.newTab().setText("Study"));
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int tab_position = tab.getPosition();
+
+                String title = "";
+                Fragment fragment = null;
+                switch (tab_position){
+                    case 0:
+//                        title = "#홈";
+//                        toolbarTitle(title);
+                        fragment = new LawHomeFragment();
+//                        detach_attach_fragment(homeFragment);
+//                        last_fragment= 0;
+                        break;
+                    case 1:
+//                        title = "#기출문제";
+//                        toolbarTitle(title);
+//                        detach_attach_fragment(examFragment);
+                        fragment = new LawExamFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("param1", "one");
+                        bundle.putString("param2", "two");
+                        fragment.setArguments(bundle);
+//                        last_fragment= 1;
+                        break;
+                    case 2:
+//                        title = "#스터디";
+//                        toolbarTitle(title);
+//                        detach_attach_fragment(studyFragment);
+//                        fragment = new StudyFragment();
+//                        last_fragment= 2;
+                        break;
+                }
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                Log.e("tab selected", String.valueOf(tab_position));
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void toolbar(){
         Toolbar tb = (Toolbar) findViewById(R.id.MainToolBar);

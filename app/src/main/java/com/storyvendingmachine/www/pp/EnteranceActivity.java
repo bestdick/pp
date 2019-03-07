@@ -224,13 +224,6 @@ public class EnteranceActivity extends AppCompatActivity {
                                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                     finish();
                                 }
-
-
-
-//                                Log.e("check success:::", "true");
-//                                Log.e("login check ::::", LoginType+"//"+G_user_id);
-
-
                             }else if(login_success_fail.equals("login_fail")){
                                 editor.putString("login_type", "null");
                                 editor.putBoolean("id_pw_match", false);

@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_more_vert_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_person_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,8 +33,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="icon_more" />
-                                      <entry key="themeColor" value="ee2f1e" />
+                                      <entry key="outputName" value="icon_law_thumbnail" />
+                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="themeColor" value="990000" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -48,6 +49,17 @@
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
                                       <entry key="foregroundLayerName" value="ic_launcher_foreground" />
                                       <entry key="outputName" value="icon_empty_thumbnail" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                            <entry key="launcherLegacy">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="outputName" value="icon" />
                                     </map>
                                   </option>
                                 </PersistentState>
