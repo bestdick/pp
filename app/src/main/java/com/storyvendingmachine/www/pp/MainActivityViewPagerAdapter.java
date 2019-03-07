@@ -11,7 +11,7 @@ import android.util.Log;
  * one of the sections/tabs/pages.
  */
 public class MainActivityViewPagerAdapter extends FragmentStatePagerAdapter{
-
+    String type;
 
     public MainActivityViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -19,26 +19,35 @@ public class MainActivityViewPagerAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-
-       if (position == 0)
-           return MainFragment.newInstance();
-       else if(position == 1)
-           return TestFragment.newInstance();
-       else if(position ==2){
-           return FlashcardFragment.newInstance();
-       }else  {
-           return StatisticFragment.newInstance(null, null);
-       }
-//       }else {
-//           return FlashcardFragment.newInstance();
-//       }
-
+        if(type.equals("lawyer")){
+            if(position==0){
+                return LawHomeFragment.newInstance("null","null");
+            }else if(position==1){
+                return LawExamFragment.newInstance("one","two");
+            }else{
+                return LawStudyFragment.newInstance("null","null");
+            }
+        }else{
+            if (position == 0)
+                return MainFragment.newInstance();
+            else if(position == 1)
+                return TestFragment.newInstance();
+            else if(position ==2){
+                return FlashcardFragment.newInstance();
+            }else  {
+                return StatisticFragment.newInstance(null, null);
+            }
+        }
     }
 
     @Override
     public int getCount() {
         // Show 3 total pages.
-        return 4;
+        if(type.equals("lawyer")){
+            return 3;
+        }else{
+            return 4;
+        }
     }
 
 

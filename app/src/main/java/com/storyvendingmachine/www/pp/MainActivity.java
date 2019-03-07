@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission_global_instance();
+        MainfragmentManager = getSupportFragmentManager();
 
         logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
         exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
@@ -121,7 +122,6 @@ public class MainActivity extends AppCompatActivity{
                 exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
                 lawyer_toolbar();
-                app_start_fragment_initializer();
             }else{
                 toolbar();
                 sugs_gs_viewPagerControll();
@@ -166,8 +166,6 @@ public class MainActivity extends AppCompatActivity{
                 exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
                 lawyer_toolbar();
-                app_start_fragment_initializer();
-
             }else{
                 toolbar();
                 sugs_gs_viewPagerControll();
@@ -212,7 +210,6 @@ public class MainActivity extends AppCompatActivity{
 
 
                 lawyer_toolbar();
-                app_start_fragment_initializer();
             }else{
                 toolbar();
                 sugs_gs_viewPagerControll();
@@ -238,13 +235,6 @@ public class MainActivity extends AppCompatActivity{
                 });
             }
         }
-
-
-
-
-
-
-
     }
 
 
@@ -296,76 +286,27 @@ public class MainActivity extends AppCompatActivity{
         exam_selection_textView.setText("#변호사시험");
         exam_selection_textView.setTextColor(getResources().getColor(R.color.colorCrimsonRed));
 
-        law_view_pager_control();
+        law_viewPagerControl();
     }
-    public void app_start_fragment_initializer(){
-        LawHomeFragment homeFragment = new LawHomeFragment();
-        homeFragment.setArguments(null);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, homeFragment)
-                .commit();
 
-    }
-    public void law_view_pager_control(){
+
+    public void law_viewPagerControl(){
+        mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+        mViewPagerAdapter.type="lawyer";
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mViewPagerAdapter);
+        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setPageMargin(16);
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.MainActivityTabs);
         tabLayout.removeAllTabs();
         tabLayout.addTab(tabLayout.newTab().setText("Home"));
         tabLayout.addTab(tabLayout.newTab().setText("Exam"));
         tabLayout.addTab(tabLayout.newTab().setText("Study"));
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                int tab_position = tab.getPosition();
 
-                String title = "";
-                Fragment fragment = null;
-                switch (tab_position){
-                    case 0:
-//                        title = "#홈";
-//                        toolbarTitle(title);
-                        fragment = new LawHomeFragment();
-//                        detach_attach_fragment(homeFragment);
-//                        last_fragment= 0;
-                        break;
-                    case 1:
-//                        title = "#기출문제";
-//                        toolbarTitle(title);
-//                        detach_attach_fragment(examFragment);
-                        fragment = new LawExamFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("param1", "one");
-                        bundle.putString("param2", "two");
-                        fragment.setArguments(bundle);
-//                        last_fragment= 1;
-                        break;
-                    case 2:
-//                        title = "#스터디";
-//                        toolbarTitle(title);
-//                        detach_attach_fragment(studyFragment);
-//                        fragment = new StudyFragment();
-//                        last_fragment= 2;
-                        break;
-                }
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                fragmentTransaction.replace(R.id.container, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-                Log.e("tab selected", String.valueOf(tab_position));
-
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
 
 
@@ -414,8 +355,9 @@ public class MainActivity extends AppCompatActivity{
 
     public void sugs_gs_viewPagerControll(){
 
-        MainfragmentManager = getSupportFragmentManager();
+//        MainfragmentManager = getSupportFragmentManager();
         mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+        mViewPagerAdapter.type="sugs/gs";
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
@@ -587,6 +529,7 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(MainActivity.this, "mainactivity : "+ exam_name+","+exam_code, Toast.LENGTH_SHORT).show();
                     removeFragmentInSupportManager();
                     mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+                    mViewPagerAdapter.type="sugs/gs";
                     mViewPager = (ViewPager) findViewById(R.id.container);
                     mViewPager.setAdapter(mViewPagerAdapter);
                     mViewPager.setOffscreenPageLimit(3);
@@ -597,13 +540,13 @@ public class MainActivity extends AppCompatActivity{
                 }
         }else if(requestCode == 10002){
             // 로그인 후 돌아왔을때 request
+            // 로그인 후 돌아왔을떄.... 복잡..;;;
+
                 if (resultCode == RESULT_OK) {
                     Log.e("result 10002", "here???10002");
-
                     login_remember = getSharedPreferences("setting", 0);
                     editor = login_remember.edit();
                     LT = login_remember.getString("login_type", "");
-
                     LoginType=data.getStringExtra("login_type");
 //                    G_user_id = data.getStringExtra("user_id");
 //
@@ -666,6 +609,8 @@ public class MainActivity extends AppCompatActivity{
         }else if(requestCode == 10003){
             //this requestCode is from LoggedInActivity
             // 로그아웃 후 리퀘스트코드
+            // 로그아웃을 하면 어떤 시험을 볼것인지에대한 판단을 해야하므로 MainActivity를 종료 하고
+            // MajorExamTypeSelectorActivity를 실행한다.
             Log.e("result 10003", String.valueOf(requestCode));
 
             if (resultCode == RESULT_OK) {
@@ -675,25 +620,35 @@ public class MainActivity extends AppCompatActivity{
                 editor = login_remember.edit();
                 LT = login_remember.getString("login_type", "");
 
-                user_thumbnail.setImageResource(R.drawable.user_thumbnail_icon);
-
-                logintype_textView.setText("Guest");
-                exam_selection_textView.setText("시험 선택");
-
-                user_thumbnail.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent =new Intent(MainActivity.this, LoginActivity.class);
-                        startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
-                        slide_left_and_slide_in();
-                    }
-                });
-
-                removeFragmentInSupportManager();
-                mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
-                mViewPager = (ViewPager) findViewById(R.id.container);
-                mViewPager.setAdapter(mViewPagerAdapter);
-                mViewPager.setOffscreenPageLimit(3);
+                Intent intent = new Intent(MainActivity.this, MajorExamTypeSelectorActivity.class);
+                String str_null = "null";
+                intent.putExtra("login_type", str_null);
+                intent.putExtra("user_id", str_null);
+                intent.putExtra("member_level", str_null);
+                intent.putExtra("user_nickname", str_null);
+                intent.putExtra("user_thumbnail", str_null);
+                startActivity(intent);
+                finish();
+//
+//                user_thumbnail.setImageResource(R.drawable.user_thumbnail_icon);
+//
+//                logintype_textView.setText("Guest");
+//                exam_selection_textView.setText("시험 선택");
+//
+//                user_thumbnail.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        Intent intent =new Intent(MainActivity.this, LoginActivity.class);
+//                        startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
+//                        slide_left_and_slide_in();
+//                    }
+//                });
+//
+//                removeFragmentInSupportManager();
+//                mViewPagerAdapter = new MainActivityViewPagerAdapter(MainfragmentManager);
+//                mViewPager = (ViewPager) findViewById(R.id.container);
+//                mViewPager.setAdapter(mViewPagerAdapter);
+//                mViewPager.setOffscreenPageLimit(3);
 
             }else if(resultCode == RESULT_CANCELED){
                 Log.e("result 10003", "cancel");

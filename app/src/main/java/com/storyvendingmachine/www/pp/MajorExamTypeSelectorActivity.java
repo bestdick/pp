@@ -80,6 +80,8 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(View view) {
 //                                            if(exam_type_code.equals("sugs_1001") || exam_type_code.equals("gs_2001")){
+                                                updateLastSelectedMajorExam(login_type, user_id, member_level,user_nickname, user_thumbnail,exam_type_code);
+
                                                 Intent intent = new Intent(MajorExamTypeSelectorActivity.this, MainActivity.class);
                                                 intent.putExtra("login_type", login_type);
                                                 intent.putExtra("user_id", user_id);
@@ -124,6 +126,49 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
             protected Map<String, String> getParams(){
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    public void updateLastSelectedMajorExam(final String login_type, final String user_id, final String member_level, final String user_nickname, final String user_thumbnail, final String user_selected_last_major_exam){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://www.joonandhoon.com/pp/PassPop/android/server/updateLastSelectedMajorExam.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("update major exam ", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access = jsonObject.getString("access");
+                            if(access.equals("valid")){
+
+                            }else{
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("login_type", login_type);
+                params.put("user_id", user_id);
+                params.put("user_selected_last_major_exam", user_selected_last_major_exam);
                 return params;
             }
         };
