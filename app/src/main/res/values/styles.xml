@@ -33,4 +33,12 @@
         <item name="colorAccent">@color/colorBlack</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
     </style>
+    <style name="PassPopLawTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorWhite</item>
+        <item name="colorPrimaryDark">@color/colorWhiteSmoke</item>
+        <item name="colorAccent">@color/colorCrimsonRed</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+    </style>
+
 </resources>

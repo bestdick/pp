@@ -90,113 +90,148 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent getIntent = getIntent();
+        major_exam_type_code = getIntent.getStringExtra("user_selected_last_major_exam");
+        if(major_exam_type_code.equals("lawyer")){
+            setTheme(R.style.PassPopLawTheme);
+        }else{
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission_global_instance();
+        logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
+        exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
+        user_thumbnail = (ImageView) findViewById(R.id.user_thumbnail_imageView);
 
-        toolbar();
+
         login_remember = getSharedPreferences("setting", 0);
         editor = login_remember.edit();
         LT = login_remember.getString("login_type", "");
         if(LT.equals("kakao")){
-            Intent getIntent = getIntent();
-            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
             if(major_exam_type_code.equals("lawyer")){
+                LoginType = getIntent.getStringExtra("login_type");
+                G_user_id = getIntent.getStringExtra("user_id");
+                G_user_level = "one";
+                G_user_nickname =getIntent.getStringExtra("user_nickname");
+                G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
 
+                exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
+                exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
+
+                lawyer_toolbar();
             }else{
+                toolbar();
                 sugs_gs_viewPagerControll();
-            }
+                LoginType = getIntent.getStringExtra("login_type");
+                G_user_id = getIntent.getStringExtra("user_id");
+                G_user_level = "one";
+                G_user_nickname =getIntent.getStringExtra("user_nickname");
+                G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
 
-            LoginType = getIntent.getStringExtra("login_type");
-            G_user_id = getIntent.getStringExtra("user_id");
-            G_user_level = "one";
-            G_user_nickname =getIntent.getStringExtra("user_nickname");
-            G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
+                exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
+                exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
-            exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
-            exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
-
-            logintype_textView.setText(LoginType);
+                logintype_textView.setText(LoginType);
 
 
-            getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
-            user_thumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
-                    startActivityForResult(intent, 10003);
-                    slide_left_and_slide_in();
+                getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+                user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
+                        startActivityForResult(intent, 10003);
+                        slide_left_and_slide_in();
+                    }
+                });
+                if(exam_selection_code.equals("null")){
+                    exam_selection_textView.setText("시험 선택");
+                }else{
+                    exam_selection_textView.setText(exam_selection_name);
                 }
-            });
-            if(exam_selection_code.equals("null")){
-                exam_selection_textView.setText("시험 선택");
-            }else{
-                exam_selection_textView.setText(exam_selection_name);
             }
-
         }else if(LT.equals("normal")){
-            Intent getIntent = getIntent();
-            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
+//            Intent getIntent = getIntent();
+//            major_exam_type_code = getIntent.getStringExtra("user_selected_last_major_exam");
             if(major_exam_type_code.equals("lawyer")){
+                LoginType = getIntent.getStringExtra("login_type");
+                G_user_id = getIntent.getStringExtra("user_id");
+                G_user_level = getIntent.getStringExtra("member_level");
+                G_user_nickname =getIntent.getStringExtra("user_nickname");
+                G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
+
+                exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
+                exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
+
+                lawyer_toolbar();
 
             }else{
+                toolbar();
                 sugs_gs_viewPagerControll();
-            }
+                LoginType = getIntent.getStringExtra("login_type");
+                G_user_id = getIntent.getStringExtra("user_id");
+                G_user_level = getIntent.getStringExtra("member_level");
+                G_user_nickname =getIntent.getStringExtra("user_nickname");
+                G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
 
-            LoginType = getIntent.getStringExtra("login_type");
-            G_user_id = getIntent.getStringExtra("user_id");
-            G_user_level = getIntent.getStringExtra("member_level");
-            G_user_nickname =getIntent.getStringExtra("user_nickname");
-            G_user_thumbnail = getIntent.getStringExtra("user_thumbnail");
+                exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
+                exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
 
-            exam_selection_code = getIntent.getStringExtra("user_selected_last_exam_code");
-            exam_selection_name = getIntent.getStringExtra("user_selected_last_exam_name");
+                logintype_textView.setText("passpop");
 
-            logintype_textView.setText("passpop");
-
-            getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
-            user_thumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
-                    startActivityForResult(intent, 10003);
-                    slide_left_and_slide_in();
+                getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+                user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent =new Intent(MainActivity.this, LoggedInActivity.class);
+                        startActivityForResult(intent, 10003);
+                        slide_left_and_slide_in();
+                    }
+                });
+                if(exam_selection_code.equals("null")){
+                    exam_selection_textView.setText("시험 선택");
+                }else{
+                    exam_selection_textView.setText(exam_selection_name);
                 }
-            });
-            if(exam_selection_code.equals("null")){
-                exam_selection_textView.setText("시험 선택");
-            }else{
-                exam_selection_textView.setText(exam_selection_name);
             }
         }else{
-            Intent getIntent = getIntent();
-            major_exam_type_code = getIntent.getStringExtra("exam_major_type");
+//            Intent getIntent = getIntent();
+//            major_exam_type_code = getIntent.getStringExtra("user_selected_last_major_exam");
             if(major_exam_type_code.equals("lawyer")){
+                LoginType = "null";
+                G_user_id = "null";
+                G_user_level = "null";
+                G_user_nickname ="null";
+                G_user_thumbnail = "null";
 
+                exam_selection_name ="null";
+                exam_selection_code ="null";
+
+
+                lawyer_toolbar();
             }else{
                 sugs_gs_viewPagerControll();
+                LoginType = "null";
+                G_user_id = "null";
+                G_user_level = "null";
+                G_user_nickname ="null";
+                G_user_thumbnail = "null";
+
+                exam_selection_name ="null";
+                exam_selection_code ="null";
+
+                logintype_textView.setText("Guest");
+                exam_selection_textView.setText("시험 선택");
+
+                user_thumbnail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent =new Intent(MainActivity.this, LoginActivity.class);
+                        startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
+                        slide_left_and_slide_in();
+                    }
+                });
             }
-
-            LoginType = "null";
-            G_user_id = "null";
-            G_user_level = "null";
-            G_user_nickname ="null";
-            G_user_thumbnail = "null";
-
-            exam_selection_name ="null";
-            exam_selection_code ="null";
-
-            logintype_textView.setText("Guest");
-            exam_selection_textView.setText("시험 선택");
-
-            user_thumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent =new Intent(MainActivity.this, LoginActivity.class);
-                    startActivityForResult(intent, 10002);// 10002 카카오 로그인 RESULT 값
-                    slide_left_and_slide_in();
-                }
-            });
         }
 
 
@@ -214,6 +249,21 @@ public class MainActivity extends AppCompatActivity{
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 0);
     }
+    public void lawyer_toolbar(){
+        logintype_textView.setTextColor(getResources().getColor(R.color.colorCrimsonRed));
+        if(LoginType.equals("kakao")){
+            logintype_textView.setText("kakao");
+        }else if(LoginType.equals("normal")){
+            logintype_textView.setText("passpop");
+        }else{
+            logintype_textView.setText("guest");
+        }
+
+//        exam_selection_textView
+        getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
+
+    }
+
     private void toolbar(){
         Toolbar tb = (Toolbar) findViewById(R.id.MainToolBar);
         setSupportActionBar(tb);
@@ -221,11 +271,6 @@ public class MainActivity extends AppCompatActivity{
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_exam_select);
         getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
         getSupportActionBar().setSubtitle("시험 선택");
-
-        logintype_textView = (TextView) findViewById(R.id.login_type_textview);// logintype textview
-        exam_selection_textView = (TextView) findViewById(R.id.exam_selection_textView); // exam selection textView
-        user_thumbnail = (ImageView) findViewById(R.id.user_thumbnail_imageView);
-
     }
     public void UIChange(){
         runOnUiThread(new Runnable() {

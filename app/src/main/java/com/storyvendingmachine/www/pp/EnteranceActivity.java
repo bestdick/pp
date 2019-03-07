@@ -78,19 +78,25 @@ public class EnteranceActivity extends AppCompatActivity {
                 //****************kakao login **************************
 
                 }
-            }, 500);
+            }, 1500);
         }else if(LT.equals("normal")){
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
                     LoginRemember();
                 }
-            }, 500);
+            }, 1500);
         }else{
             new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
                 @Override
                 public void run() {
+                    String str_null = "null";
                     Intent intent = new Intent(EnteranceActivity.this, MajorExamTypeSelectorActivity.class);
+                    intent.putExtra("login_type", str_null);
+                    intent.putExtra("user_id", str_null);
+                    intent.putExtra("member_level", str_null);
+                    intent.putExtra("user_nickname", str_null);
+                    intent.putExtra("user_thumbnail", str_null);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                     finish();
@@ -182,6 +188,7 @@ public class EnteranceActivity extends AppCompatActivity {
                                 String member_level = temp.getString("member_level");
                                 String user_nickname = temp.getString("user_nickname");
                                 String user_thumbnail = temp.getString("user_thumbnail");
+                                String user_selected_last_major_exam = temp.getString("user_selected_last_major_exam");
                                 String user_selected_last_exam_code = temp.getString("user_selected_last_exam_code");
                                 String user_selected_last_exam_name = temp.getString("user_selected_last_exam_name");
 
@@ -190,18 +197,34 @@ public class EnteranceActivity extends AppCompatActivity {
                                 editor.putString("user_password", input_user_password);
                                 editor.commit();
 
+                                if(user_selected_last_major_exam.equals("null") || user_selected_last_exam_code.equals("null")){
+                                    Intent intent = new Intent(EnteranceActivity.this, MajorExamTypeSelectorActivity.class);
+                                    intent.putExtra("login_type", "normal");
+                                    intent.putExtra("user_id", user_email);
+                                    intent.putExtra("member_level", member_level);
+                                    intent.putExtra("user_nickname", user_nickname);
+                                    intent.putExtra("user_thumbnail", user_thumbnail);
+//                                    intent.putExtra("user_selected_last_major_exam", user_selected_last_major_exam);
+//                                    intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
+//                                    intent.putExtra("user_selected_last_exam_name", user_selected_last_exam_name);
+                                    startActivity(intent);
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                    finish();
+                                }else{
+                                    Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
+                                    intent.putExtra("login_type", "normal");
+                                    intent.putExtra("user_id", user_email);
+                                    intent.putExtra("member_level", member_level);
+                                    intent.putExtra("user_nickname", user_nickname);
+                                    intent.putExtra("user_thumbnail", user_thumbnail);
+                                    intent.putExtra("user_selected_last_major_exam", user_selected_last_major_exam);
+                                    intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
+                                    intent.putExtra("user_selected_last_exam_name", user_selected_last_exam_name);
+                                    startActivity(intent);
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                    finish();
+                                }
 
-                                Intent intent = new Intent(EnteranceActivity.this, MainActivity.class);
-                                intent.putExtra("login_type", "normal");
-                                intent.putExtra("user_id", user_email);
-                                intent.putExtra("member_level", member_level);
-                                intent.putExtra("user_nickname", user_nickname);
-                                intent.putExtra("user_thumbnail", user_thumbnail);
-                                intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
-                                intent.putExtra("user_selected_last_exam_name", user_selected_last_exam_name);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                finish();
 
 
 //                                Log.e("check success:::", "true");
@@ -222,6 +245,7 @@ public class EnteranceActivity extends AppCompatActivity {
                                 intent.putExtra("member_level", str_null);
                                 intent.putExtra("user_nickname", str_null);
                                 intent.putExtra("user_thumbnail", str_null);
+                                intent.putExtra("user_selected_last_major_exam", str_null);
                                 intent.putExtra("user_selected_last_exam_code", str_null);
                                 intent.putExtra("user_selected_last_exam_name", str_null);
                                 startActivity(intent);

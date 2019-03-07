@@ -150,6 +150,7 @@ SharedPreferences.Editor editor;
                                             intent.putExtra("user_id", Integer.toString((int) userProfile.getId()));
                                             intent.putExtra("user_thumbnail", userProfile.getThumbnailImagePath());
                                             intent.putExtra("user_nickname", userProfile.getNickname());
+                                            intent.putExtra("user_selected_last_major_exam", "null");
                                             intent.putExtra("user_selected_last_exam_code", "null");
                                             intent.putExtra("user_selected_last_exam_name", "null");
 
@@ -160,6 +161,7 @@ SharedPreferences.Editor editor;
                                             ((LoginActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                                             pb.setVisibility(View.INVISIBLE);
                                         }else if(fromActivity.equals("enterance_activity")){
+                                            //처음 여기서 들어오는 경우는 없다.
                                             Intent intent = new Intent(context, MainActivity.class);
                                             intent.putExtra("login_type", "kakao");
                                             intent.putExtra("user_id", Integer.toString((int) userProfile.getId()));
@@ -250,24 +252,10 @@ SharedPreferences.Editor editor;
             @Override
             public void onSuccess(KakaoTalkProfile result) {
                 Log.e("where are we? ","1");
+                final String thumb_nail = result.getThumbnailUrl();
+                final String nickname = result.getNickName();
 
-                final Intent intent = new Intent(context, MainActivity.class);
-                intent.putExtra("login_type", "kakao");
-//                intent.putExtra("kakao_id", kakao_id);
-                intent.putExtra("user_id", kakao_id);
-                if(result.getThumbnailUrl().toString().length() == 0){
-//                    intent.putExtra("thumb_nail", "null");
-                    intent.putExtra("user_thumbnail", "null");
-                }else{
-//                    intent.putExtra("thumb_nail", result.getThumbnailUrl().toString());
-                    intent.putExtra("user_thumbnail", result.getThumbnailUrl().toString());
-                }
-//                intent.putExtra("nickname", result.getNickName().toString());
-                intent.putExtra("user_nickname", result.getNickName().toString());
-                final String thumb_nail = result.getThumbnailUrl().toString();
-                final String nickname = result.getNickName().toString();
-
-                final RequestQueue queue = Volley.newRequestQueue(context);
+                RequestQueue queue = Volley.newRequestQueue(context);
 //                String url = "http://www.storyvendingmachine.com/android/kakao_id_to_db.php";
                 String url = "http://www.joonandhoon.com/pp/PassPop/android/server/kakao_id_to_db.php";
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -278,33 +266,70 @@ SharedPreferences.Editor editor;
 
                                 try {
                                     JSONObject jsonObject = new JSONObject(response);
+                                    String last_major_exam = jsonObject.getString("last_major_exam");
                                     String last_subject_code = jsonObject.getString("last_subject_code");
                                     String last_subject_name = jsonObject.getString("last_subject_name");
                                     Log.e("where are we::::",last_subject_code+"//"+last_subject_name);
 
-                                    if(last_subject_code.equals("null")){
+                                    if(last_major_exam.equals("null") && last_subject_code.equals("null")){
+                                        Intent intent = new Intent(context, MajorExamTypeSelectorActivity.class);
+                                        intent.putExtra("login_type", "kakao");
+                                        intent.putExtra("user_id", kakao_id);
+                                        if(thumb_nail.length() == 0){
+                                            intent.putExtra("user_thumbnail", "null");
+                                        }else{
+                                            intent.putExtra("user_thumbnail", thumb_nail);
+                                        }
+                                        intent.putExtra("user_nickname", nickname);
+                                        intent.putExtra("user_selected_last_major_exam", "null");
                                         intent.putExtra("user_selected_last_exam_code", "null");
                                         intent.putExtra("user_selected_last_exam_name", "null");
+                                        if(fromActivity.equals("login_activity")){
+                                            ((LoginActivity)context).setResult(RESULT_OK, intent);
+                                            ((LoginActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            ((LoginActivity)context).finish();
+
+                                            ((LoginActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                            pb.setVisibility(View.INVISIBLE);
+                                        }else if(fromActivity.equals("enterance_activity")){
+                                            context.startActivity(intent);
+                                            ((EnteranceActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            ((EnteranceActivity)context).finish();
+//
+                                            ((EnteranceActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                            pb.setVisibility(View.INVISIBLE);
+                                        }
                                     }else{
+                                        Intent intent = new Intent(context, MainActivity.class);
+                                        intent.putExtra("login_type", "kakao");
+                                        intent.putExtra("user_id", kakao_id);
+                                        if(thumb_nail.length() == 0){
+                                            intent.putExtra("user_thumbnail", "null");
+                                        }else{
+                                            intent.putExtra("user_thumbnail", thumb_nail);
+                                        }
+                                        intent.putExtra("user_nickname", nickname);
+
+                                        intent.putExtra("user_selected_last_major_exam", last_major_exam);
                                         intent.putExtra("user_selected_last_exam_code", last_subject_code);
                                         intent.putExtra("user_selected_last_exam_name", last_subject_name);
-                                    }
+                                        if(fromActivity.equals("login_activity")){
+                                            ((LoginActivity)context).setResult(RESULT_OK, intent);
+                                            ((LoginActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            ((LoginActivity)context).finish();
 
-                                    if(fromActivity.equals("login_activity")){
-                                        ((LoginActivity)context).setResult(RESULT_OK, intent);
-                                        ((LoginActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                        ((LoginActivity)context).finish();
-
-                                        ((LoginActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                        pb.setVisibility(View.INVISIBLE);
-                                    }else if(fromActivity.equals("enterance_activity")){
-                                        context.startActivity(intent);
-                                        ((EnteranceActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                        ((EnteranceActivity)context).finish();
+                                            ((LoginActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                            pb.setVisibility(View.INVISIBLE);
+                                        }else if(fromActivity.equals("enterance_activity")){
+                                            context.startActivity(intent);
+                                            ((EnteranceActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            ((EnteranceActivity)context).finish();
 //
-                                        ((EnteranceActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                        pb.setVisibility(View.INVISIBLE);
+                                            ((EnteranceActivity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                            pb.setVisibility(View.INVISIBLE);
+                                        }
                                     }
+
 
                                     editor.putString("login_type", "kakao");
                                     editor.commit();
@@ -333,10 +358,6 @@ SharedPreferences.Editor editor;
                     }
                 };
                 queue.add(stringRequest);
-
-
-
-
             }
         });
     }

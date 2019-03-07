@@ -14,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.kakao.auth.Session;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,10 +29,33 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_major_exam_type_selector);
-        whenLoginEmpty();
+        Intent intent = getIntent();
+        String login_type = intent.getStringExtra("login_type");
+        if(login_type.equals("kakao")){
+            String user_id = intent.getStringExtra("user_id");
+//            String member_level = intent.getStringExtra("member_level");
+            String member_level = "one";
+            String user_nickname = intent.getStringExtra("user_nickname");
+            String user_thumbnail = intent.getStringExtra("user_thumbnail");
+            whenLoginEmpty(login_type, user_id, member_level, user_nickname, user_thumbnail);
+        }else if(login_type.equals("normal")){
+            // login_type.equals("normal")
+            String user_id = intent.getStringExtra("user_id");
+            String member_level = intent.getStringExtra("member_level");
+            String user_nickname = intent.getStringExtra("user_nickname");
+            String user_thumbnail = intent.getStringExtra("user_thumbnail");
+            whenLoginEmpty(login_type, user_id, member_level, user_nickname, user_thumbnail);
+        }else{
+            String user_id = intent.getStringExtra("user_id");
+            String member_level = intent.getStringExtra("member_level");
+            String user_nickname = intent.getStringExtra("user_nickname");
+            String user_thumbnail = intent.getStringExtra("user_thumbnail");
+            whenLoginEmpty(login_type, user_id, member_level, user_nickname, user_thumbnail);
+        }
+
     }
 
-    public void whenLoginEmpty(){
+    public void whenLoginEmpty(final String login_type, final String user_id, final String member_level, final String user_nickname, final String user_thumbnail){
         final LinearLayout exam_selector_linLayout = (LinearLayout) findViewById(R.id.exam_selector_linLayout);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getMajorExamSelector.php";
@@ -57,7 +81,14 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
                                         public void onClick(View view) {
 //                                            if(exam_type_code.equals("sugs_1001") || exam_type_code.equals("gs_2001")){
                                                 Intent intent = new Intent(MajorExamTypeSelectorActivity.this, MainActivity.class);
-                                                intent.putExtra("exam_major_type", exam_type_code);
+                                                intent.putExtra("login_type", login_type);
+                                                intent.putExtra("user_id", user_id);
+                                                intent.putExtra("member_level", member_level);
+                                                intent.putExtra("user_nickname", user_nickname);
+                                                intent.putExtra("user_thumbnail", user_thumbnail);
+                                                intent.putExtra("user_selected_last_major_exam", exam_type_code);
+                                                intent.putExtra("user_selected_last_exam_code", "null");
+                                                intent.putExtra("user_selected_last_exam_name", "null");
                                                 startActivity(intent);
                                                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                                                 finish();
@@ -97,5 +128,10 @@ public class MajorExamTypeSelectorActivity extends AppCompatActivity {
             }
         };
         queue.add(stringRequest);
+    }
+    @Override
+    public void onBackPressed() {
+        Session.getCurrentSession().clearCallbacks();
+        super.onBackPressed();
     }
 }
