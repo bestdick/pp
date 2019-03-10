@@ -271,7 +271,7 @@ SharedPreferences.Editor editor;
                                     String last_subject_name = jsonObject.getString("last_subject_name");
                                     Log.e("where are we::::",last_subject_code+"//"+last_subject_name);
 
-                                    if(last_major_exam.equals("null") && last_subject_code.equals("null")){
+                                    if(last_major_exam.equals("null") || last_subject_code.equals("null")){
                                         Intent intent = new Intent(context, MajorExamTypeSelectorActivity.class);
                                         intent.putExtra("login_type", "kakao");
                                         intent.putExtra("user_id", kakao_id);
@@ -284,6 +284,7 @@ SharedPreferences.Editor editor;
                                         intent.putExtra("user_selected_last_major_exam", "null");
                                         intent.putExtra("user_selected_last_exam_code", "null");
                                         intent.putExtra("user_selected_last_exam_name", "null");
+
                                         if(fromActivity.equals("login_activity")){
                                             ((LoginActivity)context).setResult(RESULT_OK, intent);
                                             ((LoginActivity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

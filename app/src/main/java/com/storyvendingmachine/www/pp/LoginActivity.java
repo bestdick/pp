@@ -194,6 +194,7 @@ public class LoginActivity extends AppCompatActivity {
                                 String user_level = temp.getString("member_level");
                                 String user_nickname = temp.getString("user_nickname");
                                 String user_thumbnail = temp.getString("user_thumbnail");
+                                String user_selected_last_major_exam = temp.getString("user_selected_last_major_exam");
                                 String user_selected_last_exam_code = temp.getString("user_selected_last_exam_code");
                                 String user_selected_last_exam_name = temp.getString("user_selected_last_exam_name");
 
@@ -219,6 +220,7 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("user_level", user_level);
                                 intent.putExtra("user_nickname", user_nickname);
                                 intent.putExtra("user_thumbnail", user_thumbnail);
+                                intent.putExtra("user_selected_last_major_exam", user_selected_last_major_exam);
                                 intent.putExtra("user_selected_last_exam_code", user_selected_last_exam_code);
                                 intent.putExtra("user_selected_last_exam_name", user_selected_last_exam_name);
                                 setResult(RESULT_OK, intent);
