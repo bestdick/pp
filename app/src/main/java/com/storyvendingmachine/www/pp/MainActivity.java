@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity{
         }else{
             getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
         }
-        exam_selection_textView.setText("#변호사시험");
+        exam_selection_textView.setText("변호사시험");
         exam_selection_textView.setTextColor(getResources().getColor(R.color.colorCrimsonRed));
 
         law_viewPagerControl();
@@ -706,6 +706,19 @@ public class MainActivity extends AppCompatActivity{
                 }else{
                     getThumbnailImageForAuthor(user_thumbnail, G_user_thumbnail);
                 }
+            }else{
+                //final int CHANGE_MAJOR_EXAM_SELECTOR_RESULT = 2212;
+                //이때는 major 시험을 변경하기위한 RESULT 이다
+                Log.e("result code", "2212");
+                Intent intent = new Intent(MainActivity.this, MajorExamTypeSelectorActivity.class);
+                intent.putExtra("login_type", LoginType);
+                intent.putExtra("user_id", G_user_id);
+                intent.putExtra("member_level", G_user_level);
+                intent.putExtra("user_nickname", G_user_nickname);
+                intent.putExtra("user_thumbnail", G_user_thumbnail);
+                startActivity(intent);
+                finish();
+
             }
         }else if(requestCode == REQUEST_CODE_FOR_TESTFRAGMENT){
             // 기출시험을 보고나왔을때 이창이 켜진다

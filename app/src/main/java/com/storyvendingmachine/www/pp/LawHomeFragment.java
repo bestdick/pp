@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,7 +87,7 @@ public class LawHomeFragment extends Fragment {
         return rootview;
     }
 
-    public void getAnnouncement_Error_Suggestion(View rootview){
+    public void getAnnouncement_Error_Suggestion(final View rootview){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = base_url + "getAnnouncement_Error_Suggestion.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -93,6 +97,34 @@ public class LawHomeFragment extends Fragment {
                         Log.e("announce response", response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+                            JSONArray news_announcement_jsonArray = jsonObject.getJSONArray("response1");
+
+                            LinearLayout news_linLayout = (LinearLayout) rootview.findViewById(R.id.announcement_LinearLayout);
+                            for(int i = 0 ; i < news_announcement_jsonArray.length(); i++){
+                                String news_primary_key = news_announcement_jsonArray.getJSONObject(i).getString("primary_key");
+                                String news_exam_type_code = news_announcement_jsonArray.getJSONObject(i).getString("exam_type_code");
+                                String news_type = news_announcement_jsonArray.getJSONObject(i).getString("type");
+                                String news_title = news_announcement_jsonArray.getJSONObject(i).getString("title");
+                                String news_content = news_announcement_jsonArray.getJSONObject(i).getString("content");
+                                String news_upload_date = news_announcement_jsonArray.getJSONObject(i).getString("upload_date");
+                                String news_upload_time = news_announcement_jsonArray.getJSONObject(i).getString("upload_time");
+                                String news_isNew = news_announcement_jsonArray.getJSONObject(i).getString("isNew");
+
+                                View container_news_inner_element = getLayoutInflater().inflate(R.layout.container_news_inner_element, null);
+                                ImageView news_isNew_imageView = (ImageView) container_news_inner_element.findViewById(R.id.new_imageView);
+                                TextView news_type_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_type_textView);
+                                TextView news_title_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_textView);
+                                TextView news_upload_date_textView = (TextView) container_news_inner_element.findViewById(R.id.upload_date_textView);
+
+                                indentify_isNew(news_isNew, news_isNew_imageView);
+
+                                news_type_textView.setText(type_selector(news_type));
+                                news_title_textView.setText(news_title);
+                                news_upload_date_textView.setText(news_upload_date);
+
+                                news_linLayout.addView(container_news_inner_element);
+                            }
+
 
 
                         } catch (JSONException e) {
@@ -157,4 +189,22 @@ public class LawHomeFragment extends Fragment {
 //        // TODO: Update argument type and name
 //        void onFragmentInteraction(Uri uri);
 //    }
+
+
+    public void indentify_isNew(String input_str, ImageView input_imageView){
+        if(input_str.equals("old")){
+            input_imageView.setVisibility(View.GONE);
+        }else{
+            input_imageView.setVisibility(View.INVISIBLE);
+        }
+    }
+    public String type_selector(String input_str){
+        if(input_str.equals("news")){
+            return "[뉴스]";
+        }else if(input_str.equals("update")){
+            return "[업데이트]";
+        }else{
+            return "[공지]";
+        }
+    }
 }

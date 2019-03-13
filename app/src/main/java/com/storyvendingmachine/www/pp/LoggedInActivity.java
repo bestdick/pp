@@ -68,6 +68,7 @@ import static com.storyvendingmachine.www.pp.VERSION.THIS_APP_VERSION;
 
 public class LoggedInActivity extends AppCompatActivity {
     final int FOLDER_MANAGER_RESULT = 2211;
+    final int CHANGE_MAJOR_EXAM_SELECTOR_RESULT = 2212;
     SharedPreferences login_remember;
     SharedPreferences.Editor editor;
 
@@ -160,6 +161,7 @@ public class LoggedInActivity extends AppCompatActivity {
             logoutProcess();
             changePasswordProcess("kakao");
             folderManageProcess();
+            changeExamTypeProcess();
         }else if(LoginType.equals("normal")){
             login_type_textView.setText("패스팝 계정");
             user_nickname_textView.setText(G_user_nickname+" ( "+ G_user_id +" ) ");
@@ -177,6 +179,7 @@ public class LoggedInActivity extends AppCompatActivity {
             logoutProcess();
             changePasswordProcess("normal");
             folderManageProcess();
+            changeExamTypeProcess();
         }else{
             //로그인 타입 // 정해지지 않음
         }
@@ -298,6 +301,18 @@ public class LoggedInActivity extends AppCompatActivity {
                 slide_left_and_slide_in();
             }
         });
+    }
+    public void changeExamTypeProcess(){
+        Button change_major_exam_selector_button = (Button) findViewById(R.id.major_exam_type_selector_button);
+        change_major_exam_selector_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoggedInActivity.this, LoggedInSettingsActivity.class);
+                setResult(CHANGE_MAJOR_EXAM_SELECTOR_RESULT, intent);
+                onBackPressed();
+            }
+        });
+
     }
     private void logout_notifier(String message, String positive_message, String negative_message){
         AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInActivity.this);
