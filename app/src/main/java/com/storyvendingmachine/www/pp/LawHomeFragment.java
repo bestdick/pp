@@ -1,5 +1,6 @@
 package com.storyvendingmachine.www.pp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -84,9 +85,37 @@ public class LawHomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootview =inflater.inflate(R.layout.fragment_home_law, container, false);
         getAnnouncement_Error_Suggestion(rootview);
+        seeMoreAction(rootview);
         return rootview;
     }
 
+    public void seeMoreAction(View rootview){
+        TextView error_board_see_more_textView = (TextView) rootview.findViewById(R.id.error_board_see_more_textView);
+        TextView free_board_see_more_textView = (TextView) rootview.findViewById(R.id.free_board_see_more_textView);
+
+        error_board_see_more_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), NewsActivity.class);
+                intent.putExtra("enter_method", "LAW");
+                intent.putExtra("minor_type", "error");
+                startActivity(intent);
+                slide_left_and_slide_in();
+            }
+        });
+
+        free_board_see_more_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), NewsActivity.class);
+                intent.putExtra("enter_method", "LAW");
+                intent.putExtra("minor_type", "free");
+                startActivity(intent);
+                slide_left_and_slide_in();
+            }
+        });
+
+    }
     public void getAnnouncement_Error_Suggestion(final View rootview){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = base_url + "getAnnouncement_Error_Suggestion.php";
@@ -98,6 +127,7 @@ public class LawHomeFragment extends Fragment {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray news_announcement_jsonArray = jsonObject.getJSONArray("response1");
+                            JSONArray suggestions_jsonArray = jsonObject.getJSONArray("response2");
 
                             LinearLayout news_linLayout = (LinearLayout) rootview.findViewById(R.id.announcement_LinearLayout);
                             for(int i = 0 ; i < news_announcement_jsonArray.length(); i++){
@@ -124,6 +154,37 @@ public class LawHomeFragment extends Fragment {
 
                                 news_linLayout.addView(container_news_inner_element);
                             }
+
+                            LinearLayout error_Linear_Layout = (LinearLayout) rootview.findViewById(R.id.error_Linear_Layout);
+                            Log.e("length of error", String.valueOf(suggestions_jsonArray.length()));
+                            for(int i = 0 ; i < suggestions_jsonArray.length(); i++){
+                                String error_primary_key = suggestions_jsonArray.getJSONObject(i).getString("primary_key");
+                                String error_login_type = suggestions_jsonArray.getJSONObject(i).getString("login_type");
+                                String error_user_id = suggestions_jsonArray.getJSONObject(i).getString("user_id");
+                                String error_type = suggestions_jsonArray.getJSONObject(i).getString("type");
+                                String error_title = suggestions_jsonArray.getJSONObject(i).getString("title");
+                                String error_content = suggestions_jsonArray.getJSONObject(i).getString("content");
+                                String error_upload_date = suggestions_jsonArray.getJSONObject(i).getString("upload_date");
+                                String error_upload_time = suggestions_jsonArray.getJSONObject(i).getString("upload_time");
+                                String error_isNew = suggestions_jsonArray.getJSONObject(i).getString("isNew");
+
+                                View container_news_inner_element = getLayoutInflater().inflate(R.layout.container_news_inner_element, null);
+                                ImageView news_isNew_imageView = (ImageView) container_news_inner_element.findViewById(R.id.new_imageView);
+                                TextView news_type_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_type_textView);
+                                TextView news_title_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_textView);
+                                TextView news_upload_date_textView = (TextView) container_news_inner_element.findViewById(R.id.upload_date_textView);
+
+                                indentify_isNew(error_isNew, news_isNew_imageView);
+
+                                news_type_textView.setText(type_selector(error_type));
+                                news_title_textView.setText(error_title);
+                                news_upload_date_textView.setText(error_upload_date);
+
+                                error_Linear_Layout.addView(container_news_inner_element);
+                            }
+
+
+
 
 
 
@@ -195,7 +256,7 @@ public class LawHomeFragment extends Fragment {
         if(input_str.equals("old")){
             input_imageView.setVisibility(View.GONE);
         }else{
-            input_imageView.setVisibility(View.INVISIBLE);
+            input_imageView.setVisibility(View.VISIBLE);
         }
     }
     public String type_selector(String input_str){
@@ -206,5 +267,8 @@ public class LawHomeFragment extends Fragment {
         }else{
             return "[공지]";
         }
+    }
+    public void slide_left_and_slide_in(){//opening new activity
+        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
     }
 }

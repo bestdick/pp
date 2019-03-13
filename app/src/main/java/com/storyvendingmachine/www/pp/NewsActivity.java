@@ -56,11 +56,15 @@ import static com.storyvendingmachine.www.pp.MainFragment.quiz_viewPager;
 import static com.storyvendingmachine.www.pp.MainFragment.quizUserSelectedAnswers;
 
 public class NewsActivity extends AppCompatActivity {
+    final String ENTER_METHOD_TYPE_LAW = "LAW";
+
     final String ENTER_METHOD_TYPE_ALL = "NEWS";
     final String ENTER_METHOD_TYPE_ONE = "ONE";
     final String ENTER_METHOD_TYPE_QUIZ = "QUIZ";
     final String ENTER_METHOD_TYPE_SUGGESTION_ALL = "SUGGESTION_ALL";
     final String ENTER_METHOD_TYPE_SUGGESTION_SELECT = "SUGGESTION_SELECT";
+
+
 
     final int REQUEST_CODE_WRITE_SUGGESTION = 44001;
 
@@ -147,7 +151,7 @@ public class NewsActivity extends AppCompatActivity {
             String type = "suggestions";
             getNewsAnnouncement(-1, type);
             fabOnclickController();
-        }else{
+        }else if(enter_method.equals(ENTER_METHOD_TYPE_SUGGESTION_SELECT)){
             //enter_method.equals(ENTER_METHOD_TYPE_SUGGESTION_SELECT)
             fab.setVisibility(View.VISIBLE);
             fab.attachToListView(expandableListView);
@@ -157,6 +161,16 @@ public class NewsActivity extends AppCompatActivity {
             String type = "suggestions";
             getNewsAnnouncement(Integer.parseInt(key), type);
             fabOnclickController();
+        }else{
+            //enter_method.equals(ENTER_METHOD_TYPE_LAW)
+            // law 일때
+            String minor_type = intent.getStringExtra("minor_type");
+            if(minor_type.equals("error")){
+                Log.e("minor_type", "error");
+            }else{
+                // minor_type.equals("free")
+                Log.e("minor_type", "free");
+            }
         }
     }
 
