@@ -53,11 +53,14 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.Inflater;
+
+import javax.xml.transform.Result;
 
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
@@ -220,12 +223,23 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         queue.add(stringRequest);
     }
     private void toolbar(){
-        Toolbar tb = (Toolbar) findViewById(R.id.exam_result_toolbar);
-        tb.setElevation(5);
-        setSupportActionBar(tb);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
-        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+        if(major_exam_type.equals("lawyer")){
+            Toolbar tb = (Toolbar) findViewById(R.id.exam_result_toolbar);
+            tb.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            tb.setElevation(0);
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+        }else{
+            Toolbar tb = (Toolbar) findViewById(R.id.exam_result_toolbar);
+            tb.setElevation(5);
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+        }
+
 
     }
     private void initializer(){
@@ -410,8 +424,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                                         });
                                         linearLayout_inner_second.addView(result_prob_view);
 
-
-
                                         JSONArray compared_array = jsonArray.getJSONObject(i).getJSONArray("compared");
                                         JSONArray question_number = jsonArray.getJSONObject(i).getJSONArray("question_number");
                                         JSONArray question_array = jsonArray.getJSONObject(i).getJSONArray("question_array");
@@ -438,8 +450,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
                                         }
                                     }
-
-
 
 //                                     여기는 전체 합격 여부 판단.......
                                     View view =View.inflate(ExamResultActivity.this, R.layout.exam_subject_result_element, null);
@@ -731,10 +741,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         }
 
     }
-
-
-
-
     public void getQuestionImage(ImageView imageView, String url){
         Picasso.with(ExamResultActivity.this)
                 .load(url)
@@ -933,8 +939,11 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 //UNDER THIS LINE LAW FUNCTIONS ------------------------------
 
     public void LAW_resultProcess(String exam_data_str, String UserAnswer_str, String exam_placed_year, String major_type, String minor_type){
-//        ArrayList<Integer> array_correct_answer = new ArrayList<>();
-//        ArrayList<Integer> array_incorrect_answer = new ArrayList<>();
+        LinearLayout exam_result_inner_second_container = (LinearLayout) findViewById(R.id.exam_result_inner_second_container);
+        exam_result_inner_second_container.setVisibility(View.VISIBLE);
+
+        TextView title_textView  = (TextView) findViewById(R.id.title_textView);
+        title_textView.setText(exam_placed_year+"변호사 시험"+ major_type+" "+minor_type);
         int correct_count = 0;
         int incorrect_count = 0;
             try {
@@ -948,16 +957,127 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                     }else{
                         incorrect_count++;
                     }
+
+                    View rootview = getLayoutInflater().inflate(R.layout.law_container_wrong_problems, null);
+                    TextView question_textView = (TextView) rootview.findViewById(R.id.question_textView);
+                    TextView example_1_textView = (TextView) rootview.findViewById(R.id.example_1_textView);
+                    TextView example_2_textView = (TextView) rootview.findViewById(R.id.example_2_textView);
+
+                    ConstraintLayout answer_1_conLayout = (ConstraintLayout) rootview.findViewById(R.id.answer_1_conLayout);
+                    ConstraintLayout answer_2_conLayout = (ConstraintLayout) rootview.findViewById(R.id.answer_2_conLayout);
+                    ConstraintLayout answer_3_conLayout = (ConstraintLayout) rootview.findViewById(R.id.answer_3_conLayout);
+                    ConstraintLayout answer_4_conLayout = (ConstraintLayout) rootview.findViewById(R.id.answer_4_conLayout);
+                    ConstraintLayout answer_5_conLayout = (ConstraintLayout) rootview.findViewById(R.id.answer_5_conLayout);
+
+                    TextView answer_number_1 = (TextView) rootview.findViewById(R.id.answer_number_1);
+                    TextView answer_number_2 = (TextView) rootview.findViewById(R.id.answer_number_2);
+                    TextView answer_number_3 = (TextView) rootview.findViewById(R.id.answer_number_3);
+                    TextView answer_number_4 = (TextView) rootview.findViewById(R.id.answer_number_4);
+                    TextView answer_number_5 = (TextView) rootview.findViewById(R.id.answer_number_5);
+
+                    TextView answer_1_textView = (TextView) rootview.findViewById(R.id.answer_1_textView);
+                    TextView answer_2_textView = (TextView) rootview.findViewById(R.id.answer_2_textView);
+                    TextView answer_3_textView = (TextView) rootview.findViewById(R.id.answer_3_textView);
+                    TextView answer_4_textView = (TextView) rootview.findViewById(R.id.answer_4_textView);
+                    TextView answer_5_textView = (TextView) rootview.findViewById(R.id.answer_5_textView);
+
+                    String question_number = exam_data.getJSONObject(i).getString("question_number");
+                    String question_context = exam_data.getJSONObject(i).getString("question_context");
+                    String question_example_1_exist =  exam_data.getJSONObject(i).getString("question_example_1_exist");
+                    String question_example_1_context = exam_data.getJSONObject(i).getString("question_example_1_context");
+                    String question_example_2_exist =  exam_data.getJSONObject(i).getString("question_example_2_exist");
+                    String question_example_2_context =  exam_data.getJSONObject(i).getString("question_example_2_context");
+                    String answer_context =  exam_data.getJSONObject(i).getString("answer_context");
+//                    String correct_answer =  exam_data.getJSONObject(i).getString("correct_answer"); // 위에 있음
+
+                    LAW_make_question_and_example(i, question_textView,  example_1_textView,  example_2_textView,
+                            question_context,  question_example_1_exist,  question_example_1_context,
+                            question_example_2_exist,  question_example_2_context);
+                    LAW_make_answer_choice( answer_context,  answer_1_textView,  answer_2_textView,  answer_3_textView,
+                            answer_4_textView,  answer_5_textView);
+
+                    exam_result_inner_second_container.addView(rootview);
+                    if( i == (exam_data.length()-1)){
+                        progressbar_invisible();
+                    }
                 }
-                Log.e("answer_correct", String.valueOf(correct_count) + "//"+String.valueOf(incorrect_count));
+
+                linearLayout_inner = (LinearLayout) findViewById(R.id.exam_result_inner_container);
+
+                View ResultView = getLayoutInflater().inflate(R.layout.law_container_exam_result, null);
+                ProgressBar percent_bar = (ProgressBar) ResultView.findViewById(R.id.percent_bar);
+                TextView score_percent_textView = (TextView) ResultView.findViewById(R.id.score_percent_textView);
+                TextView score_fraction_textView = (TextView) ResultView.findViewById(R.id.score_fraction_textView);
+
+
+                int count_total = correct_count+incorrect_count;
+                String percent = decimal_two_digis(String.valueOf(correct_count), String.valueOf(count_total));
+                String fraction = correct_count+" / "+(correct_count+incorrect_count);
+                percent_bar.setProgress((int) Float.parseFloat(percent));
+
+                score_percent_textView.setText(percent + "%");
+                score_fraction_textView.setText(fraction);
+
+                linearLayout_inner.addView(ResultView);
+
+                Log.e("answer_correct", percent + "percent//"+String.valueOf(correct_count) + "//"+String.valueOf(incorrect_count));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+    }
 
+    public void LAW_make_question_and_example(int mParam2, TextView question_textView, TextView example_1_textView, TextView example_2_textView,
+                                          String question_context, String question_example_1_exist, String question_example_1_context,
+                                          String question_example_2_exist, String question_example_2_context){
+        if(question_example_1_exist.equals("true") && question_example_2_exist.equals("true")){
+            String str_question = "[ "+(mParam2+1) + " ] "+question_context.replace("<br>","\n");
+            String str_example_1 = question_example_1_context.replace("<br>","\n");
+            String str_example_2 = question_example_2_context.replace("<br>","\n");
+
+            question_textView.setText(str_question);
+            example_1_textView.setText(str_example_1);
+            example_2_textView.setText(str_example_2);
+
+        }else if(question_example_1_exist.equals("true") && question_example_2_exist.equals("false")){
+            String str_question = "[ "+(mParam2+1)+" ] "+question_context.replace("<br>","\n");
+            String str_example_1 = question_example_1_context.replace("<br>","\n");
+
+            question_textView.setText(str_question);
+            example_1_textView.setText(str_example_1);
+            example_2_textView.setVisibility(View.GONE);
+        }else {
+            String str_question = "[ "+(mParam2+1)+ " ] "+question_context.replace("<br>","\n");
+
+            question_textView.setText(str_question);
+            example_1_textView.setVisibility(View.GONE);
+            example_2_textView.setVisibility(View.GONE);
+        }
+    }
+    public void LAW_make_answer_choice(String answer_context, TextView answer_1_textView, TextView answer_2_textView, TextView answer_3_textView,
+                                   TextView answer_4_textView, TextView answer_5_textView){
+        String[] answer_array = answer_context.split("##");
+        String answer_1 = answer_array[0];
+        String answer_2 = answer_array[1];
+        String answer_3 = answer_array[2];
+        String answer_4 = answer_array[3];
+        String answer_5 = answer_array[4];
+
+        answer_1_textView.setText(answer_1);
+        answer_2_textView.setText(answer_2);
+        answer_3_textView.setText(answer_3);
+        answer_4_textView.setText(answer_4);
+        answer_5_textView.setText(answer_5);
 
     }
 
 
+    public String decimal_two_digis(String count_correct, String count_total){
+        double correct = Float.parseFloat(count_correct);
+        double total = Float.parseFloat(count_total);
+        double percent = (correct/total)*100;
+        String str_percent = new DecimalFormat("##.##").format(percent);
+        return str_percent;
+    }
 
     @Override
     public Drawable getDrawable(String source){
