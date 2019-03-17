@@ -70,12 +70,14 @@ public class LawExamFragment extends Fragment {
         examSubClassViewPagerAdapter = new LawExamSubClassViewPagerAdapter(getActivity().getSupportFragmentManager());
         viewPager = (ViewPager) rootview.findViewById(R.id.examTypeContainer);
         viewPager.setAdapter(examSubClassViewPagerAdapter);
-        viewPager.setOffscreenPageLimit(4);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setPageMargin(16);
+        viewPager.setCurrentItem(2);
 
         TabLayout tabLayout = (TabLayout) rootview.findViewById(R.id.tabLayout);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
 
         return rootview;
     }

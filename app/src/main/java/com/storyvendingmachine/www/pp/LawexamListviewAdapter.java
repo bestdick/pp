@@ -1,7 +1,10 @@
 package com.storyvendingmachine.www.pp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -40,7 +43,12 @@ public class LawexamListviewAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         String identifier = list.get(i).getIdentifier();
-        if(identifier.equals("year")){
+        if(identifier.equals("empty")){
+            View v =View.inflate(context, R.layout.law_container_listview_element_type_a, null);
+            TextView exam_placed_year_textView = (TextView) v.findViewById(R.id.exam_placed_year_textView);
+            exam_placed_year_textView.setText("기출 준비중");
+            return v;
+        }else if(identifier.equals("year")){
             View v =View.inflate(context, R.layout.law_container_listview_element_type_a, null);
             TextView exam_placed_year_textView = (TextView) v.findViewById(R.id.exam_placed_year_textView);
 
@@ -64,16 +72,43 @@ public class LawexamListviewAdapter extends BaseAdapter {
             v2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Intent intent = new Intent(context, ExamViewTypeAActivity.class);
-//                    intent.putExtra("exam_placed_year", exam_placed_year);
-//                    intent.putExtra("major_type", major_type);
-//                    intent.putExtra("minor_type", minor_type);
-//                    context.startActivity(intent);
+                    selectAlertDialog(exam_placed_year, major_type, minor_type);
                 }
             });
             return v2;
         }
+    }
 
+    public void selectAlertDialog(final String exam_placed_year, final String major_type, final String minor_type){
+        final CharSequence list[] = new CharSequence[]{"#시험 보기", "#시험 답 함께 보기"};
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("시험응시 방법");
+        builder.setItems(list, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.e("value is", "" + which);
+                Intent intent = new Intent(context, ExamViewActivity.class);
+                switch (which) {
+                    case 0:
+                        intent.putExtra("exam_major_type", "lawyer");
+                        intent.putExtra("navi_selection", "1");
+                        intent.putExtra("exam_placed_year", exam_placed_year);
+                        intent.putExtra("major_type", major_type);
+                        intent.putExtra("minor_type", minor_type);
+                        context.startActivity(intent);
+                        break;
+                    case 1:
+                        intent.putExtra("exam_major_type", "lawyer");
+                        intent.putExtra("navi_selection", "2");
+                        intent.putExtra("exam_placed_year", exam_placed_year);
+                        intent.putExtra("major_type", major_type);
+                        intent.putExtra("minor_type", minor_type);
+                        context.startActivity(intent);
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 }

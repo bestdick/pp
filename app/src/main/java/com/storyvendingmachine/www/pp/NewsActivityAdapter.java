@@ -80,8 +80,6 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int listPosition) {
         return 1;
     }
-
-
     // -------------여기서부터는 group adaper--------------------
     @Override
     public Object getGroup(int listPosition) {
@@ -110,9 +108,6 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
         String upload_date = group.getUpload_date();
         String upload_time = group.getUpload_time();
 
-
-
-
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -123,20 +118,21 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
         TextView new_title_textView = (TextView) convertView.findViewById(R.id.new_title_textView);
         TextView upload_date_textView = (TextView) convertView.findViewById(R.id.upload_date_textView);
 
-        if(type.equals(STRING_NEWS)){
-            new_title_type_textView.setText("[뉴스]");
-        }else if (type.equals(STRING_ANNOUNCEMENT)){
-            new_title_type_textView.setText("[공지]");
-        }else if (type.equals(STRING_UPDATE)){
-            new_title_type_textView.setText("[업데이트]");
-        }else if(type.equals(STRING_FEDDBACK)){
-            new_title_type_textView.setText("[피드백]");
-        }else if(type.equals(STRING_SUGGESTION)){
-            new_title_type_textView.setText("[건의및개선]");
-        }else{
-//            type.equals(STRING_ERROR)
-            new_title_type_textView.setText("[오류]");
-        }
+//        if(type.equals(STRING_NEWS)){
+//            new_title_type_textView.setText("[뉴스]");
+//        }else if (type.equals(STRING_ANNOUNCEMENT)){
+//            new_title_type_textView.setText("[공지]");
+//        }else if (type.equals(STRING_UPDATE)){
+//            new_title_type_textView.setText("[업데이트]");
+//        }else if(type.equals(STRING_FEDDBACK)){
+//            new_title_type_textView.setText("[피드백]");
+//        }else if(type.equals(STRING_SUGGESTION)){
+//            new_title_type_textView.setText("[건의및개선]");
+//        }else{
+////            type.equals(STRING_ERROR)
+//            new_title_type_textView.setText("[오류]");
+//        }
+        new_title_type_textView.setText(type_to_kor(type));
         if(isNew.equals("old")) {
             isNew_imageView.setVisibility(View.GONE);
         }
@@ -150,9 +146,33 @@ public class NewsActivityAdapter extends BaseExpandableListAdapter {
     public boolean hasStableIds() {
         return false;
     }
-
     @Override
     public boolean isChildSelectable(int listPosition, int expandedListPosition) {
         return true;
+    }
+
+    public String type_to_kor(String input_str){
+        switch (input_str){
+            case "news":
+                return "[뉴스]";
+            case "update":
+                return "[업데이트]";
+            case "announcement":
+                return "[공지]";
+            case "feedback":
+                return "[피드백]";
+            case "suggestion":
+                return "[건의]";
+            case "error":
+                return "[오류]";
+            case "lawyer":
+                return "[변호사]";
+            case "sugs_1001":
+                return "[산업기사]";
+            case "gs_2001":
+                return "[기사]";
+            default:
+                return "null";
+        }
     }
 }

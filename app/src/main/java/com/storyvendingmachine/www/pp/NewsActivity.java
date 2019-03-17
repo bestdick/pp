@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.storyvendingmachine.www.pp.Allurl.base_url;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
@@ -57,6 +58,8 @@ import static com.storyvendingmachine.www.pp.MainFragment.quizUserSelectedAnswer
 
 public class NewsActivity extends AppCompatActivity {
     final String ENTER_METHOD_TYPE_LAW = "LAW";
+    final int SELECTION_ON = 1;
+    final int SELECTION_OFF = 0;
 
     final String ENTER_METHOD_TYPE_ALL = "NEWS";
     final String ENTER_METHOD_TYPE_ONE = "ONE";
@@ -161,15 +164,55 @@ public class NewsActivity extends AppCompatActivity {
             String type = "suggestions";
             getNewsAnnouncement(Integer.parseInt(key), type);
             fabOnclickController();
-        }else{
+        }else {
             //enter_method.equals(ENTER_METHOD_TYPE_LAW)
             // law 일때
+            ad();
             String minor_type = intent.getStringExtra("minor_type");
-            if(minor_type.equals("error")){
-                Log.e("minor_type", "error");
+            int selection = intent.getIntExtra("selection", -1);
+            if(minor_type.equals("news_announcement")){
+                appbar_title_textView.setText("공지 및 업데이트");
+                if(selection == SELECTION_ON){
+                    int selected_number = intent.getIntExtra("number", -1);
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "news_announcement"+selected_number);
+                }else if(selection == SELECTION_OFF){
+                    int selected_number = -1;
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "news_announcement"+selected_number);
+                }else{
+                 //default
+                }
+                fabOnclickController();
+            }else if(minor_type.equals("error")){
+                appbar_title_textView.setText("오류신고 및 개선사항");
+                if(selection == SELECTION_ON){
+                    int selected_number = intent.getIntExtra("number", -1);
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "error"+selected_number);
+                }else if(selection == SELECTION_OFF){
+                    int selected_number = -1;
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "error"+selected_number);
+                }else{
+                    //default
+                }
+                fabOnclickController();
             }else{
                 // minor_type.equals("free")
-                Log.e("minor_type", "free");
+                appbar_title_textView.setText("자유게시판");
+                if(selection == SELECTION_ON){
+                    int selected_number = intent.getIntExtra("number", -1);
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "free"+selected_number);
+                }else if(selection == SELECTION_OFF){
+                    int selected_number = -1;
+                    LAW_getNewsAnnouncement_Suggestion_Error_Free(selected_number, minor_type);
+                    Log.e("minor_type", "free"+selected_number);
+                }else{
+                    //default
+                }
+                fabOnclickController();
             }
         }
     }
@@ -718,7 +761,119 @@ public class NewsActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    public void LAW_getNewsAnnouncement_Suggestion_Error_Free(final int key, final String type){
+        String url = base_url + "getAnnouncement_Error_Suggestion.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("NewsActivity::" , response);
+                        HashMap<NewsActivityGroupList, NewsActivityItemList> hashMap = new HashMap<NewsActivityGroupList,NewsActivityItemList>();
+                        List<NewsActivityGroupList> group_list = new ArrayList<NewsActivityGroupList>();
+                        List<NewsActivityItemList> item_list = new ArrayList<NewsActivityItemList>();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                String response_type = jsonObject.getString("type");
+                                if(response_type.equals("news_announcement")){
+                                    JSONArray jsonArray  = jsonObject.getJSONArray("response1");
+                                    for(int i = 0 ; i < jsonArray.length(); i++){
+                                        String primary_key = jsonArray.getJSONObject(i).getString("primary_key");
+                                        String exam_type_code = jsonArray.getJSONObject(i).getString("exam_type_code");
+                                        String type = jsonArray.getJSONObject(i).getString("type");
+                                        String title = jsonArray.getJSONObject(i).getString("title");
+                                        String content = jsonArray.getJSONObject(i).getString("content");
+                                        String upload_date = jsonArray.getJSONObject(i).getString("upload_date");
+                                        String upload_time = jsonArray.getJSONObject(i).getString("upload_time");
+                                        String isNew = jsonArray.getJSONObject(i).getString("isNew");
+                                        NewsActivityGroupList group_element = new NewsActivityGroupList(title, type, upload_date, upload_time, isNew);
+                                        group_list.add(group_element);
+                                        NewsActivityItemList item_element = new NewsActivityItemList(String.valueOf(key), type, title, content, upload_date, upload_time, isNew);
+                                        item_list.add(item_element);
 
+                                        hashMap.put(group_element, item_element);
+                                    }
+                                }else if(response_type.equals("error")){
+                                    JSONArray jsonArray  = jsonObject.getJSONArray("response1");
+                                    for(int i = 0 ; i < jsonArray.length(); i++){
+                                        String primary_key = jsonArray.getJSONObject(i).getString("primary_key");
+                                        String login_type = jsonArray.getJSONObject(i).getString("login_type");
+                                        String user_id = jsonArray.getJSONObject(i).getString("user_id");
+                                        String user_nickname = jsonArray.getJSONObject(i).getString("user_nickname");
+                                        String type = jsonArray.getJSONObject(i).getString("type");
+                                        String title = jsonArray.getJSONObject(i).getString("title");
+                                        String content = jsonArray.getJSONObject(i).getString("content");
+                                        String upload_date = jsonArray.getJSONObject(i).getString("upload_date");
+                                        String upload_time = jsonArray.getJSONObject(i).getString("upload_time");
+                                        String isNew = jsonArray.getJSONObject(i).getString("isNew");
+                                        NewsActivityGroupList group_element = new NewsActivityGroupList(title, type, upload_date, upload_time, isNew);
+                                        group_list.add(group_element);
+                                        NewsActivityItemList item_element = new NewsActivityItemList(String.valueOf(key), type, title, content, upload_date, upload_time, isNew);
+                                        item_list.add(item_element);
+
+                                        hashMap.put(group_element, item_element);
+                                    }
+                                }else{
+                                    //response_type.equals("free");
+                                    JSONArray jsonArray  = jsonObject.getJSONArray("response1");
+                                    for(int i = 0 ; i < jsonArray.length(); i++){
+                                        String primary_key = jsonArray.getJSONObject(i).getString("primary_key");
+                                        String login_type = jsonArray.getJSONObject(i).getString("login_type");
+                                        String user_id = jsonArray.getJSONObject(i).getString("user_id");
+                                        String user_nickname = jsonArray.getJSONObject(i).getString("user_nickname");
+                                        String major_exam_type = jsonArray.getJSONObject(i).getString("major_exam_type");
+                                        String title = jsonArray.getJSONObject(i).getString("title");
+                                        String content = jsonArray.getJSONObject(i).getString("content");
+                                        String upload_date = jsonArray.getJSONObject(i).getString("upload_date");
+                                        String upload_time = jsonArray.getJSONObject(i).getString("upload_time");
+                                        String isNew = jsonArray.getJSONObject(i).getString("isNew");
+                                        NewsActivityGroupList group_element = new NewsActivityGroupList(title, major_exam_type, upload_date, upload_time, isNew);
+                                        group_list.add(group_element);
+                                        NewsActivityItemList item_element = new NewsActivityItemList(String.valueOf(key), major_exam_type, title, content, upload_date, upload_time, isNew);
+                                        item_list.add(item_element);
+
+                                        hashMap.put(group_element, item_element);
+                                    }
+                                }
+                                expandableListAdapter = new NewsActivityAdapter(NewsActivity.this, group_list, hashMap);
+                                expandableListView.setAdapter(expandableListAdapter);
+                                if(key != -1){
+                                    expandableListView.expandGroup(key);
+                                }
+                            }else if(access_token.equals("invalid")){
+
+                            }else{
+
+                            }
+                            progressbar_invisible();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("limit_type", "long");
+                params.put("type", type);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
     // ALL THE METHOD UNDER THIS LINE REPRESENTS GLOBAL METHOD THAT CAN BE USED COMMONLY ON NEW OR QUIZ
     private void toolbar(){
         tb = (Toolbar) findViewById(R.id.NewsActivityToolbar);
@@ -727,7 +882,6 @@ public class NewsActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
         getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
     }
-
     public void notifier(String message, String positive_message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)

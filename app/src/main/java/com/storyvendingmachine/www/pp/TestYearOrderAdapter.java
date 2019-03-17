@@ -93,6 +93,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
                         @Override
                         public void onClick(View view) {
                             Intent intent = new Intent(context, ExamViewActivity.class);
+                            intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                             intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
                             intent.putExtra("exam_code", exam_code);
                             intent.putExtra("exam_name", exam_name);
@@ -113,6 +114,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(context, ExamViewActivity.class);
+                                intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                                 intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
                                 intent.putExtra("exam_code", exam_code);
                                 intent.putExtra("exam_name", exam_name);
@@ -138,6 +140,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
                         @Override
                         public void onClick(View view) {
                             Intent intent = new Intent(context, ExamViewActivity.class);
+                            intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                             intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
                             intent.putExtra("exam_code", exam_code);
                             intent.putExtra("exam_name", exam_name);
@@ -159,6 +162,7 @@ public class TestYearOrderAdapter extends BaseAdapter {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(context, ExamViewActivity.class);
+                                intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                                 intent.putExtra("navi_selection", navi_selection);// navi_selection = 1  일때는 시험 2일때는 기출 공부
                                 intent.putExtra("exam_code", exam_code);
                                 intent.putExtra("exam_name", exam_name);

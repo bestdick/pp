@@ -90,15 +90,28 @@ public class LawHomeFragment extends Fragment {
     }
 
     public void seeMoreAction(View rootview){
+        TextView new_announcement_see_more_textView = (TextView) rootview.findViewById(R.id.new_announcement_see_more_textView);
         TextView error_board_see_more_textView = (TextView) rootview.findViewById(R.id.error_board_see_more_textView);
         TextView free_board_see_more_textView = (TextView) rootview.findViewById(R.id.free_board_see_more_textView);
 
+        new_announcement_see_more_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), NewsActivity.class);
+                intent.putExtra("enter_method", "LAW");
+                intent.putExtra("minor_type", "news_announcement");
+                intent.putExtra("selection", 0);
+                startActivity(intent);
+                slide_left_and_slide_in();
+            }
+        });
         error_board_see_more_textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), NewsActivity.class);
                 intent.putExtra("enter_method", "LAW");
                 intent.putExtra("minor_type", "error");
+                intent.putExtra("selection", 0);
                 startActivity(intent);
                 slide_left_and_slide_in();
             }
@@ -110,6 +123,7 @@ public class LawHomeFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), NewsActivity.class);
                 intent.putExtra("enter_method", "LAW");
                 intent.putExtra("minor_type", "free");
+                intent.putExtra("selection", 0);
                 startActivity(intent);
                 slide_left_and_slide_in();
             }
@@ -128,6 +142,8 @@ public class LawHomeFragment extends Fragment {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray news_announcement_jsonArray = jsonObject.getJSONArray("response1");
                             JSONArray suggestions_jsonArray = jsonObject.getJSONArray("response2");
+                            JSONArray freeboard_jsonArray = jsonObject.getJSONArray("response3");
+
 
                             LinearLayout news_linLayout = (LinearLayout) rootview.findViewById(R.id.announcement_LinearLayout);
                             for(int i = 0 ; i < news_announcement_jsonArray.length(); i++){
@@ -148,11 +164,25 @@ public class LawHomeFragment extends Fragment {
 
                                 indentify_isNew(news_isNew, news_isNew_imageView);
 
-                                news_type_textView.setText(type_selector(news_type));
+                                news_type_textView.setText(news_type_selector(news_type));
                                 news_title_textView.setText(news_title);
                                 news_upload_date_textView.setText(news_upload_date);
 
                                 news_linLayout.addView(container_news_inner_element);
+
+                                final int selected_number = i;
+                                container_news_inner_element.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                        intent.putExtra("enter_method", "LAW");
+                                        intent.putExtra("minor_type", "news_announcement");
+                                        intent.putExtra("selection", 1);
+                                        intent.putExtra("number", selected_number);
+                                        startActivity(intent);
+                                        slide_left_and_slide_in();
+                                    }
+                                });
                             }
 
                             LinearLayout error_Linear_Layout = (LinearLayout) rootview.findViewById(R.id.error_Linear_Layout);
@@ -176,17 +206,68 @@ public class LawHomeFragment extends Fragment {
 
                                 indentify_isNew(error_isNew, news_isNew_imageView);
 
-                                news_type_textView.setText(type_selector(error_type));
+                                news_type_textView.setText(error_type_selector(error_type));
                                 news_title_textView.setText(error_title);
                                 news_upload_date_textView.setText(error_upload_date);
 
                                 error_Linear_Layout.addView(container_news_inner_element);
+
+                                final int selected_number = i;
+                                container_news_inner_element.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                        intent.putExtra("enter_method", "LAW");
+                                        intent.putExtra("minor_type", "error");
+                                        intent.putExtra("selection", 1);
+                                        intent.putExtra("number", selected_number);
+                                        startActivity(intent);
+                                        slide_left_and_slide_in();
+                                    }
+                                });
                             }
 
+                            LinearLayout freeboard_LinearLayout = (LinearLayout) rootview.findViewById(R.id.freeboard_LinearLayout);
+                            for(int i = 0 ; i < freeboard_jsonArray.length(); i++){
+                                String free_primary_key = freeboard_jsonArray.getJSONObject(i).getString("primary_key");
+                                String free_login_type = freeboard_jsonArray.getJSONObject(i).getString("login_type");
+                                String free_user_id = freeboard_jsonArray.getJSONObject(i).getString("user_id");
+//                                String type = suggestions_jsonArray.getJSONObject(i).getString("type");
+                                String free_major_exam_type = freeboard_jsonArray.getJSONObject(i).getString("major_exam_type");
+                                String free_title = freeboard_jsonArray.getJSONObject(i).getString("title");
+                                String free_content = freeboard_jsonArray.getJSONObject(i).getString("content");
+                                String free_upload_date = freeboard_jsonArray.getJSONObject(i).getString("upload_date");
+                                String free_upload_time = freeboard_jsonArray.getJSONObject(i).getString("upload_time");
+                                String free_isNew = freeboard_jsonArray.getJSONObject(i).getString("isNew");
 
+                                View container_news_inner_element = getLayoutInflater().inflate(R.layout.container_news_inner_element, null);
+                                ImageView news_isNew_imageView = (ImageView) container_news_inner_element.findViewById(R.id.new_imageView);
+                                TextView news_type_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_type_textView);
+                                TextView news_title_textView = (TextView) container_news_inner_element.findViewById(R.id.new_title_textView);
+                                TextView news_upload_date_textView = (TextView) container_news_inner_element.findViewById(R.id.upload_date_textView);
 
+                                indentify_isNew(free_isNew, news_isNew_imageView);
 
+                                news_type_textView.setText(free_type_selector(free_major_exam_type) );
+                                news_title_textView.setText(free_title);
+                                news_upload_date_textView.setText(free_upload_date);
 
+                                freeboard_LinearLayout.addView(container_news_inner_element);
+
+                                final int selected_number = i;
+                                container_news_inner_element.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), NewsActivity.class);
+                                        intent.putExtra("enter_method", "LAW");
+                                        intent.putExtra("minor_type", "free");
+                                        intent.putExtra("selection", 1);
+                                        intent.putExtra("number", selected_number);
+                                        startActivity(intent);
+                                        slide_left_and_slide_in();
+                                    }
+                                });
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -206,6 +287,7 @@ public class LawHomeFragment extends Fragment {
             protected Map<String, String> getParams(){
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
+                params.put("limit_type","short");
                 return params;
             }
         };
@@ -259,13 +341,33 @@ public class LawHomeFragment extends Fragment {
             input_imageView.setVisibility(View.VISIBLE);
         }
     }
-    public String type_selector(String input_str){
+    public String news_type_selector(String input_str){
         if(input_str.equals("news")){
             return "[뉴스]";
         }else if(input_str.equals("update")){
             return "[업데이트]";
         }else{
             return "[공지]";
+        }
+    }
+    public String error_type_selector(String input_str){
+        if(input_str.equals("feedback")){
+            return "[피드백]";
+        }else if(input_str.equals("suggestion")){
+            return "[건의]";
+        }else{
+            //input_str.equals("error")
+            return "[오류]";
+        }
+    }
+    public String free_type_selector(String input_str){
+        if(input_str.equals("lawyer")){
+            return "[변호사]";
+        }else if(input_str.equals("sugs_1001")){
+            return "[산업기사]";
+        }else{
+            //input_str.equals("gs_2001")
+            return "[기사]";
         }
     }
     public void slide_left_and_slide_in(){//opening new activity

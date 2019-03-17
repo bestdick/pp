@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 
-
+import static com.storyvendingmachine.www.pp.Allurl.base_url;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 
@@ -65,7 +65,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     NavigationView navigationView;
     LinearLayout answer_sheet_element_layout;
 
-    ProgressBar progressBar;
+    static ProgressBar ExamView_progressBar;
     LinearLayout progressBarBackground;
 
     String exam_name, exam_code, published_year, published_round;
@@ -73,6 +73,10 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     static List<Integer> answer;
     static ExamViewActivityViewPagerAdaper eViewPagerAdapter;
     static ViewPager eviewPager;
+
+
+    LawExamViewTypeAViewPagerAdapter examViewTypeAViewPagerAdapter;
+
 
 
     JSONArray resultJSONarray;
@@ -87,146 +91,175 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
     String refresh_upload_prevent;
     Button submit_button;
+
+
+    String exam_major_type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent getIntent = getIntent();
+        exam_major_type = getIntent.getStringExtra("exam_major_type");
+        if(exam_major_type.equals("lawyer")){
+            setTheme(R.style.PassPopLawTheme);
+        }else{
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_view);
-        submit_button = (Button) findViewById(R.id.submit_textView);
 
+        if(exam_major_type.equals("lawyer")){
+            navi_selection = getIntent.getStringExtra("navi_selection");
+            String exam_placed_year = getIntent.getStringExtra("exam_placed_year");
+            String major_type = getIntent.getStringExtra("major_type");
+            String minor_type = getIntent.getStringExtra("minor_type");
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        Date date = new Date();
-        refresh_upload_prevent = dateFormat.format(date);
-
-        Intent getIntent =getIntent();
-        navi_selection = getIntent.getStringExtra("navi_selection");
-        exam_name = getIntent.getStringExtra("exam_name");
-        exam_code = getIntent.getStringExtra("exam_code");
-        published_year = getIntent.getStringExtra("published_year");
-        published_round = getIntent.getStringExtra("published_round");
-
-
-
-
-
-        progressBar = (ProgressBar) findViewById(R.id.read_progress_bar);
-        progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
-        progressbar_visible();
-        new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
-            @Override
-            public void run() {
-                progressbar_invisible();
-            }
-        }, 2500);
-//         2초후에 progressbar 없애기
-
-        if(navi_selection.equals("1")){// 1 일때는 기출시험 문제 풀이
-            //기출시험 문제 풀이
+            String title_message = exam_placed_year+"년도 "+LAW_major_minor_to_kor(major_type)+" "+LAW_major_minor_to_kor(minor_type);
+            toolbar( exam_major_type, title_message);
             drawer = (DrawerLayout) findViewById(R.id.drawer);
-            //handling navigation view item event
             navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-            navigationView.setNavigationItemSelectedListener(this);
-             answer_sheet_element_layout= (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
-
-            answer = new ArrayList<Integer>();
-            getSelectedExam();
-            String title_message = published_year+" 년도 "+published_round+" 회 "+exam_name;
-            toolbar(title_message);
-
-            drawer_listener();
-
-            submit_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    boolean is = checkifAllAnswersAreSelected();
-                    if(is){
-                        String message = "채점 하시겠습니까?";
-                        String pos_message = "네";
-                        String neg_message = "아니요";
-                        notifier_examSubmitButtonProcess(message, pos_message, neg_message);
-                    }else{
-                        String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
-                        String pos_message = "네";
-                        String neg_message = "아니요";
-                        notifier_examSubmitButtonProcess(message, pos_message, neg_message);
-                    }
-                }
-            });
-
-        }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
-            //기출 시험 공부
-            submit_button.setVisibility(View.GONE);
-            drawer = (DrawerLayout) findViewById(R.id.drawer);
-
-            navigationView = (NavigationView) findViewById(R.id.nav_view);
-//navigation drawer size
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) navigationView.getLayoutParams();
-//            params.width = metrics.widthPixels;  // full size of drawer
-            params.width = (int) (metrics.widthPixels*0.9);
-            navigationView.setLayoutParams(params);
-//navigation drawer size
-
             navigationView.setNavigationItemSelectedListener(this);
             answer_sheet_element_layout = (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
+            ExamView_progressBar = (ProgressBar) findViewById(R.id.read_progress_bar);
+            if(navi_selection.equals("1")){
+                progressbar_visible();
+                submit_button = (Button) findViewById(R.id.submit_textView);
+                submit_button.setBackgroundColor(getResources().getColor(R.color.colorCrimsonRed));
+                submit_button.setTextColor(getResources().getColor(R.color.colorWhite));
 
-            String title_message = published_year+" 년도 "+published_round+" 회 "+exam_name+" 시험 공부";
-            toolbar(title_message);
-            answer = new ArrayList<Integer>();
-
-            getExamNote(exam_code, published_year, published_round);
-
-            Toast.makeText(this, "Exam selection study exam", Toast.LENGTH_SHORT).show();
-            drawer_listener();
-        }
-
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
+                answer = new ArrayList<Integer>();
+                LAW_getSelectedExam(exam_placed_year, major_type, minor_type);
+                drawer_listener();
+            }else{
+                // navi_selection.equals("2")
+                submit_button = (Button) findViewById(R.id.submit_textView);
+                submit_button.setVisibility(View.GONE);
             }
-        });
+        }else{
+            navi_selection = getIntent.getStringExtra("navi_selection");
+            exam_name = getIntent.getStringExtra("exam_name");
+            exam_code = getIntent.getStringExtra("exam_code");
+            published_year = getIntent.getStringExtra("published_year");
+            published_round = getIntent.getStringExtra("published_round");
 
+
+            submit_button = (Button) findViewById(R.id.submit_textView);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            Date date = new Date();
+            refresh_upload_prevent = dateFormat.format(date);
+
+            ExamView_progressBar = (ProgressBar) findViewById(R.id.read_progress_bar);
+            progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
+//            progressbar_visible();
+            new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                @Override
+                public void run() {
+                    progressbar_invisible();
+                }
+            }, 2500);
+    //         2초후에 progressbar 없애기
+
+            if(navi_selection.equals("1")){// 1 일때는 기출시험 문제 풀이
+                //기출시험 문제 풀이
+                drawer = (DrawerLayout) findViewById(R.id.drawer);
+                //handling navigation view item event
+                navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+                navigationView.setNavigationItemSelectedListener(this);
+                answer_sheet_element_layout= (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
+
+                answer = new ArrayList<Integer>();
+                getSelectedExam();
+                String title_message = published_year+" 년도 "+published_round+" 회 "+exam_name;
+                toolbar(exam_major_type, title_message);
+
+                drawer_listener();
+
+                submit_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        boolean is = checkifAllAnswersAreSelected();
+                        if(is){
+                            String message = "채점 하시겠습니까?";
+                            String pos_message = "네";
+                            String neg_message = "아니요";
+                            notifier_examSubmitButtonProcess(message, pos_message, neg_message);
+                        }else{
+                            String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
+                            String pos_message = "네";
+                            String neg_message = "아니요";
+                            notifier_examSubmitButtonProcess(message, pos_message, neg_message);
+                        }
+                    }
+                });
+
+            }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
+                //기출 시험 공부
+                submit_button.setVisibility(View.GONE);
+                drawer = (DrawerLayout) findViewById(R.id.drawer);
+
+                navigationView = (NavigationView) findViewById(R.id.nav_view);
+    //navigation drawer size
+                DisplayMetrics metrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) navigationView.getLayoutParams();
+    //            params.width = metrics.widthPixels;  // full size of drawer
+                params.width = (int) (metrics.widthPixels*0.9);
+                navigationView.setLayoutParams(params);
+    //navigation drawer size
+
+                navigationView.setNavigationItemSelectedListener(this);
+                answer_sheet_element_layout = (LinearLayout) navigationView.findViewById(R.id.answer_element_layout);
+
+                String title_message = published_year+" 년도 "+published_round+" 회 "+exam_name+" 시험 공부";
+                toolbar(exam_major_type, title_message);
+                answer = new ArrayList<Integer>();
+
+                getExamNote(exam_code, published_year, published_round);
+
+                Toast.makeText(this, "Exam selection study exam", Toast.LENGTH_SHORT).show();
+                drawer_listener();
+            }
+        }
     }
 
     public void drawer_listener(){
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-//                Toast.makeText(ExamViewActivity.this, "on slide", Toast.LENGTH_SHORT).show();
                 Log.e("drawer state ", "on slide");
             }
-
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
-                if(navi_selection.equals("1")){
-                    // 기출 풀기
-                    makeAnswerSheet();
-                    Toast.makeText(ExamViewActivity.this, "open", Toast.LENGTH_SHORT).show();
-                }else{
-                    //기출 공부
-                    if(LoginType.equals("null")){
-                        //로그인을 하지 않은 상태
+                if(exam_major_type.equals("lawyer")){
+                    if(navi_selection.equals("1")){
+                        LAW_makeAnswerSheet();
                     }else{
-                        //로그인 한 상태
-                        progressbar_visible();
-                        answer_sheet_element_layout.removeAllViews();
-                        try {
-                            makeUserPersonalNoteSheet_renew();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+
+                    }
+                }else{
+                    if(navi_selection.equals("1")){
+                        // 기출 풀기
+                        makeAnswerSheet();
+                    }else{
+                        //기출 공부
+                        if(LoginType.equals("null")){
+                            //로그인을 하지 않은 상태
+                        }else{
+                            //로그인 한 상태
+                            progressbar_visible();
+                            answer_sheet_element_layout.removeAllViews();
+                            try {
+                                makeUserPersonalNoteSheet_renew();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
-
             }
 
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
-                Toast.makeText(ExamViewActivity.this, "close", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -236,94 +269,30 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             }
         });
     }
+    private void toolbar(String major_exam_type, String title_message){
+        if(major_exam_type.equals("lawyer")){
+            Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
+            tb.setElevation(0);
+            tb.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
 
-
-
-    private void toolbar(String title_message){
-        Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
-        tb.setElevation(5);
-        setSupportActionBar(tb);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
-        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
-
-
-        TextView exam_title_TextView = (TextView) tb.findViewById(R.id.exam_titleTextView);
-        exam_title_TextView.setText(title_message);
-    }
-
-    @Override
-    public void onBackPressed(){
-        super.onBackPressed();
-        setResult(RESULT_CANCELED);
-        finish();
-        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        if(navi_selection.equals("1")){// 1 일때는 기출시험 문제 풀이
-            getMenuInflater().inflate(R.menu.exam_answer_sheet, menu);
-        }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
-            getMenuInflater().inflate(R.menu.exam_note_sheet, menu);
-        }
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.answer_sheet_menu){
-            //기출 시험 응시
-            // drawer
-            if (drawer.isDrawerOpen(Gravity.RIGHT)) {
-                //drawer is open
-//                drawer.closeDrawer(Gravity.LEFT);
-                drawer.closeDrawer(Gravity.RIGHT);
-
-            } else {
-                //drawer is closed
-                drawer.openDrawer(Gravity.RIGHT);
-
-            }
-        }else if(id==R.id.exam_note_sheet){// backpress id
-            //기출 시험 공부
-            // drawer
-            if (drawer.isDrawerOpen(Gravity.RIGHT)) {
-                //drawer is open
-                drawer.closeDrawer(Gravity.RIGHT);
-
-            } else {
-                //drawer is closed
-                drawer.openDrawer(Gravity.RIGHT);
-                if(LoginType.equals("null")){
-                    //로그인을 하지 않은 상태
-                }else{
-                    //로그인 한 상태
-                    progressbar_visible();
-                    answer_sheet_element_layout.removeAllViews();
-                    try {
-                        makeUserPersonalNoteSheet_renew();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            TextView exam_title_TextView = (TextView) tb.findViewById(R.id.exam_titleTextView);
+            exam_title_TextView.setText(title_message);
         }else{
-            onBackPressed();
+            Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
+            tb.setElevation(5);
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+
+            TextView exam_title_TextView = (TextView) tb.findViewById(R.id.exam_titleTextView);
+            exam_title_TextView.setText(title_message);
         }
-        return super.onOptionsItemSelected(item);
     }
-
-
-
     public void getSelectedExam(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getSelectedExam.php";
         RequestQueue queue = Volley.newRequestQueue(ExamViewActivity.this);
@@ -449,7 +418,6 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         };
                     queue.add(stringRequest);
     }
-
     public void getExamNote(final String exam_code, final String exam_placed_year, final String exam_placed_round){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/getExamNote.php";
@@ -923,16 +891,15 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         };
         queue.add(stringRequest);
     }
-
     public void progressbar_visible(){
-        progressBar.setVisibility(View.VISIBLE);
-        progressBarBackground.setVisibility(View.VISIBLE);
+        ExamView_progressBar.setVisibility(View.VISIBLE);
+//        progressBarBackground.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
     public void progressbar_invisible(){
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        progressBar.setVisibility(View.GONE);
-        progressBarBackground.setVisibility(View.GONE);
+        ExamView_progressBar.setVisibility(View.GONE);
+//        progressBarBackground.setVisibility(View.GONE);
     }
     public void slide_left_and_slide_in(){//opening new activity
         overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
@@ -944,7 +911,377 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+    public String LAW_major_minor_to_kor(String input_str){
+        switch (input_str){
+            case "major_1001":
+                return "사례형";
+            case "major_1002":
+                return "기록형";
+            case "major_1003":
+                return "선택형";
+            case "minor_2001":
+                return "공법";
+            case "minor_2002":
+                return "민사법";
+            case "minor_2003":
+                return "형사법";
+            default:
+//                "minor_2004":
+                return "선택형";
+        }
+    }
+    public void LAW_getSelectedExam(final String exam_placed_year, final String major_type, final String minor_type){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = base_url+"getExamList.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
 
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("exam selected response", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access = jsonObject.getString("access");
+                            if(access.equals("valid")){
+                                JSONObject response1 = jsonObject.getJSONObject("response1");
+                                String question_count_str = response1.getString("question_count");
+                                int question_count_int = Integer.parseInt(question_count_str);
+                                JSONArray exam_data = response1.getJSONArray("exam_data");
+
+                                examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
+                                examViewTypeAViewPagerAdapter.count = question_count_int;
+                                examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+
+                                eviewPager = (ViewPager) findViewById(R.id.container);
+                                eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
+                                eviewPager.setOffscreenPageLimit(question_count_int);
+                                eviewPager.setPageMargin(16);
+
+                                LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+//
+//                        examlistviewAdapter.notifyDataSetChanged();
+                    }},
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("are we here 6", error.toString());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", "select");
+                params.put("exam_placed_year", exam_placed_year);
+                params.put("major_type", major_type);
+                params.put("minor_type", minor_type);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+    public void LAW_create_answer_sheet(int count, JSONArray exam_data, String exam_placed_year, String major_type, String minor_type){
+        TextView title_textView = new TextView(ExamViewActivity.this);
+//        title_textView.setBackground(getResources().getDrawable(R.drawable.outline_round_orange));
+        title_textView.setGravity(Gravity.CENTER);
+        title_textView.setText("답안지");
+        answer_sheet_element_layout.addView(title_textView);
+        for(int i =0 ; i<count; i++){
+            final int ii = i;
+            View answer_sheet_element = getLayoutInflater().inflate(R.layout.law_container_exam_view_type_a_answer_sheet_element, null);
+            answer_sheet_element.setId(i);
+
+            TextView questionNumber = (TextView) answer_sheet_element.findViewById(R.id.questionNumber_textView);
+            questionNumber.setText(String.valueOf(i+1)+".");
+
+            ConstraintLayout layout = (ConstraintLayout) answer_sheet_element.findViewById(R.id.answer_sheet_element_container);
+            layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.e("page", "page:::"+String.valueOf(ii));
+                    eviewPager.setCurrentItem(ii);
+                    drawer.closeDrawer(Gravity.RIGHT);
+                }
+            });
+
+            answer_sheet_element_layout.addView(answer_sheet_element);
+
+        }
+        Button submit_button = new Button(ExamViewActivity.this);
+        LAW_examSubmitButtonProcess(submit_button, exam_data,  exam_placed_year,  major_type,  minor_type);// 시험 종료 및 체점 버튼 프로세스
+        answer_sheet_element_layout.addView(submit_button);
+    }
+    public void LAW_makeAnswerSheet(){// 기출 시험에만 적용되는것
+        int size = answer.size();
+        for(int i = 0; i<size; i++){
+            View v = findViewById(i);
+            TextView one = (TextView) v.findViewById(R.id.answerChoice_1_textView);
+            TextView two = (TextView) v.findViewById(R.id.answerChoice_2_textView);
+            TextView three = (TextView) v.findViewById(R.id.answerChoice_3_textView);
+            TextView four = (TextView) v.findViewById(R.id.answerChoice_4_textView);
+            TextView five = (TextView) v.findViewById(R.id.answerChoice_5_textView);
+
+            int answer1 = answer.get(i);
+
+            if(answer1 ==1){
+                one.setTextColor(getResources().getColor(R.color.colorWhite));
+                one.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                two.setBackground(null);
+                three.setBackground(null);
+                four.setBackground(null);
+                five.setBackground(null);
+            }else if(answer1==2){
+                one.setBackground(null);
+                two.setTextColor(getResources().getColor(R.color.colorWhite));
+                two.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                three.setBackground(null);
+                four.setBackground(null);
+                five.setBackground(null);
+            }else if(answer1==3){
+                one.setBackground(null);
+                two.setBackground(null);
+                three.setTextColor(getResources().getColor(R.color.colorWhite));
+                three.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                four.setBackground(null);
+                five.setBackground(null);
+            }else if(answer1==4){
+                one.setBackground(null);
+                two.setBackground(null);
+                three.setBackground(null);
+                four.setTextColor(getResources().getColor(R.color.colorWhite));
+                four.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                five.setBackground(null);
+            }else if(answer1==5){
+                one.setBackground(null);
+                two.setBackground(null);
+                three.setBackground(null);
+                four.setBackground(null);
+                five.setTextColor(getResources().getColor(R.color.colorWhite));
+                five.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+            }
+        }
+    }
+    public void LAW_examSubmitButtonProcess(Button submitButton, final JSONArray exam_data, final String exam_placed_year, final String major_type, final String minor_type){// 기출 시험에만 적용되는것
+        submitButton.setText("시험 종료 및 체점");
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0,20,0,20);
+        submitButton.setLayoutParams(params);
+//        submitButton.setBackground(getResources().getDrawable(R.drawable.solid_round_orange));
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean is = checkifAllAnswersAreSelected();
+                if(is){
+                    String message = "채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    LAW_notifier_examSubmitButtonProcess(message, pos_message, neg_message, exam_data, exam_placed_year,  major_type,  minor_type);
+                }else{
+                    String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    LAW_notifier_examSubmitButtonProcess(message, pos_message, neg_message, exam_data,exam_placed_year,  major_type,  minor_type);
+                }
+            }
+        });
+
+        submit_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean is = checkifAllAnswersAreSelected();
+                if(is){
+                    String message = "채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    LAW_notifier_examSubmitButtonProcess(message, pos_message, neg_message, exam_data,exam_placed_year,  major_type,  minor_type);
+                }else{
+                    String message = "답을 선택하지 않은 문제가 존재합니다.\n그래도 채점 하시겠습니까?";
+                    String pos_message = "네";
+                    String neg_message = "아니요";
+                    LAW_notifier_examSubmitButtonProcess(message, pos_message, neg_message, exam_data,exam_placed_year,  major_type,  minor_type);
+                }
+            }
+        });
+    }
+    public void LAW_notifier_examSubmitButtonProcess(String message, String positive_message, String negative_message,
+                                                     final JSONArray exam_data, final String exam_placed_year, final String major_type, final String minor_type){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ExamViewActivity.this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //positive button
+//                        sendExamResult(exam_data, exam_placed_year,  major_type,  minor_type);
+                        if(LoginType.equals("normal") || LoginType.equals("kakao")){
+                            JSONArray answer_json = LAW_user_answers_to_json();
+                            LAW_upload_process(exam_placed_year, major_type, minor_type, answer_json);
+                        }else{
+                            sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type);
+                        }
+                        drawer.closeDrawer(Gravity.RIGHT);
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //negative button
+                        drawer.closeDrawer(Gravity.RIGHT);
+                    }
+                })
+                .create()
+                .show();
+    }
+    public void LAW_upload_process(final String exam_placed_year, final String major_type, final String minor_type, final JSONArray exam_data){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = base_url+"LAW_upload_process.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("exam upload res ::" , response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                String response1 = jsonObject.getString("response1");
+                                if(response1.equals("success")){
+                                    sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type);
+                                }
+                            }else if(access_token.equals("invalid")){
+
+                            }else{
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+//                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+//                        toast(message);
+//                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("exam_data", exam_data.toString());
+                params.put("exam_placed_year", exam_placed_year);
+                params.put("major_type", major_type);
+                params.put("minor_type", minor_type);
+
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+    public JSONArray LAW_user_answers_to_json(){
+        JSONArray jsonArray = new JSONArray();
+        try {
+            for(int i = 0 ; i < answer.size(); i++){
+                int a = answer.get(i);
+                jsonArray.put(i, a);
+            }
+            return jsonArray;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    public void sendExamResult(JSONArray exam_data, String exam_placed_year, String major_type, String minor_type){
+        Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
+        intent.putExtra("major_exam_type", "lawyer");
+        intent.putExtra("exam_placed_year", exam_placed_year);
+        intent.putExtra("major_type", major_type);
+        intent.putExtra("minor_type", minor_type);
+        intent.putExtra("exam_data", exam_data.toString());
+//        intent.putExtra("UserSelectedAnswer", answer);
+        startActivity(intent);
+        finish();
+    }
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finish();
+        overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
+    }
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if(navi_selection.equals("1")){// 1 일때는 기출시험 문제 풀이
+            getMenuInflater().inflate(R.menu.exam_answer_sheet, menu);
+        }else { // else 는 2 밖에 없기때문에 우선 else 로 둔다.
+            getMenuInflater().inflate(R.menu.exam_note_sheet, menu);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.answer_sheet_menu){
+            //기출 시험 응시
+            // drawer
+            if (drawer.isDrawerOpen(Gravity.RIGHT)) {
+                //drawer is open
+//                drawer.closeDrawer(Gravity.LEFT);
+                drawer.closeDrawer(Gravity.RIGHT);
+
+            } else {
+                //drawer is closed
+                drawer.openDrawer(Gravity.RIGHT);
+
+            }
+        }else if(id==R.id.exam_note_sheet){// backpress id
+            //기출 시험 공부
+            // drawer
+            if (drawer.isDrawerOpen(Gravity.RIGHT)) {
+                //drawer is open
+                drawer.closeDrawer(Gravity.RIGHT);
+
+            } else {
+                //drawer is closed
+                drawer.openDrawer(Gravity.RIGHT);
+                if(LoginType.equals("null")){
+                    //로그인을 하지 않은 상태
+                }else{
+                    //로그인 한 상태
+                    progressbar_visible();
+                    answer_sheet_element_layout.removeAllViews();
+                    try {
+                        makeUserPersonalNoteSheet_renew();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }else{
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

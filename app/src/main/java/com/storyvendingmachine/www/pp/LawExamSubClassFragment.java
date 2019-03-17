@@ -176,27 +176,55 @@ public class LawExamSubClassFragment extends Fragment {
                             if(mParam1.equals("major_1003")) {
                                 JSONObject jsonObject = new JSONObject(response);
                                 JSONArray jsonArray = jsonObject.getJSONArray("response");
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    String exam_placed_year = jsonArray.getJSONObject(i).getString("year_round");
-                                    LawExamListTypeA item = new LawExamListTypeA("year", exam_placed_year,
+                                if(jsonArray.length()<=0){
+                                    LawExamListTypeA item = new LawExamListTypeA("empty", null,
                                             null, null, null, null, 0);
                                     examListTypeAList.add(item);
-                                    JSONArray inner_data_array = jsonArray.getJSONObject(i).getJSONArray("inner_data");
-                                    for (int j = 0; j < inner_data_array.length(); j++) {
-                                        String major_type = inner_data_array.getJSONObject(j).getString("major_type");
-                                        String major_type_kor = inner_data_array.getJSONObject(j).getString("major_type_kor");
-                                        String minor_type = inner_data_array.getJSONObject(j).getString("minor_type");
-                                        String minor_type_kor = inner_data_array.getJSONObject(j).getString("minor_type_kor");
-                                        JSONArray second_inner_data_array = inner_data_array.getJSONObject(j).getJSONArray("second_inner_data");
-                                        int count_questions = second_inner_data_array.length();
-                                        LawExamListTypeA inner_item = new LawExamListTypeA("all", exam_placed_year,
-                                                major_type, major_type_kor, minor_type, minor_type_kor, count_questions);
-                                        examListTypeAList.add(inner_item);
+                                    examlistviewAdapter.notifyDataSetChanged();
+                                }else{
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        String exam_placed_year = jsonArray.getJSONObject(i).getString("year_round");
+                                        LawExamListTypeA item = new LawExamListTypeA("year", exam_placed_year,
+                                                null, null, null, null, 0);
+                                        examListTypeAList.add(item);
+                                        JSONArray inner_data_array = jsonArray.getJSONObject(i).getJSONArray("inner_data");
+                                        for (int j = 0; j < inner_data_array.length(); j++) {
+                                            String major_type = inner_data_array.getJSONObject(j).getString("major_type");
+                                            String major_type_kor = inner_data_array.getJSONObject(j).getString("major_type_kor");
+                                            String minor_type = inner_data_array.getJSONObject(j).getString("minor_type");
+                                            String minor_type_kor = inner_data_array.getJSONObject(j).getString("minor_type_kor");
+                                            JSONArray second_inner_data_array = inner_data_array.getJSONObject(j).getJSONArray("second_inner_data");
+                                            int count_questions = second_inner_data_array.length();
+                                            LawExamListTypeA inner_item = new LawExamListTypeA("all", exam_placed_year,
+                                                    major_type, major_type_kor, minor_type, minor_type_kor, count_questions);
+                                            examListTypeAList.add(inner_item);
+                                        }
                                     }
+                                    examlistviewAdapter.notifyDataSetChanged();
                                 }
-                                examlistviewAdapter.notifyDataSetChanged();
-                            }else{
+                            }else if(mParam1.equals("major_1002")){
+                                JSONObject jsonObject = new JSONObject(response);
+                                JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                if(jsonArray.length()<=0) {
+                                    LawExamListTypeA item = new LawExamListTypeA("empty", null,
+                                            null, null, null, null, 0);
+                                    examListTypeAList.add(item);
+                                    examlistviewAdapter.notifyDataSetChanged();
+                                }else{
 
+                                }
+                            }else{
+//                                mParam1.equals("major_1001")
+                                JSONObject jsonObject = new JSONObject(response);
+                                JSONArray jsonArray = jsonObject.getJSONArray("response");
+                                if(jsonArray.length()<=0) {
+                                    LawExamListTypeA item = new LawExamListTypeA("empty", null,
+                                            null, null, null, null, 0);
+                                    examListTypeAList.add(item);
+                                    examlistviewAdapter.notifyDataSetChanged();
+                                }else{
+
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -875,7 +875,7 @@ public class MainFragment extends Fragment {
                                     String suggestioon_new = suggestion_jsonArray.getJSONObject(j).getString("new");
 
                                     if(suggestioon_new.equals("old")){
-                                        //마약 해당 공지 또는 뉴스가 1주일 안에 발표된 공지가 아닌 오래된 공지일때
+                                        //만약 해당 공지 또는 뉴스가 1주일 안에 발표된 공지가 아닌 오래된 공지일때
                                         new_imageView.setVisibility(View.GONE);
                                     }
                                     if(type.equals("feedback")){
@@ -893,7 +893,7 @@ public class MainFragment extends Fragment {
                                         @Override
                                         public void onClick(View view) {
                                             Intent intent = new Intent(getActivity(), NewsActivity.class);
-                                            intent.putExtra("enter_method", "SUGGESTION_SELECT  ");
+                                            intent.putExtra("enter_method", "SUGGESTION_SELECT");
                                             intent.putExtra("key", temp_j);
 //                                            startActivity(intent);
                                             getActivity().startActivityForResult(intent, REQUEST_CODE_FOR_SUGGESTION);
