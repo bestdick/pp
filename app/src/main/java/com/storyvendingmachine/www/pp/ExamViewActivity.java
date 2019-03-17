@@ -121,9 +121,14 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             ExamView_progressBar = (ProgressBar) findViewById(R.id.read_progress_bar);
             if(navi_selection.equals("1")){
                 progressbar_visible();
+
                 submit_button = (Button) findViewById(R.id.submit_textView);
                 submit_button.setBackgroundColor(getResources().getColor(R.color.colorCrimsonRed));
                 submit_button.setTextColor(getResources().getColor(R.color.colorWhite));
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+                Date date = new Date();
+                refresh_upload_prevent = dateFormat.format(date);
 
                 answer = new ArrayList<Integer>();
                 LAW_getSelectedExam(exam_placed_year, major_type, minor_type);
@@ -805,6 +810,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
             Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
             intent.putExtra("from", "ExamViewActivity");
+            intent.putExtra("from_exam_type", "sugs_1001/gs_2001");
             intent.putExtra("ExamResult", savejsonArray.toString());
             intent.putExtra("exam_code", exam_code);
             intent.putExtra("exam_name", exam_name);
@@ -820,6 +826,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         }else{
             Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
             intent.putExtra("ExamResult", savejsonArray.toString());
+            intent.putExtra("from_exam_type", "sugs_1001/gs_2001");
             intent.putExtra("exam_code", exam_code);
             intent.putExtra("exam_name", exam_name);
             intent.putExtra("published_year", published_year);
@@ -1122,9 +1129,10 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 //                        sendExamResult(exam_data, exam_placed_year,  major_type,  minor_type);
                         if(LoginType.equals("normal") || LoginType.equals("kakao")){
                             JSONArray answer_json = LAW_user_answers_to_json();
-                            LAW_upload_process(exam_placed_year, major_type, minor_type, answer_json);
+                            LAW_upload_process(exam_placed_year, major_type, minor_type, exam_data, answer_json);
                         }else{
-                            sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type);
+                            JSONArray answer_json = LAW_user_answers_to_json();
+                            sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type, answer_json);
                         }
                         drawer.closeDrawer(Gravity.RIGHT);
                     }
@@ -1139,7 +1147,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 .create()
                 .show();
     }
-    public void LAW_upload_process(final String exam_placed_year, final String major_type, final String minor_type, final JSONArray exam_data){
+    public void LAW_upload_process(final String exam_placed_year, final String major_type, final String minor_type, final JSONArray exam_data, final JSONArray answer_json){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = base_url+"LAW_upload_process.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -1153,7 +1161,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                             if(access_token.equals("valid")){
                                 String response1 = jsonObject.getString("response1");
                                 if(response1.equals("success")){
-                                    sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type);
+                                    sendExamResult( exam_data,  exam_placed_year,  major_type,  minor_type, answer_json);
                                 }
                             }else if(access_token.equals("invalid")){
 
@@ -1179,10 +1187,11 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
-                params.put("exam_data", exam_data.toString());
+                params.put("exam_data", answer_json.toString());
                 params.put("exam_placed_year", exam_placed_year);
                 params.put("major_type", major_type);
                 params.put("minor_type", minor_type);
+                params.put("refresh_prevent", refresh_upload_prevent);
 
                 params.put("login_type", LoginType);
                 params.put("user_id", G_user_id);
@@ -1205,13 +1214,15 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         }
 
     }
-    public void sendExamResult(JSONArray exam_data, String exam_placed_year, String major_type, String minor_type){
+    public void sendExamResult(JSONArray exam_data, String exam_placed_year, String major_type, String minor_type, JSONArray answer_json){
         Intent intent = new Intent(ExamViewActivity.this, ExamResultActivity.class);
+        intent.putExtra("from", "ExamViewActivity");
         intent.putExtra("major_exam_type", "lawyer");
         intent.putExtra("exam_placed_year", exam_placed_year);
         intent.putExtra("major_type", major_type);
         intent.putExtra("minor_type", minor_type);
         intent.putExtra("exam_data", exam_data.toString());
+        intent.putExtra("answer_json", answer_json.toString());
 //        intent.putExtra("UserSelectedAnswer", answer);
         startActivity(intent);
         finish();

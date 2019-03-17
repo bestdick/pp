@@ -255,6 +255,7 @@ public class StatisticFragment extends Fragment {
                                 //틀린 문제 보러간다.
                                Intent intent = new Intent(getActivity(), ExamResultActivity.class);
                                intent.putExtra("from","StatisticFragment");
+                               intent.putExtra("from_exam_type", "sugs_1001/gs_2001");
                                intent.putExtra("exam_code", exam_code);
                                intent.putExtra("exam_name", exam_name);
                                intent.putExtra("exam_placed_year", exam_placed_year);

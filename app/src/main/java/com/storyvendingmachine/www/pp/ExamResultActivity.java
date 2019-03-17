@@ -79,8 +79,17 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
     private RewardedVideoAd mRewardedVideoAd;
 
     TextView test_textView;
+
+    String major_exam_type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent getIntent = getIntent();
+        major_exam_type = getIntent.getStringExtra("major_exam_type");
+        if(major_exam_type.equals("lawyer")){
+            setTheme(R.style.PassPopLawTheme);
+        }else{
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_result);
         toolbar();
@@ -88,7 +97,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
         if(LoginType.equals("kakao") || LoginType.equals("normal")){
             //로그인 상태
-            Intent getIntent = getIntent();
+//            Intent getIntent = getIntent();
             identifier = getIntent.getStringExtra("from");
             if(identifier.equals("StatisticFragment")){
                 //StatisticFragment 에서 받은 intent
@@ -107,8 +116,47 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
             }else{
                 //ExamViewActivity 에서 받은 intent
-                String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
+              //  major_exam_type = getIntent.getStringExtra("major_exam_type");
+                if(major_exam_type.equals("lawyer")){
+                    progressbar_visible();// 동그라미
+                    String exam_placed_year = getIntent.getStringExtra("exam_placed_year");
+                    String major_type = getIntent.getStringExtra("major_type");
+                    String minor_type = getIntent.getStringExtra("minor_type");
+                    String exam_data = getIntent.getStringExtra("exam_data");
+                    String answer_json = getIntent.getStringExtra("answer_json");
 
+                    LAW_resultProcess( exam_data,  answer_json,  exam_placed_year,  major_type,  minor_type);
+                    Log.e("major_exam_type", major_exam_type);
+                }else {
+                    String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
+                    exam_code = getIntent.getStringExtra("exam_code");
+                    exam_name = getIntent.getStringExtra("exam_name");
+                    published_year = getIntent.getStringExtra("published_year");
+                    published_round = getIntent.getStringExtra("published_round");
+                    refresh_upload_prevent = getIntent.getStringExtra("refresh_upload_prevent");
+                    TextView title_textView = (TextView) findViewById(R.id.title_textView);
+                    title_textView.setText(published_year + " 년 " + published_round + " 회 " + exam_name);
+                    progressbar_visible();// 동그라미
+                    sendExamResultToServerForCalculator(ExamResult, exam_code, published_year, published_round, ORDER_FIRST_TIME, null);
+                }
+            }
+        }else{
+            //로그인을 안한 상태
+//            Intent getIntent = getIntent();
+         //   major_exam_type = getIntent.getStringExtra("major_exam_type");
+            if(major_exam_type.equals("lawyer")){
+                progressbar_visible();// 동그라미
+
+                String exam_placed_year = getIntent.getStringExtra("exam_placed_year");
+                String major_type = getIntent.getStringExtra("major_type");
+                String minor_type = getIntent.getStringExtra("minor_type");
+                String exam_data = getIntent.getStringExtra("exam_data");
+                String answer_json = getIntent.getStringExtra("answer_json");
+
+                LAW_resultProcess( exam_data,  answer_json,  exam_placed_year,  major_type,  minor_type);
+                Log.e("major_exam_type", major_exam_type);
+            }else {
+                String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
                 exam_code = getIntent.getStringExtra("exam_code");
                 exam_name = getIntent.getStringExtra("exam_name");
                 published_year = getIntent.getStringExtra("published_year");
@@ -116,27 +164,11 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                 refresh_upload_prevent = getIntent.getStringExtra("refresh_upload_prevent");
 
                 TextView title_textView = (TextView) findViewById(R.id.title_textView);
-                title_textView.setText(published_year+" 년 "+ published_round + " 회 "+exam_name);
+                title_textView.setText(published_year + " 년 " + published_round + " 회 " + exam_name);
 
                 progressbar_visible();// 동그라미
                 sendExamResultToServerForCalculator(ExamResult, exam_code, published_year, published_round, ORDER_FIRST_TIME, null);
             }
-        }else{
-            //로그인을 안한 상태
-            Intent getIntent = getIntent();
-            String ExamResult = getIntent.getStringExtra("ExamResult"); //ExamResult will be sent to server and calculate
-
-            exam_code = getIntent.getStringExtra("exam_code");
-            exam_name = getIntent.getStringExtra("exam_name");
-            published_year = getIntent.getStringExtra("published_year");
-            published_round = getIntent.getStringExtra("published_round");
-            refresh_upload_prevent = getIntent.getStringExtra("refresh_upload_prevent");
-
-            TextView title_textView = (TextView) findViewById(R.id.title_textView);
-            title_textView.setText(published_year+" 년 "+ published_round + " 회 "+exam_name);
-
-            progressbar_visible();// 동그라미
-            sendExamResultToServerForCalculator(ExamResult, exam_code, published_year, published_round, ORDER_FIRST_TIME, null);
         }
     }
     public void fromStatisticFragment_getSelectedExamResult_fromDatabase(final String exam_code, final String exam_placed_year, final String exam_placed_round, final String date_user_took_exam, final String time_user_took_exam){
@@ -257,8 +289,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                 .create()
                 .show();
     }
-
-
     public int eachSubjectPassFail(int correct, int incorrect){
         int total = correct+incorrect;
         float min = (float) correct/total;
@@ -317,7 +347,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
 
         }
     }
-
     public void sendExamResultToServerForCalculator(final String ExamResult, final String exam_code, final String published_year, final String published_round, final int order, final String rewarded){
         RequestQueue queue = Volley.newRequestQueue(ExamResultActivity.this);
         String url = "http://www.joonandhoon.com/pp/PassPop/android/server/CalculateResult.php";
@@ -898,6 +927,37 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         };
         queue.add(stringRequest);
     }
+
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+//UNDER THIS LINE LAW FUNCTIONS ------------------------------
+
+    public void LAW_resultProcess(String exam_data_str, String UserAnswer_str, String exam_placed_year, String major_type, String minor_type){
+//        ArrayList<Integer> array_correct_answer = new ArrayList<>();
+//        ArrayList<Integer> array_incorrect_answer = new ArrayList<>();
+        int correct_count = 0;
+        int incorrect_count = 0;
+            try {
+                JSONArray exam_data = new JSONArray(exam_data_str);
+                JSONArray UserAnswer = new JSONArray(UserAnswer_str);
+                for (int i = 0 ; i < exam_data.length(); i ++){
+                    String user_choice = UserAnswer.getString(i);
+                    String correct_answer = exam_data.getJSONObject(i).getString("correct_answer");
+                    if(user_choice.equals(correct_answer)){
+                        correct_count++;
+                    }else{
+                        incorrect_count++;
+                    }
+                }
+                Log.e("answer_correct", String.valueOf(correct_count) + "//"+String.valueOf(incorrect_count));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+    }
+
+
 
     @Override
     public Drawable getDrawable(String source){
