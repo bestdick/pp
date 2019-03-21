@@ -11,6 +11,7 @@
     <color name="colorBlack">#000000</color>
     <color name="colorRed">#E3342F</color>
     <color name="colorGreen">#8bc34a</color>
+    <color name="colorGreen_transparent">#308bc34a</color>
     <color name="colorGrey">#95A5A6</color>
     <color name="colorLightgrey">#D6DBDF</color>
     <color name="colorUnderLineBlue">#5DADE2</color>
@@ -25,6 +26,8 @@
 
 
     <color name="colorCrimsonRed">#990000</color>
+    <color name = "colorCrimsonRedTransparent">#30990000</color>
+
 
 
 

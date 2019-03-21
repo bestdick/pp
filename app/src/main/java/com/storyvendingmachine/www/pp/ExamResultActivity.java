@@ -943,7 +943,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         exam_result_inner_second_container.setVisibility(View.VISIBLE);
 
         TextView title_textView  = (TextView) findViewById(R.id.title_textView);
-        title_textView.setText(exam_placed_year+"변호사 시험"+ major_type+" "+minor_type);
+        title_textView.setText(exam_placed_year+"변호사 시험"+ LAW_major_minor(major_type)+" "+LAW_major_minor(minor_type));
         int correct_count = 0;
         int incorrect_count = 0;
             try {
@@ -995,6 +995,7 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                             question_example_2_exist,  question_example_2_context);
                     LAW_make_answer_choice( answer_context,  answer_1_textView,  answer_2_textView,  answer_3_textView,
                             answer_4_textView,  answer_5_textView);
+                    LAW_mark_correct_incorrect_answer(correct_answer, user_choice, answer_1_conLayout, answer_2_conLayout, answer_3_conLayout, answer_4_conLayout, answer_5_conLayout);
 
                     exam_result_inner_second_container.addView(rootview);
                     if( i == (exam_data.length()-1)){
@@ -1025,7 +1026,6 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
                 e.printStackTrace();
             }
     }
-
     public void LAW_make_question_and_example(int mParam2, TextView question_textView, TextView example_1_textView, TextView example_2_textView,
                                           String question_context, String question_example_1_exist, String question_example_1_context,
                                           String question_example_2_exist, String question_example_2_context){
@@ -1069,8 +1069,62 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         answer_5_textView.setText(answer_5);
 
     }
-
-
+    public void LAW_mark_correct_incorrect_answer(String correct, String user_choice, ConstraintLayout one, ConstraintLayout two, ConstraintLayout three, ConstraintLayout four, ConstraintLayout five ){
+        if(correct.equals(user_choice)  || user_choice.equals("-1")){
+            switch (correct){
+                case "1":
+                    one.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "2":
+                    two.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "3":
+                    three.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "4":
+                    four.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                default:
+                    five.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+            }
+        }else{
+            switch (correct){
+                case "1":
+                    one.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "2":
+                    two.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "3":
+                    three.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                case "4":
+                    four.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+                default:
+                    five.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_correct));
+                    break;
+            }
+            switch (user_choice){
+                case "1":
+                    one.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_incorrect));
+                    break;
+                case "2":
+                    two.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_incorrect));
+                    break;
+                case "3":
+                    three.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_incorrect));
+                    break;
+                case "4":
+                    four.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_incorrect));
+                    break;
+                default:
+                    five.setBackground(getResources().getDrawable(R.drawable.law_exam_result_box_incorrect));
+                    break;
+            }
+        }
+    }
     public String decimal_two_digis(String count_correct, String count_total){
         double correct = Float.parseFloat(count_correct);
         double total = Float.parseFloat(count_total);
@@ -1078,7 +1132,25 @@ public class ExamResultActivity extends AppCompatActivity implements RewardedVid
         String str_percent = new DecimalFormat("##.##").format(percent);
         return str_percent;
     }
-
+    public String LAW_major_minor(String input){
+        switch(input){
+            case "major_1001":
+                return "사례형";
+            case "major_1002":
+                return "기록형";
+            case "major_1003":
+                return "선택형";
+            case "minor_2001":
+                return "공법";
+            case "minor_2002":
+                return "민사법";
+            case "minor_2003":
+                return "형사법";
+            default:
+//            case "minor_2004":
+                return "선택형";
+        }
+    }
     @Override
     public Drawable getDrawable(String source){
         LevelListDrawable d = new LevelListDrawable();

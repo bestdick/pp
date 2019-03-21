@@ -137,6 +137,9 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 // navi_selection.equals("2")
                 submit_button = (Button) findViewById(R.id.submit_textView);
                 submit_button.setVisibility(View.GONE);
+
+                LAW_getSelectedExam(exam_placed_year, major_type, minor_type);
+                drawer_listener();
             }
         }else{
             navi_selection = getIntent.getStringExtra("navi_selection");
@@ -990,6 +993,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 params.put("exam_placed_year", exam_placed_year);
                 params.put("major_type", major_type);
                 params.put("minor_type", minor_type);
+                params.put("navi_selection", navi_selection);
                 return params;
             }
         };
@@ -1227,6 +1231,9 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
         startActivity(intent);
         finish();
     }
+
+
+
     @Override
     public void onBackPressed(){
         super.onBackPressed();
