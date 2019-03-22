@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.ExamView_progressBar;
-
+import static com.storyvendingmachine.www.pp.ExamViewActivity.navi_selection;
 
 
 public class LawExamViewTypeAFragment extends Fragment {
@@ -93,10 +93,17 @@ public class LawExamViewTypeAFragment extends Fragment {
                 question_example_2_exist,  question_example_2_context);
         make_answer_choice( answer_context,  answer_1_textView,  answer_2_textView,  answer_3_textView,
                  answer_4_textView,  answer_5_textView);
-        select_answer_choice( answer_1_conLayout,  answer_2_conLayout,  answer_3_conLayout,  answer_4_conLayout,  answer_5_conLayout,
-                answer_number_1,answer_number_2,answer_number_3,answer_number_4,answer_number_5,
-                answer_1_textView,answer_2_textView,answer_3_textView,answer_4_textView,answer_5_textView);
-
+        if(navi_selection.equals("1")){
+            //시험 응시
+            select_answer_choice( answer_1_conLayout,  answer_2_conLayout,  answer_3_conLayout,  answer_4_conLayout,  answer_5_conLayout,
+                    answer_number_1,answer_number_2,answer_number_3,answer_number_4,answer_number_5,
+                    answer_1_textView,answer_2_textView,answer_3_textView,answer_4_textView,answer_5_textView);
+        }else{
+            //시험 공부 with notes
+            select_answer_previously( answer_1_conLayout,  answer_2_conLayout,  answer_3_conLayout,  answer_4_conLayout,  answer_5_conLayout,
+                    answer_number_1,answer_number_2,answer_number_3,answer_number_4,answer_number_5,
+                    answer_1_textView,answer_2_textView,answer_3_textView,answer_4_textView,answer_5_textView, correct_answer);
+        }
     }
 
     public void make_question_and_example(TextView question_textView, TextView example_1_textView, TextView example_2_textView,
@@ -236,6 +243,33 @@ public class LawExamViewTypeAFragment extends Fragment {
     }
 
 
+    // LAW 시험 공부 with NOTE -------------------------
+    public void select_answer_previously(ConstraintLayout a_1_c, ConstraintLayout a_2_c, ConstraintLayout a_3_c, ConstraintLayout a_4_c, ConstraintLayout a_5_c,
+                                         final TextView a_n_1, final TextView a_n_2, final TextView a_n_3, final TextView a_n_4, final TextView a_n_5,
+                                         TextView a_c_1, TextView a_c_2, TextView a_c_3, TextView a_c_4, TextView a_c_5, String correct_answer){
+        switch (correct_answer){
+            case "1":
+                a_n_1.setTextColor(getResources().getColor(R.color.colorWhite));
+                a_n_1.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                break;
+            case "2":
+                a_n_2.setTextColor(getResources().getColor(R.color.colorWhite));
+                a_n_2.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                break;
+            case "3":
+                a_n_3.setTextColor(getResources().getColor(R.color.colorWhite));
+                a_n_3.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                break;
+            case "4":
+                a_n_4.setTextColor(getResources().getColor(R.color.colorWhite));
+                a_n_4.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                break;
+            default:
+                a_n_5.setTextColor(getResources().getColor(R.color.colorWhite));
+                a_n_5.setBackground(getResources().getDrawable(R.drawable.answer_selected_container_law));
+                break;
+        }
+    }
     public void progressbar_visible(){
         ExamView_progressBar.setVisibility(View.VISIBLE);
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
