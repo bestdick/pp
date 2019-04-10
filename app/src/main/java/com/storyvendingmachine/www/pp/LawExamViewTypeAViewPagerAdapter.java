@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class LawExamViewTypeAViewPagerAdapter extends FragmentStatePagerAdapter {
     int count;
     JSONArray jsonArray;
-
+    String navi_selection;
 
     public LawExamViewTypeAViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -21,7 +21,7 @@ public class LawExamViewTypeAViewPagerAdapter extends FragmentStatePagerAdapter 
     @Override
     public Fragment getItem(int position) {
         Bundle bundle = EachQuestionToBundle(position);
-        return LawExamViewTypeAFragment.newInstance(bundle, position);
+        return LawExamViewTypeAFragment.newInstance(bundle, position, navi_selection);
     }
     @Override
     public int getCount() {

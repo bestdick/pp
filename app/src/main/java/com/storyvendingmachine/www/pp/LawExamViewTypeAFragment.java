@@ -19,16 +19,19 @@ public class LawExamViewTypeAFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private Bundle mParam1;
     private int mParam2;
+    private String mParam3;
 
-    public static LawExamViewTypeAFragment newInstance(Bundle param1, int param2) {
+    public static LawExamViewTypeAFragment newInstance(Bundle param1, int param2, String param3) {
         LawExamViewTypeAFragment fragment = new LawExamViewTypeAFragment();
         Bundle args = new Bundle();
         args.putBundle(ARG_PARAM1, param1);
         args.putInt(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM3, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,6 +42,7 @@ public class LawExamViewTypeAFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getBundle(ARG_PARAM1);
             mParam2 = getArguments().getInt(ARG_PARAM2);
+            mParam3 = getArguments().getString(ARG_PARAM3);
         }
         answer.add(mParam2, -1);
     }

@@ -964,6 +964,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                                 examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
                                 examViewTypeAViewPagerAdapter.count = question_count_int;
                                 examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+                                examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
 
                                 eviewPager = (ViewPager) findViewById(R.id.container);
                                 eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
