@@ -207,6 +207,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
                         intent.putExtra("type", "flashcard_comment");
+                        intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                         intent.putExtra("flashcard_exam_name", flashcard_exam_name);
                         intent.putExtra("flashcard_subject_name", flashcard_subject_name);
                         intent.putExtra("flashcard_title", flashcard_title);

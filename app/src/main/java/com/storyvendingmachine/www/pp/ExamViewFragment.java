@@ -261,14 +261,11 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
 //            ExamNoteRevise(rootView);
             TextView note_add_revise_button = (TextView) rootView.findViewById(R.id.note_add_revise_button);
             //로그인한상태와 안한상태를 말해줌ㅕ
-
-            //로그인 한 상태이라면....
             note_add_revise_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(LoginType.equals("null")){
                         //로그인하지 않았다면....
-
                         String message = "로그인을 하셔야 사용 할 수 있는 기능입니다.";
                         String positive_message = "확인";
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -283,8 +280,10 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
                                 .show();
 
                     }else {
+                        //로그인 한 상태이라면....
                         Intent intent =new Intent(getActivity(), ExamNoteWriteActivity.class);
                         intent.putExtra("type", "note_write");
+                        intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                         intent.putExtra("exam_code", exam_code);
                         intent.putExtra("exam_name", exam_name);
                         intent.putExtra("exam_placed_round", published_round);
@@ -344,6 +343,7 @@ public class ExamViewFragment extends Fragment implements Html.ImageGetter{
                     }else {
                         Intent intent =new Intent(getActivity(), ExamNoteWriteActivity.class);
                         intent.putExtra("type", "note_write");
+                        intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                         intent.putExtra("exam_code", exam_code);
                         intent.putExtra("exam_name", exam_name);
                         intent.putExtra("exam_placed_round", published_round);

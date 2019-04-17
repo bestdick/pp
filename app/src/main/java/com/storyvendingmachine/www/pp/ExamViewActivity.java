@@ -956,22 +956,49 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                             JSONObject jsonObject = new JSONObject(response);
                             String access = jsonObject.getString("access");
                             if(access.equals("valid")){
-                                JSONObject response1 = jsonObject.getJSONObject("response1");
-                                String question_count_str = response1.getString("question_count");
-                                int question_count_int = Integer.parseInt(question_count_str);
-                                JSONArray exam_data = response1.getJSONArray("exam_data");
+                                if(navi_selection.equals("1")){
+                                    JSONObject response1 = jsonObject.getJSONObject("response1");
 
-                                examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
-                                examViewTypeAViewPagerAdapter.count = question_count_int;
-                                examViewTypeAViewPagerAdapter.jsonArray = exam_data;
-                                examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
+                                    String question_count_str = response1.getString("question_count");
+                                    int question_count_int = Integer.parseInt(question_count_str);
+                                    JSONArray exam_data = response1.getJSONArray("exam_data");
 
-                                eviewPager = (ViewPager) findViewById(R.id.container);
-                                eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
-                                eviewPager.setOffscreenPageLimit(question_count_int);
-                                eviewPager.setPageMargin(16);
+                                    examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
+                                    examViewTypeAViewPagerAdapter.count = question_count_int;
+                                    examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+                                    examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
 
-                                LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
+                                    eviewPager = (ViewPager) findViewById(R.id.container);
+                                    eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
+                                    eviewPager.setOffscreenPageLimit(question_count_int);
+                                    eviewPager.setPageMargin(16);
+
+                                    LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
+                                }else{
+                                    JSONObject response1 = jsonObject.getJSONObject("response1");// actual question
+                                   // note_array = new String[Integer.parseInt(response1.getString("question_count"))];
+                                    JSONObject response2 = jsonObject.getJSONObject("response2"); // this particular user's note
+                                    JSONArray response3 = jsonObject.getJSONArray("response3"); // others notes;
+
+
+                                    String question_count_str = response1.getString("question_count");
+                                    int question_count_int = Integer.parseInt(question_count_str);
+                                    JSONArray exam_data = response1.getJSONArray("exam_data");
+
+                                    examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
+                                    examViewTypeAViewPagerAdapter.count = question_count_int;
+                                    examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+                                    examViewTypeAViewPagerAdapter.userPersonalNotes = response2;
+                                    examViewTypeAViewPagerAdapter.allNotes = response3;
+                                    examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
+
+                                    eviewPager = (ViewPager) findViewById(R.id.container);
+                                    eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
+                                    eviewPager.setOffscreenPageLimit(question_count_int);
+                                    eviewPager.setPageMargin(16);
+
+                                    LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -995,6 +1022,8 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 params.put("major_type", major_type);
                 params.put("minor_type", minor_type);
                 params.put("navi_selection", navi_selection);
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
                 return params;
             }
         };
