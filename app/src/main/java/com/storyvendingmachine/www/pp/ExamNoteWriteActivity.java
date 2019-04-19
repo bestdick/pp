@@ -58,12 +58,13 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                 exam_placed_year = intent.getStringExtra("exam_placed_year");
                 major_type = intent.getStringExtra("major_type");
                 minor_type = intent.getStringExtra("minor_type");
+                note_number = Integer.parseInt(intent.getStringExtra("note_number"));
 
                 boolean isNoteExist = intent.getBooleanExtra("isNoteExist", false);
                 if(isNoteExist){
                     String note = intent.getStringExtra("note");
-//                    note_number = Integer.parseInt(intent.getStringExtra("note_number"));
                     note_editText.setText(note);
+                    note_editText.setSelection(note.length());
                 }else{
                     note_editText.setHint("노트를 작성해주세요...");
                 }
@@ -327,11 +328,14 @@ public class ExamNoteWriteActivity extends AppCompatActivity {
                             if(access_token.equals("valid")){
                                 String resp =jsonObject.getString("response");
                                 if(resp.equals("success")){
-                                   // Intent resultIntent = new Intent();
-//                                    resultIntent.putExtra("upload_status", "success");
-//                                    resultIntent.putExtra("note_number", String.valueOf(note_number));
-//                                    setResult(RESULT_OK, resultIntent);
-//                                    onBackPressed();
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("upload_status", "success");
+                                    resultIntent.putExtra("exam_placed_year", exam_placed_year);
+                                    resultIntent.putExtra("major_type", major_type);
+                                    resultIntent.putExtra("minor_type", minor_type);
+                                    resultIntent.putExtra("note_number", String.valueOf(note_number));
+                                    setResult(RESULT_OK, resultIntent);
+                                    onBackPressed();
                                 }else{
 
                                 }

@@ -2,6 +2,7 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.storyvendingmachine.www.pp.FlashCardWriteActivity.flashCardWriteListAdapter;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.MainActivity.major_exam_type_code;
 
 /**
  * Created by Administrator on 2018-12-18.
@@ -49,6 +51,10 @@ public class FlashCardWriteListAdapter extends BaseAdapter{
     public View getView(final int i, View view, ViewGroup viewGroup) {
         View v =View.inflate(context, R.layout.container_flashcard_write, null);
 
+        if(major_exam_type_code.equals("lawyer")){
+            ConstraintLayout constraintLayout8 = (ConstraintLayout) v.findViewById(R.id.constraintLayout8);
+            constraintLayout8.setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
+        }
         TextView no = (TextView) v.findViewById(R.id.flashcard_number_textView);
         final EditText flashcard_term_editText = (EditText) v.findViewById(R.id.flashcard_term_editText);
         final TextView flashcard_term_count_textView = (TextView) v.findViewById(R.id.flashcard_term_count_textView);

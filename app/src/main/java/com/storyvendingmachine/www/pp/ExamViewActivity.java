@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -94,6 +95,8 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
     String exam_major_type;
+
+    String exam_placed_year, major_type, minor_type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent getIntent = getIntent();
@@ -108,9 +111,9 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
         if(exam_major_type.equals("lawyer")){
             navi_selection = getIntent.getStringExtra("navi_selection");
-            String exam_placed_year = getIntent.getStringExtra("exam_placed_year");
-            String major_type = getIntent.getStringExtra("major_type");
-            String minor_type = getIntent.getStringExtra("minor_type");
+             exam_placed_year = getIntent.getStringExtra("exam_placed_year");
+             major_type = getIntent.getStringExtra("major_type");
+             minor_type = getIntent.getStringExtra("minor_type");
 
             String title_message = exam_placed_year+"년도 "+LAW_major_minor_to_kor(major_type)+" "+LAW_major_minor_to_kor(minor_type);
             toolbar( exam_major_type, title_message);
@@ -131,14 +134,25 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 refresh_upload_prevent = dateFormat.format(date);
 
                 answer = new ArrayList<Integer>();
-                LAW_getSelectedExam(exam_placed_year, major_type, minor_type);
+                LAW_getSelectedExam(exam_placed_year, major_type, minor_type, "select");
                 drawer_listener();
             }else{
                 // navi_selection.equals("2")
+
+                //navigation drawer size
+                DisplayMetrics metrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) navigationView.getLayoutParams();
+                //            params.width = metrics.widthPixels;  // full size of drawer
+                params.width = (int) (metrics.widthPixels*0.9);
+                navigationView.setLayoutParams(params);
+                //navigation drawer size
+
+
                 submit_button = (Button) findViewById(R.id.submit_textView);
                 submit_button.setVisibility(View.GONE);
 
-                LAW_getSelectedExam(exam_placed_year, major_type, minor_type);
+                LAW_getSelectedExam(exam_placed_year, major_type, minor_type, "select");
                 drawer_listener();
             }
         }else{
@@ -253,12 +267,16 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                             //로그인을 하지 않은 상태
                         }else{
                             //로그인 한 상태
-                            progressbar_visible();
-                            answer_sheet_element_layout.removeAllViews();
-                            try {
-                                makeUserPersonalNoteSheet_renew();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            if(exam_major_type.equals("lawyer")){
+
+                            }else{
+                                progressbar_visible();
+                                answer_sheet_element_layout.removeAllViews();
+                                try {
+                                    makeUserPersonalNoteSheet_renew();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
@@ -547,6 +565,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 .create()
                 .show();
     }
+
     public void makeUserPersonalNoteSheet_renew() throws JSONException{ // 일단 이 매소드만 생각하면 된다  renew 말고는 일단 필요없음
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -666,6 +685,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
 
 
 }
+
     public void makeAnswerSheet(){// 기출 시험에만 적용되는것
         int size = answer.size();
         for(int i = 0; i<size; i++){
@@ -943,7 +963,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                 return "선택형";
         }
     }
-    public void LAW_getSelectedExam(final String exam_placed_year, final String major_type, final String minor_type){
+    public void LAW_getSelectedExam(final String exam_placed_year, final String major_type, final String minor_type, final String server_ask_type){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = base_url+"getExamList.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -956,49 +976,61 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                             JSONObject jsonObject = new JSONObject(response);
                             String access = jsonObject.getString("access");
                             if(access.equals("valid")){
-                                if(navi_selection.equals("1")){
-                                    JSONObject response1 = jsonObject.getJSONObject("response1");
 
-                                    String question_count_str = response1.getString("question_count");
-                                    int question_count_int = Integer.parseInt(question_count_str);
-                                    JSONArray exam_data = response1.getJSONArray("exam_data");
+                                    if(navi_selection.equals("1")){
+                                        JSONObject response1 = jsonObject.getJSONObject("response1");
 
-                                    examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
-                                    examViewTypeAViewPagerAdapter.count = question_count_int;
-                                    examViewTypeAViewPagerAdapter.jsonArray = exam_data;
-                                    examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
+                                        String question_count_str = response1.getString("question_count");
+                                        int question_count_int = Integer.parseInt(question_count_str);
+                                        JSONArray exam_data = response1.getJSONArray("exam_data");
 
-                                    eviewPager = (ViewPager) findViewById(R.id.container);
-                                    eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
-                                    eviewPager.setOffscreenPageLimit(question_count_int);
-                                    eviewPager.setPageMargin(16);
+                                        examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
+                                        examViewTypeAViewPagerAdapter.count = question_count_int;
+                                        examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+                                        examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
 
-                                    LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
-                                }else{
-                                    JSONObject response1 = jsonObject.getJSONObject("response1");// actual question
-                                   // note_array = new String[Integer.parseInt(response1.getString("question_count"))];
-                                    JSONObject response2 = jsonObject.getJSONObject("response2"); // this particular user's note
-                                    JSONArray response3 = jsonObject.getJSONArray("response3"); // others notes;
+                                        eviewPager = (ViewPager) findViewById(R.id.container);
+                                        eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
+                                        eviewPager.setOffscreenPageLimit(question_count_int);
+                                        eviewPager.setPageMargin(16);
+
+                                        LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
+                                    }else{
+                                        //시험 공부
+                                        if(server_ask_type.equals("select")) {
+                                            JSONObject response1 = jsonObject.getJSONObject("response1");// actual question
+                                            JSONObject response2 = jsonObject.getJSONObject("response2"); // this particular user's note
+                                            JSONArray response3 = jsonObject.getJSONArray("response3"); // others notes;
 
 
-                                    String question_count_str = response1.getString("question_count");
-                                    int question_count_int = Integer.parseInt(question_count_str);
-                                    JSONArray exam_data = response1.getJSONArray("exam_data");
+                                            String question_count_str = response1.getString("question_count");
+                                            int question_count_int = Integer.parseInt(question_count_str);
+                                            JSONArray exam_data = response1.getJSONArray("exam_data");
 
-                                    examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
-                                    examViewTypeAViewPagerAdapter.count = question_count_int;
-                                    examViewTypeAViewPagerAdapter.jsonArray = exam_data;
-                                    examViewTypeAViewPagerAdapter.userPersonalNotes = response2;
-                                    examViewTypeAViewPagerAdapter.allNotes = response3;
-                                    examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
+                                            examViewTypeAViewPagerAdapter = new LawExamViewTypeAViewPagerAdapter(getSupportFragmentManager());
+                                            examViewTypeAViewPagerAdapter.count = question_count_int;
+                                            examViewTypeAViewPagerAdapter.jsonArray = exam_data;
+                                            examViewTypeAViewPagerAdapter.userPersonalNotes = response2;
+                                            examViewTypeAViewPagerAdapter.allNotes = response3;
+                                            examViewTypeAViewPagerAdapter.navi_selection = navi_selection;
 
-                                    eviewPager = (ViewPager) findViewById(R.id.container);
-                                    eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
-                                    eviewPager.setOffscreenPageLimit(question_count_int);
-                                    eviewPager.setPageMargin(16);
+                                            eviewPager = (ViewPager) findViewById(R.id.container);
+                                            eviewPager.setAdapter(examViewTypeAViewPagerAdapter);
+                                            eviewPager.setOffscreenPageLimit(question_count_int);
+                                            eviewPager.setPageMargin(16);
 
-                                    LAW_create_answer_sheet(exam_data.length(), exam_data, exam_placed_year, major_type, minor_type);
-                                }
+                                            LAW_create_note_sheet(question_count_int, response2);
+                                        }else{
+                                            // note sheet refresh
+                                            Log.e("are we here yet?", "yet?....2");
+                                            JSONObject response1 = jsonObject.getJSONObject("response1");// actual question
+                                            String question_count_str = response1.getString("question_count");
+                                            int question_count_int = Integer.parseInt(question_count_str);
+                                            JSONObject response2 = jsonObject.getJSONObject("response2"); // this particular user's note
+                                            LAW_create_note_sheet(question_count_int, response2);
+                                        }
+                                    }
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1017,7 +1049,7 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             protected Map<String, String> getParams(){
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("token", "passpop");
-                params.put("type", "select");
+                params.put("type", server_ask_type);
                 params.put("exam_placed_year", exam_placed_year);
                 params.put("major_type", major_type);
                 params.put("minor_type", minor_type);
@@ -1028,6 +1060,54 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
             }
         };
         queue.add(stringRequest);
+    }
+
+    public void LAW_create_note_sheet(int count_questions, JSONObject jsonObject){
+        answer_sheet_element_layout.removeAllViews();
+        if(LoginType.equals("null") || G_user_id.equals("null")){
+            View personal_note_view = getLayoutInflater().inflate(R.layout.examview_exam_note_personal_container, null);
+            TextView question_number_textView = personal_note_view.findViewById(R.id.question_number_textView);
+            TextView user_personal_note_textView = personal_note_view.findViewById(R.id.user_personal_note_textView);
+            user_personal_note_textView.setText("로그인하시면 노트 작성이 가능합니다");
+            answer_sheet_element_layout.addView(personal_note_view);
+        }else{
+            TextView title_textView = new TextView(ExamViewActivity.this);
+//            title_textView.setBackground(getResources().getDrawable(R.drawable.outline_round_orange));
+            title_textView.setGravity(Gravity.CENTER);
+            title_textView.setText("시험 노트");
+            answer_sheet_element_layout.addView(title_textView);
+
+            for(int i = 0 ; i < count_questions; i++){
+                View personal_note_view = getLayoutInflater().inflate(R.layout.examview_exam_note_personal_container, null);
+                TextView question_number_textView = personal_note_view.findViewById(R.id.question_number_textView);
+                TextView user_personal_note_textView = personal_note_view.findViewById(R.id.user_personal_note_textView);
+                question_number_textView.setText(String.valueOf((i+1))+" 번 노트");
+                user_personal_note_textView.setText("작성된 노트가 없습니다.");
+                try {
+                    JSONArray jsonArray = jsonObject.getJSONArray("note");
+                    for(int j = 0 ; j < jsonArray.length(); j++){
+                        String question_number = jsonArray.getJSONObject(j).getString("number");
+                        if(i == Integer.parseInt(question_number)){
+                            String note = jsonArray.getJSONObject(j).getString("note");
+                            String personal_note_show  = Html.fromHtml(note).toString().replace("<br>", "\n");
+                            user_personal_note_textView.setText(personal_note_show);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                final int page = i;
+                personal_note_view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        eviewPager.setCurrentItem(page);
+                        drawer.closeDrawer(Gravity.RIGHT);
+                    }
+                });
+
+                answer_sheet_element_layout.addView(personal_note_view);
+            }
+        }
     }
     public void LAW_create_answer_sheet(int count, JSONArray exam_data, String exam_placed_year, String major_type, String minor_type){
         TextView title_textView = new TextView(ExamViewActivity.this);
@@ -1316,12 +1396,16 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
                     //로그인을 하지 않은 상태
                 }else{
                     //로그인 한 상태
-                    progressbar_visible();
-                    answer_sheet_element_layout.removeAllViews();
-                    try {
-                        makeUserPersonalNoteSheet_renew();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if(exam_major_type.equals("lawyer")){
+
+                    }else{
+                        progressbar_visible();
+                        answer_sheet_element_layout.removeAllViews();
+                        try {
+                            makeUserPersonalNoteSheet_renew();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -1333,13 +1417,18 @@ public class ExamViewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e("activity request", "activity request");
+        Log.e("activity request", "activity request"+ requestCode + "// "+ resultCode);
+        //현제 프레그먼트에서 다른 엑티비티(notewriteactivity)실행후 종료하면 발생되는데 그냥 이때마다 일단 노트를 업데이트 시킨다.
+
+
         ActivityResultBus.getInstance().postQueue(
                 new ActivityResultEvent(requestCode, resultCode, data));
-//        if(requestCode == NOTE_REQUEST_CODE){
-//            if(resultCode==RESULT_OK){
-//                eViewPagerAdapter.getItem(0).onActivityResult(40001, resultCode, data);
-//            }
-//        }
+
+        if(navi_selection.equals("2")){
+            if(exam_major_type.equals("lawyer")){
+                Log.e("are we here yet?", "yet?....1");
+                LAW_getSelectedExam(exam_placed_year, major_type, minor_type, "note_sheet_refresh");
+            }
+        }
     }
 }

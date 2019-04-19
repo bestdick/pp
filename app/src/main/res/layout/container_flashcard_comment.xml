@@ -40,6 +40,15 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/isPublic_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="."
+            app:layout_constraintBaseline_toBaselineOf="@+id/comment_author_textView"
+            app:layout_constraintStart_toEndOf="@+id/comment_author_textView" />
+
+        <TextView
             android:id="@+id/upload_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

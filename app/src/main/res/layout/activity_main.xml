@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -15,117 +16,117 @@
         <!--app:expandedTitleMarginEnd="64dp"-->
         <!--app:expandedTitleMarginStart="48dp"-->
         <!--app:layout_scrollFlags="scroll|snap">-->
-        <android.support.design.widget.AppBarLayout
+    <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/MainToolBar"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/MainToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+            <!--app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"-->
+            <!--위의 app 을 툴바에다 넣으면 -->
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                >
-                <!--app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"-->
-                <!--위의 app 을 툴바에다 넣으면 -->
-                <android.support.constraint.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/exam_selection_textView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:gravity="clip_vertical"
-                        android:text="시험 선택"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="18dp"
-                        android:textStyle="bold"
-                        android:typeface="monospace"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/login_type_textview"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/exam_selection_textView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="clip_vertical"
+                    android:text="시험 선택"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:typeface="monospace"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/login_type_textview"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageView
-                        android:id="@+id/user_thumbnail_imageView"
-                        android:layout_width="50dp"
-                        android:layout_height="0dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginTop="8dp"
-                        android:src="@drawable/icon_thumbnail_login"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/user_thumbnail_imageView"
+                    android:layout_width="50dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/icon_thumbnail_login"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/login_type_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginTop="8dp"
-                        android:gravity="bottom"
-                        android:typeface="monospace"
-                        android:text="guest"
-                        android:textSize="15dp"
-                        android:textColor="@color/colorWhite"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/user_thumbnail_imageView"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.379" />
-                </android.support.constraint.ConstraintLayout>
-            </android.support.v7.widget.Toolbar>
+                <TextView
+                    android:id="@+id/login_type_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="bottom"
+                    android:text="guest"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:typeface="monospace"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/user_thumbnail_imageView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.379" />
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v7.widget.Toolbar>
 
-            <android.support.design.widget.TabLayout
+        <android.support.design.widget.TabLayout
             android:id="@+id/MainActivityTabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
             <android.support.design.widget.TabItem
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                />
+                android:layout_height="wrap_content" />
 
             <android.support.design.widget.TabItem
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                 />
+                android:layout_height="wrap_content" />
 
             <android.support.design.widget.TabItem
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                />
+                android:layout_height="wrap_content" />
 
             <android.support.design.widget.TabItem
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                />
+                android:layout_height="wrap_content" />
 
             <!--<android.support.design.widget.TabItem-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:text="Tab5" />-->
-       </android.support.design.widget.TabLayout>
-        </android.support.design.widget.AppBarLayout>
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:text="Tab5" />-->
+        </android.support.design.widget.TabLayout>
+    </android.support.design.widget.AppBarLayout>
     <!--</android.support.design.widget.CollapsingToolbarLayout>-->
-    <android.support.v4.widget.NestedScrollView
+    <!--<android.support.v4.widget.NestedScrollView-->
         android:id="@+id/nestedscrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </android.support.v4.view.ViewPager>
-    </android.support.v4.widget.NestedScrollView>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar"></android.support.v4.view.ViewPager>
+    <!--</android.support.v4.widget.NestedScrollView>-->
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/floating_action_button"
@@ -146,4 +147,4 @@
 
 
 
-</android.support.design.widget.CoordinatorLayout>
+</android.support.constraint.ConstraintLayout>

@@ -41,6 +41,7 @@ import java.util.Map;
 import static com.storyvendingmachine.www.pp.Allurl.base_url;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.MainActivity.REQUEST_CODE_FOR_FLASHCARD_WRITE;
 
 //import static com.storyvendingmachine.www.pp_law.MainActivity.REQUEST_CODE_FOR_FLASHCARD_WRITE;
 
@@ -169,10 +170,10 @@ public class LawStudySubClassFragment extends Fragment {
                     String positive_message = "확인";
                     notifier(message, positive_message);
                 }else{
-//                    Intent intent = new Intent(getActivity(), FlashCardWriteActivity.class);
-//                    intent.putExtra("type", "new");
-//                    startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
-//                    slide_left_and_slide_in();
+                    Intent intent = new Intent(getActivity(), FlashCardWriteActivity.class);
+                    intent.putExtra("type", "new");
+                    startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARD_WRITE);
+                    slide_left_and_slide_in();
                 }
             }
         });

@@ -15,12 +15,27 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.answer;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.ExamView_progressBar;
 import static com.storyvendingmachine.www.pp.ExamViewActivity.navi_selection;
@@ -32,6 +47,14 @@ import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 public class LawExamViewTypeAFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+
+    LinearLayout comment_layout;
+
+    boolean isPersonalNoteExist;
+    String personal_note_show;
+    ProgressBar note_progressbar;
+
 
     final int NOTE_REQUEST_CODE = 40001;
 
@@ -75,6 +98,8 @@ public class LawExamViewTypeAFragment extends Fragment {
             }
         }
 
+
+//        personal_note_show=null;
     }
 
     @Override
@@ -91,19 +116,6 @@ public class LawExamViewTypeAFragment extends Fragment {
     }
 
     public void intialize_elements(View rootview){
-        if(mParam3.equals("2")){
-            ConstraintLayout exam_note_container = (ConstraintLayout) rootview.findViewById(R.id.exam_note_container);
-                TextView refresh_button = (TextView) rootview.findViewById(R.id.refresh_button);
-                TextView note_add_revise_button = (TextView) rootview.findViewById(R.id.note_add_revise_button);
-            LinearLayout comment_layout = (LinearLayout) rootview.findViewById(R.id.comment_layout);
-
-            exam_note_container.setVisibility(View.VISIBLE);
-            comment_layout.setVisibility(View.VISIBLE);
-          //  study_note(comment_layout);
-            personal_note(comment_layout);
-            all_notes(comment_layout);
-            note_controller(refresh_button, note_add_revise_button);
-        }
 
         TextView question_textView = (TextView) rootview.findViewById(R.id.question_textView);
         TextView example_1_textView = (TextView) rootview.findViewById(R.id.example_1_textView);
@@ -152,6 +164,22 @@ public class LawExamViewTypeAFragment extends Fragment {
             select_answer_previously( answer_1_conLayout,  answer_2_conLayout,  answer_3_conLayout,  answer_4_conLayout,  answer_5_conLayout,
                     answer_number_1,answer_number_2,answer_number_3,answer_number_4,answer_number_5,
                     answer_1_textView,answer_2_textView,answer_3_textView,answer_4_textView,answer_5_textView, correct_answer);
+
+            ConstraintLayout exam_note_container = (ConstraintLayout) rootview.findViewById(R.id.exam_note_container);
+                TextView refresh_button = (TextView) rootview.findViewById(R.id.refresh_button);
+                TextView note_add_revise_button = (TextView) rootview.findViewById(R.id.note_add_revise_button);
+                note_progressbar = (ProgressBar) rootview.findViewById(R.id.note_progressbar);
+            comment_layout = (LinearLayout) rootview.findViewById(R.id.comment_layout);
+
+            exam_note_container.setVisibility(View.VISIBLE);
+            comment_layout.setVisibility(View.VISIBLE);
+
+     //       String note = mParam5.getString("note");
+      //      personal_note_show = Html.fromHtml(note).toString().replace("<br>", "\n");
+
+            personal_note();
+            all_notes();
+            note_controller(refresh_button, note_add_revise_button);
         }
     }
 
@@ -325,7 +353,8 @@ public class LawExamViewTypeAFragment extends Fragment {
         refresh_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                note_progressbar.setVisibility(View.VISIBLE);
+                noteRefresh(  mParam1.getString("exam_placed_year"),    mParam1.getString("major_type"),   mParam1.getString("minor_type"),   String.valueOf(mParam2));
             }
         });
 
@@ -346,18 +375,14 @@ public class LawExamViewTypeAFragment extends Fragment {
                             .create()
                             .show();
                 }else{
-                    boolean isExist = mParam5.getBoolean("isExist");
-                    String note = mParam5.getString("note");
-                    String note_show = Html.fromHtml(note).toString().replace("<br>", "\n");
-
                         Intent intent =new Intent(getActivity(), ExamNoteWriteActivity.class);
                         intent.putExtra("type", "note_write");
                         intent.putExtra("exam_major_type", "lawyer");
                         intent.putExtra("exam_placed_year", mParam1.getString("exam_placed_year"));
                         intent.putExtra("major_type", mParam1.getString("major_type"));
                         intent.putExtra("minor_type", mParam1.getString("minor_type"));
-                        intent.putExtra("isNoteExist", isExist);
-                        intent.putExtra("note", note_show);
+                        intent.putExtra("isNoteExist", isPersonalNoteExist);
+                        intent.putExtra("note", personal_note_show);
                         intent.putExtra("note_number", String.valueOf(mParam2));
                         startActivityForResult(intent, NOTE_REQUEST_CODE);
                         slide_left_and_slide_in();
@@ -366,7 +391,7 @@ public class LawExamViewTypeAFragment extends Fragment {
         });
     }
 
-    public void all_notes(LinearLayout comment_layout){
+    public void all_notes( ){
         if(mParam4==null){
             // 노트가 없을떄
             View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
@@ -401,7 +426,7 @@ public class LawExamViewTypeAFragment extends Fragment {
             }
         }
     }
-    public void personal_note(LinearLayout comment_layout){
+    public void personal_note( ){
         if(LoginType.equals("null") || G_user_id.equals("null")){
             //guest
             View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
@@ -409,13 +434,14 @@ public class LawExamViewTypeAFragment extends Fragment {
             empty_textView.setText("로그인 하시면 노트를 작성할 수 있습니다.");
             comment_layout.addView(exam_view_exam_note_empty);
         }else{
-            boolean isExist = mParam5.getBoolean("isExist");
-            if(isExist){
+            isPersonalNoteExist = mParam5.getBoolean("isExist");
+            if(isPersonalNoteExist){
                 View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
                 ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
                 TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
                 TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                 TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+                TextView isPublic_textView = (TextView) exam_view_exam_note.findViewById(R.id.isPublic_textView);
 
                 String author_id = mParam5.getString("author_id");
                 String author_nickname = mParam5.getString("author_nickname");
@@ -428,13 +454,13 @@ public class LawExamViewTypeAFragment extends Fragment {
 
                 if(isPublic.equals("public")){
                     //공개
-                    String note_show = Html.fromHtml(note).toString().replace("<br>", "\n");
-                    note_text_view.setText(note_show);
+                    isPublic_textView.setText("공개");
                 }else{
                     //비공개
-                    String note_show = Html.fromHtml(note).toString().replace("<br>", "\n");
-                    note_text_view.setText(note_show);
+                    isPublic_textView.setText("비공개");
                 }
+                personal_note_show  = Html.fromHtml(note).toString().replace("<br>", "\n");
+                note_text_view.setText(personal_note_show);
                 author_text_view.setText(author_nickname);
                 upload_textView.setText(upload_date);
                 getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
@@ -448,6 +474,130 @@ public class LawExamViewTypeAFragment extends Fragment {
             }
         }
 
+    }
+
+    public void noteRefresh(final String exam_placed_year, final String major_type, final String minor_type, final String question_number){
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        String url = "http://www.joonandhoon.com/pp/passpop_law/android/server/getExamList.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("exam note refresh::" , response);
+                        try {
+                            comment_layout.removeAllViews();
+
+                            JSONObject jsonObject = new JSONObject(response);
+                            if(LoginType.equals("null") || G_user_id.equals("null")){
+                                //guest
+                                View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                empty_textView.setText("로그인 하시면 노트를 작성할 수 있습니다.");
+                                comment_layout.addView(exam_view_exam_note_empty);
+                            }else{
+                                JSONObject response1  = jsonObject.getJSONObject("response1");
+                                isPersonalNoteExist = response1.getBoolean("isExist");
+                                if(isPersonalNoteExist){
+                                    View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+                                    ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
+                                    TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
+                                    TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
+                                    TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+                                    TextView isPublic_textView = (TextView) exam_view_exam_note.findViewById(R.id.isPublic_textView);
+
+                                    String author_id = response1.getString("user_id");
+                                    String author_nickname = response1.getString("user_nickname");
+                                    String author_thumbnail = response1.getString("user_thumbnail");
+                                    String note = response1.getString("note");
+
+                                    String isPublic = response1.getString("isPublic");
+                                    String upload_date = response1.getString("upload_date");
+                                    String upload_time = response1.getString("upload_time");
+
+                                    if(isPublic.equals("public")){
+                                        //공개
+                                        isPublic_textView.setText("공개");
+                                    }else{
+                                        //비공개
+                                        isPublic_textView.setText("비공개");
+                                    }
+                                    personal_note_show  = Html.fromHtml(note).toString().replace("<br>", "\n");
+                                    note_text_view.setText(personal_note_show);
+                                    author_text_view.setText(author_nickname);
+                                    upload_textView.setText(upload_date);
+                                    getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
+
+                                    comment_layout.addView(exam_view_exam_note);
+                                }else{
+                                    View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                    TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                    empty_textView.setText(G_user_nickname+" 님 노트를 작성해주세요!");
+                                    comment_layout.addView(exam_view_exam_note_empty);
+                                }
+                            }
+                            JSONArray response2  = jsonObject.getJSONArray("response2");
+                            if(response2.length() == 0){
+                                // 노트가 없을떄
+                                View exam_view_exam_note_empty = getLayoutInflater().inflate(R.layout.examview_exam_note_empty_container, null);
+                                TextView empty_textView = (TextView) exam_view_exam_note_empty.findViewById(R.id.empty_textView);
+                                empty_textView.setText("공개된 노트가 없습니다");
+                                comment_layout.addView(exam_view_exam_note_empty);
+                            }else{
+                                for(int i = 0 ; i < response2.length(); i++){
+                                    String author_id = response2.getJSONObject(i).getString("user_id");
+                                    String author_nickname = response2.getJSONObject(i).getString("user_nickname");
+                                    String author_thumbnail = response2.getJSONObject(i).getString("user_thumbnail");
+                                    String note = response2.getJSONObject(i).getString("note");
+                                    String note_show = Html.fromHtml(note).toString().replace("<br>", "\n");
+                                    String upload_date = response2.getJSONObject(i).getString("upload_date");
+                                    String upload_time = response2.getJSONObject(i).getString("upload_time");
+
+                                    View exam_view_exam_note = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+                                    ImageView author_thumbnail_imageView = (ImageView) exam_view_exam_note.findViewById(R.id.author_imageView);
+                                    TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
+                                    TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
+                                    TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+
+                                    author_text_view.setText(author_nickname);
+                                    upload_textView.setText(upload_date);
+                                    getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
+                                    note_text_view.setText(note_show);
+                                    comment_layout.addView(exam_view_exam_note);
+                                }
+                            }
+                            note_progressbar.setVisibility(View.GONE);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("volley error", error.toString());
+                        //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+//                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+//                        toast(message);
+//                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", "note_refresh");
+                params.put("exam_placed_year", exam_placed_year);
+                params.put("major_type", major_type);
+                params.put("minor_type", minor_type);
+                params.put("question_number", question_number);
+
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
     public void study_note(LinearLayout comment_layout){
@@ -551,5 +701,30 @@ public class LawExamViewTypeAFragment extends Fragment {
     }
     public void slide_left_and_slide_in(){//opening new activity
         getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NOTE_REQUEST_CODE){
+            if (resultCode == RESULT_OK) {
+                String upload_status = data.getStringExtra("upload_status");
+                if(upload_status.equals("success")){
+                    Log.e("why not working?", "what the fuck");
+                    String exam_placed_year = data.getStringExtra("exam_placed_year");
+                    String major_type = data.getStringExtra("major_type");
+                    String minor_type = data.getStringExtra("minor_type");
+                    String question_number = data.getStringExtra("note_number");
+
+                    Log.e("page :", question_number);
+                    noteRefresh(  exam_placed_year,   major_type,   minor_type,   question_number);
+                }
+            }else if(resultCode == RESULT_CANCELED){
+
+            }
+        }else{
+        }
+
     }
 }
