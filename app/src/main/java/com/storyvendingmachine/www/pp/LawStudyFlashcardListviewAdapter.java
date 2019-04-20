@@ -2,6 +2,7 @@ package com.storyvendingmachine.www.pp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,32 +70,38 @@ public class LawStudyFlashcardListviewAdapter extends BaseAdapter {
 
 
             final String primary_key = list.get(i).getFlashcard_db_id();
-            String title = list.get(i).getTitle();
-            String date = list.get(i).getUpload_date();
+            final String title = list.get(i).getTitle();
+            String title_show = Html.fromHtml(title).toString().replace("<br>", "\n");
+            final String upload_date = list.get(i).getUpload_date();
             String first_term = list.get(i).getFlashcard_first_term();
+            String first_term_show = Html.fromHtml(first_term).toString().replace("<br>", "\n");
 
-            String author_nickname = list.get(i).getUser_nickname();
+            final String author_nickname = list.get(i).getUser_nickname();
             String author_thumbnail = list.get(i).getUser_thumbnail();
             String hit_count = list.get(i).getHit_count();
 
             getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
             number_textView.setText("Flash Card " + (i + 1));
-            title_textView.setText(title);
-            first_term_textView.setText(first_term);
-            date_textView.setText(date);
+            title_textView.setText(title_show);
+            first_term_textView.setText(first_term_show);
+            date_textView.setText(upload_date);
             author_textView.setText(author_nickname);
             hit_count_textView.setText(hit_count);
 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Intent intent = new Intent(context, StudyFlashcardViewActivity.class);
-//                    intent.putExtra("type", "regular");
-//                    intent.putExtra("primary_key", primary_key);
-//
-////                ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARDFRAGMENT);
-//                    context.startActivity(intent);
-//                    slide_left_and_slide_in();
+                    Intent intent = new Intent(context, FlashCardViewActivity.class);
+                    intent.putExtra("type", "regular");
+                    intent.putExtra("primary_key", primary_key);
+                    intent.putExtra("author_nickname", author_nickname);
+                    intent.putExtra("title", title);
+                    intent.putExtra("upload_date", upload_date);
+
+
+//                ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_FOR_FLASHCARDFRAGMENT);
+                    context.startActivity(intent);
+                    slide_left_and_slide_in();
                 }
             });
             return v;

@@ -48,6 +48,7 @@ import java.util.Map;
 
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.MainActivity.major_exam_type_code;
 import static com.storyvendingmachine.www.pp.REQUESTCODES.REQUEST_CODE_FLASHCARD_REVISE;
 
 public class FlashCardViewActivity extends AppCompatActivity {
@@ -77,75 +78,83 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(major_exam_type_code.equals("lawyer")){
+            setTheme(R.style.PassPopLawTheme);
+        }else{
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash_card_view);
 
         Intent intent = getIntent();
         flashcard_view_type = intent.getStringExtra("type");
-        if(flashcard_view_type.equals("regular")){
-            flashcard_exam_name =  intent.getStringExtra("exam_name");
-            flashcard_subject_name = intent.getStringExtra("subject_name");
-            flashcard_title = intent.getStringExtra("flashcard_title");
-            flashcard_db_id = intent.getStringExtra("flashcard_db_id");
+        if(flashcard_view_type.equals("regular")) {
+            if (major_exam_type_code.equals("lawyer")) {
+              LAW_initializer(intent);
+            } else {
+                flashcard_exam_name = intent.getStringExtra("exam_name");
+                flashcard_subject_name = intent.getStringExtra("subject_name");
+                flashcard_title = intent.getStringExtra("flashcard_title");
+                flashcard_db_id = intent.getStringExtra("flashcard_db_id");
 
-            pb = findViewById(R.id.flashcard_activity_progress_bar);
-            progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
-            progressbar_visible();
-            new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
-                @Override
-                public void run() {
-                    progressbar_invisible();
+                pb = findViewById(R.id.flashcard_activity_progress_bar);
+                progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
+                progressbar_visible();
+                new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                    @Override
+                    public void run() {
+                        progressbar_invisible();
+                    }
+                }, 800); // 2.5초 후에 실행됨
+
+                comment_layout = findViewById(R.id.flashcard_comment_layout);
+                scrap_folder_layout = findViewById(R.id.scrap_folder_layout);
+
+                hit_count_textView = (TextView) findViewById(R.id.hit_count_textView);
+                like_count_textView = (TextView) findViewById(R.id.like_count_textView);
+                scrap_count_textView = (TextView) findViewById(R.id.scrap_count_textView);
+                flashcard_author_textView = (TextView) findViewById(R.id.flashcard_author_textView);
+                flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
+
+                drawer = (DrawerLayout) findViewById(R.id.drawer);
+
+                BackgroundTask backgroundTask = new BackgroundTask();
+                backgroundTask.execute();
+
+                toolbar(flashcard_title);
+                comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
+                if (LoginType.equals("kakao") || LoginType.equals("normal")) {
+                    likeButtonClicked();
+                    comment_write_textView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
+                            intent.putExtra("type", "flashcard_comment");
+                            intent.putExtra("flashcard_exam_name", flashcard_exam_name);
+                            intent.putExtra("flashcard_subject_name", flashcard_subject_name);
+                            intent.putExtra("flashcard_title", flashcard_title);
+                            intent.putExtra("flashcard_db_id", flashcard_db_id);
+    //                        startActivity(intent);
+                            startActivityForResult(intent, 20001);//20001 mean flashcard comment change result.
+                            slide_left_and_slide_in();
+                        }
+                    });
+                } else {
+                    likeButtonClicked();
+                    comment_write_textView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String message = "로그인 후에 사용 가능한 메뉴 입니다.";
+                            String positivie_message = "확인";
+                            notifier(message, positivie_message);
+                        }
+                    });
+                    Toast.makeText(this, "로그인 후에 사용 가능", Toast.LENGTH_SHORT).show();
                 }
-            }, 800); // 2.5초 후에 실행됨
-
-            comment_layout = findViewById(R.id.flashcard_comment_layout);
-            scrap_folder_layout = findViewById(R.id.scrap_folder_layout);
-
-            hit_count_textView = (TextView) findViewById(R.id.hit_count_textView);
-            like_count_textView = (TextView) findViewById(R.id.like_count_textView);
-            scrap_count_textView = (TextView) findViewById(R.id.scrap_count_textView);
-            flashcard_author_textView = (TextView) findViewById(R.id.flashcard_author_textView);
-            flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
-
-            drawer = (DrawerLayout) findViewById(R.id.drawer);
-
-            BackgroundTask backgroundTask  = new BackgroundTask();
-            backgroundTask.execute();
-
-            toolbar(flashcard_title);
-            comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
-            if(LoginType.equals("kakao") || LoginType.equals("normal")){
-                likeButtonClicked();
-
-                comment_write_textView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
-                        intent.putExtra("type", "flashcard_comment");
-                        intent.putExtra("flashcard_exam_name", flashcard_exam_name);
-                        intent.putExtra("flashcard_subject_name", flashcard_subject_name);
-                        intent.putExtra("flashcard_title", flashcard_title);
-                        intent.putExtra("flashcard_db_id", flashcard_db_id);
-//                        startActivity(intent);
-                        startActivityForResult(intent, 20001);//20001 mean flashcard comment change result.
-                        slide_left_and_slide_in();
-                    }
-                });
-            }else{
-                likeButtonClicked();
-                comment_write_textView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String message = "로그인 후에 사용 가능한 메뉴 입니다.";
-                        String positivie_message = "확인";
-                        notifier(message, positivie_message);
-                    }
-                });
-                Toast.makeText(this, "로그인 후에 사용 가능", Toast.LENGTH_SHORT).show();
             }
         }else{
             //----------------my_folder--my_folder--my_folder---my_folder--my_folder--my_folder------------
-            Toast.makeText(this, "folder 접속", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(this, "folder 접속", Toast.LENGTH_SHORT).show();
             folder_name = intent.getStringExtra("folder_name");
             folder_code = intent.getStringExtra("folder_code");
             folder_flashcard_length = intent.getStringExtra("flashcard_length");
@@ -163,9 +172,9 @@ public class FlashCardViewActivity extends AppCompatActivity {
             toolbar(folder_name);
             getSelectedMyFlashCard();
         }
-
-
     }
+
+
     public void initializer(Intent intent){
         if(flashcard_view_type.equals("regular")){
             flashcard_exam_name =  intent.getStringExtra("exam_name");
@@ -329,15 +338,25 @@ public class FlashCardViewActivity extends AppCompatActivity {
     }
     private void toolbar(String title_message){
         Toolbar tb = (Toolbar) findViewById(R.id.loggedin_toolBar);
-        tb.setElevation(5);
-        setSupportActionBar(tb);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
-        getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
+        if(major_exam_type_code.equals("lawyer")){
+            tb.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
 
+            TextView exam_title_TextView = (TextView) tb.findViewById(R.id.flashcard_titleTextView);
+            exam_title_TextView.setText(title_message);
+        }else{
+            tb.setElevation(5);
+            setSupportActionBar(tb);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+            getSupportActionBar().setTitle("");  //해당 액티비티의 툴바에 있는 타이틀을 공백으로 처리
 
-        TextView exam_title_TextView = (TextView) tb.findViewById(R.id.flashcard_titleTextView);
-        exam_title_TextView.setText(title_message);
+            TextView exam_title_TextView = (TextView) tb.findViewById(R.id.flashcard_titleTextView);
+            exam_title_TextView.setText(title_message);
+        }
     }
     public void likeButtonClicked(){
 //        TextView like_button = (TextView) findViewById(R.id.like_count_textView);
@@ -1026,10 +1045,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
-
-
-
-
     public class BackgroundTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
@@ -1064,28 +1079,111 @@ public class FlashCardViewActivity extends AppCompatActivity {
             super.onPostExecute(result);
         }
     }
-    public class BackgroundTaskMyFolderFlashCard extends AsyncTask<Void, Void, Integer> {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
 
-        @Override
-        protected Integer doInBackground(Void... integers) {
+//    LAW          LAW           LAW     LAW     LAW
+    public void LAW_initializer(Intent intent){
+        String flashcard_primary_key = intent.getStringExtra("primary_key");
+        String author_nickname = intent.getStringExtra("author_nickname");
+        String title = intent.getStringExtra("title");
+        String upload_date = intent.getStringExtra("upload_date");
 
-            return -1;
-        }
+        String toolbar_message = "Written By. "+author_nickname;
+        toolbar(toolbar_message);
 
-        @Override
-        protected void onProgressUpdate(Void... params) {
-            super.onProgressUpdate(params);
-        }
+//                보류
+//                pb = findViewById(R.id.flashcard_activity_progress_bar);
+//                progressBarBackground = (LinearLayout) findViewById(R.id.progress_bar_background);
+//                progressbar_visible();
+//                보류
 
-        @Override
-        protected void onPostExecute(Integer result) {
-            super.onPostExecute(result);
-        }
+        drawer = (DrawerLayout) findViewById(R.id.drawer);
+
+        comment_layout = findViewById(R.id.flashcard_comment_layout);
+        scrap_folder_layout = findViewById(R.id.scrap_folder_layout);
+
+        hit_count_textView = (TextView) findViewById(R.id.hit_count_textView);
+        like_count_textView = (TextView) findViewById(R.id.like_count_textView);
+        scrap_count_textView = (TextView) findViewById(R.id.scrap_count_textView);
+        flashcard_author_textView = (TextView) findViewById(R.id.flashcard_author_textView);
+        flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
+
+        String type = "selected";
+        LAW_connect_to_server(type, flashcard_primary_key);
+    }
+
+    public void LAW_connect_to_server(final String type, final String primary_key){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/passpop_law/android/server/getFlashcardList.php";
+        RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("flashcard_response", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                global_flashcard_jsonObject = jsonObject.getJSONObject("response1");
+                                JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
+                                int count = (jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards").length()*2);//앞뒤가 있기때문에 2장을 만들어야한다.
+//
+                                ArrayList<String> flashcards = new ArrayList<>();
+                                for(int i = 0 ; i<flashcard_json.length(); i++){
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
+                                }
+//
+                                fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
+                                fViewPagerAdapter.count = count;
+                                fViewPagerAdapter.flashcard_array = flashcards;
+                                fViewPagerAdapter.exam_name = flashcard_exam_name;
+                                fViewPagerAdapter.subject_name = flashcard_subject_name;
+                                fViewPagerAdapter.solo_page = true;
+                                fViewPagerAdapter.flashcard_or_folder = "flashcard";
+
+
+
+                                fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
+                                fviewPager.setAdapter(fViewPagerAdapter);
+                                fviewPager.setOffscreenPageLimit(count);
+//
+//                                String author_nickname = jsonObject.getJSONObject("response1").getString("user_nickname");
+//                                String upload_date = jsonObject.getJSONObject("response1").getString("upload_date");
+//
+//                                flashcard_author_textView.setText("작성자 "+author_nickname);
+//                                flashcard_written_date_textView.setText("작성일 "+upload_date);
+//
+//                                author_of_this_flashcard = jsonObject.getJSONObject("response").getString("author_id");
+                            }else if(access_token.equals("invalid")){
+
+                            }else{
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(getActivity(), "volley error", Toast.LENGTH_LONG).show();
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", type);
+                params.put("primary_key", primary_key);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
 
