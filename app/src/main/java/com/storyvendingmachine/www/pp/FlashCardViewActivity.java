@@ -1107,6 +1107,14 @@ public class FlashCardViewActivity extends AppCompatActivity {
         scrap_count_textView = (TextView) findViewById(R.id.scrap_count_textView);
         flashcard_author_textView = (TextView) findViewById(R.id.flashcard_author_textView);
         flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
+        comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
+
+        comment_write_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         String type = "selected";
         LAW_connect_to_server(type, flashcard_primary_key);
@@ -1125,9 +1133,27 @@ public class FlashCardViewActivity extends AppCompatActivity {
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
                                 global_flashcard_jsonObject = jsonObject.getJSONObject("response1");
+                                JSONArray response2 =  jsonObject.getJSONArray("response2");
+
                                 JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
                                 int count = (jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards").length()*2);//앞뒤가 있기때문에 2장을 만들어야한다.
-//
+
+
+                                String primary_key =jsonObject.getJSONObject("response1").getString("primary_key");
+                                String flashcard_minor_type =jsonObject.getJSONObject("response1").getString("minor_type");
+                                String flashcard_minor_type_kor =jsonObject.getJSONObject("response1").getString("minor_type_kor");
+                                String flashcard_title =jsonObject.getJSONObject("response1").getString("flashcard_title");
+                                String user_login_type =jsonObject.getJSONObject("response1").getString("user_login_type");
+                                String user_id =jsonObject.getJSONObject("response1").getString("user_id");
+                                String user_nickname =jsonObject.getJSONObject("response1").getString("user_nickname");
+                                String user_thumbnail =jsonObject.getJSONObject("response1").getString("user_thumbnail");
+                                String flashcard_hit =jsonObject.getJSONObject("response1").getString("flashcard_hit");
+                                String flashcard_like_count = jsonObject.getJSONObject("response1").getString("flashcard_like_count");
+                                String flashcard_scrapped_count = jsonObject.getJSONObject("response1").getString("flashcard_scrapped_count");
+                                String upload_date =jsonObject.getJSONObject("response1").getString("upload_date");
+                                String upload_time =jsonObject.getJSONObject("response1").getString("upload_time");
+
+
                                 ArrayList<String> flashcards = new ArrayList<>();
                                 for(int i = 0 ; i<flashcard_json.length(); i++){
                                     flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
@@ -1137,24 +1163,39 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                 fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
                                 fViewPagerAdapter.count = count;
                                 fViewPagerAdapter.flashcard_array = flashcards;
-                                fViewPagerAdapter.exam_name = flashcard_exam_name;
-                                fViewPagerAdapter.subject_name = flashcard_subject_name;
+                                fViewPagerAdapter.exam_name = "변호사시험";
+                                fViewPagerAdapter.subject_name = flashcard_minor_type;
                                 fViewPagerAdapter.solo_page = true;
                                 fViewPagerAdapter.flashcard_or_folder = "flashcard";
-
-
 
                                 fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
                                 fviewPager.setAdapter(fViewPagerAdapter);
                                 fviewPager.setOffscreenPageLimit(count);
-//
-//                                String author_nickname = jsonObject.getJSONObject("response1").getString("user_nickname");
-//                                String upload_date = jsonObject.getJSONObject("response1").getString("upload_date");
-//
-//                                flashcard_author_textView.setText("작성자 "+author_nickname);
-//                                flashcard_written_date_textView.setText("작성일 "+upload_date);
-//
-//                                author_of_this_flashcard = jsonObject.getJSONObject("response").getString("author_id");
+
+                                flashcard_author_textView.setText("작성자 "+user_nickname);
+                                hit_count_textView.setText("조회수 +"+flashcard_hit);
+                                like_count_textView.setText("좋아요 +"+flashcard_like_count);
+                                scrap_count_textView.setText("스크랩 +"+flashcard_scrapped_count);
+                                flashcard_written_date_textView.setText("작성일 "+upload_date);
+
+                                for(int i = 0 ; i < response2.length(); i++){
+                                    String folder_code = response2.getJSONObject(i).getString("folder_code");
+                                    String folder_name = response2.getJSONObject(i).getString("folder_name");
+                                    String exam = response2.getJSONObject(i).getString("exam");
+                                    String flashcard_count = response2.getJSONObject(i).getString("count");
+
+                                    View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
+                                    TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
+                                    TextView scrap_count_textView = folder_container.findViewById(R.id.scrap_count_textView);
+                                    TextView exam_textView = folder_container.findViewById(R.id.exam_textView);
+
+                                    folder_name_textView.setText(folder_name);
+                                    scrap_count_textView.setText(flashcard_count);
+                                    exam_textView.setText(exam);
+
+                                    scrap_folder_layout.addView(folder_container);
+                                }
+
                             }else if(access_token.equals("invalid")){
 
                             }else{
@@ -1180,6 +1221,9 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 params.put("token", "passpop");
                 params.put("type", type);
                 params.put("primary_key", primary_key);
+
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
                 return params;
             }
         };
