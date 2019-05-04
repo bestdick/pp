@@ -67,9 +67,30 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:text="comment"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/revise_textView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/author_imageView"
             app:layout_constraintTop_toBottomOf="@+id/comment_author_textView" />
+
+        <TextView
+            android:id="@+id/revise_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="8dp"
+            android:text="수정"
+            android:padding="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/delete_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:text="삭제"
+            android:padding="5dp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/revise_textView"
+            app:layout_constraintEnd_toStartOf="@+id/revise_textView" />
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

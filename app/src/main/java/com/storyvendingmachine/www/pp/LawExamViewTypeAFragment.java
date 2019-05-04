@@ -418,6 +418,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                 TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                 TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
 
+                TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                revise_textView.setVisibility(View.GONE);
+                delete_textView.setVisibility(View.GONE);
+
                 author_text_view.setText(author_nickname);
                 upload_textView.setText(upload_date);
                 getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail);
@@ -442,6 +447,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                 TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                 TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
                 TextView isPublic_textView = (TextView) exam_view_exam_note.findViewById(R.id.isPublic_textView);
+
+                TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                revise_textView.setVisibility(View.GONE);
+                delete_textView.setVisibility(View.GONE);
 
                 String author_id = mParam5.getString("author_id");
                 String author_nickname = mParam5.getString("author_nickname");
@@ -505,6 +515,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                                     TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
                                     TextView isPublic_textView = (TextView) exam_view_exam_note.findViewById(R.id.isPublic_textView);
 
+                                    TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                                    TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                                    revise_textView.setVisibility(View.GONE);
+                                    delete_textView.setVisibility(View.GONE);
+
                                     String author_id = response1.getString("user_id");
                                     String author_nickname = response1.getString("user_nickname");
                                     String author_thumbnail = response1.getString("user_thumbnail");
@@ -557,6 +572,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                                     TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
                                     TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                                     TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+
+                                    TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                                    TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                                    revise_textView.setVisibility(View.GONE);
+                                    delete_textView.setVisibility(View.GONE);
 
                                     author_text_view.setText(author_nickname);
                                     upload_textView.setText(upload_date);
@@ -626,6 +646,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                             TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                             TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
 
+                            TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                            TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                            revise_textView.setVisibility(View.GONE);
+                            delete_textView.setVisibility(View.GONE);
+
                             String author = mParam4.get(i).getString("user_nickname");
                             String author_thumbnail = mParam4.get(i).getString("user_thumbnail");
                             String upload_date =  mParam4.get(i).getString("upload_date");
@@ -659,6 +684,11 @@ public class LawExamViewTypeAFragment extends Fragment {
                         TextView upload_textView = (TextView) exam_view_exam_note.findViewById(R.id.upload_textView);
                         TextView author_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_author_textView);
                         TextView note_text_view = (TextView) exam_view_exam_note.findViewById(R.id.comment_textView);
+
+                        TextView revise_textView = (TextView)exam_view_exam_note.findViewById(R.id.revise_textView);
+                        TextView delete_textView = (TextView)exam_view_exam_note.findViewById(R.id.delete_textView);
+                        revise_textView.setVisibility(View.GONE);
+                        delete_textView.setVisibility(View.GONE);
 
                         String author = mParam4.get(i).getString("user_nickname");
                         String author_thumbnail = mParam4.get(i).getString("user_thumbnail");

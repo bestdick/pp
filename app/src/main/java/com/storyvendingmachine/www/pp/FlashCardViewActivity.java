@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -46,12 +47,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kakao.kakaotalk.StringSet.title;
 import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
 import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
 import static com.storyvendingmachine.www.pp.MainActivity.major_exam_type_code;
 import static com.storyvendingmachine.www.pp.REQUESTCODES.REQUEST_CODE_FLASHCARD_REVISE;
 
 public class FlashCardViewActivity extends AppCompatActivity {
+
+    final int WRITE_COMMENT = 0;
+    final int UPDATE_LIKE = 1;
+    final int FLASHCARD_WRITE_COMMENT = 20001;
 
     DrawerLayout drawer;
     NavigationView navigationView;
@@ -90,6 +96,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
         flashcard_view_type = intent.getStringExtra("type");
         if(flashcard_view_type.equals("regular")) {
             if (major_exam_type_code.equals("lawyer")) {
+                //변호사 시험일떄 .....
               LAW_initializer(intent);
             } else {
                 flashcard_exam_name = intent.getStringExtra("exam_name");
@@ -130,11 +137,11 @@ public class FlashCardViewActivity extends AppCompatActivity {
                         public void onClick(View view) {
                             Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
                             intent.putExtra("type", "flashcard_comment");
+                            intent.putExtra("exam_major_type", "sugs_1001/gs_2001");
                             intent.putExtra("flashcard_exam_name", flashcard_exam_name);
                             intent.putExtra("flashcard_subject_name", flashcard_subject_name);
                             intent.putExtra("flashcard_title", flashcard_title);
                             intent.putExtra("flashcard_db_id", flashcard_db_id);
-    //                        startActivity(intent);
                             startActivityForResult(intent, 20001);//20001 mean flashcard comment change result.
                             slide_left_and_slide_in();
                         }
@@ -798,6 +805,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                     }
                 });
     }
+
     public void getSelectedFlashCardComments_And_Others(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getSelectedFlashCardComments_And_Others.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
@@ -818,7 +826,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                 }else{
                                     for(int i = 0 ; i < jsonArray.length(); i++){
                                         String commenter_login_type = jsonArray.getJSONObject(i).getString("login_type");
-                                        String commenter_id = jsonArray.getJSONObject(i).getString("login_type");
+                                        String commenter_id = jsonArray.getJSONObject(i).getString("user_id");
                                         String author_nickname = jsonArray.getJSONObject(i).getString("user_nickname");
                                         String author_thumbnail_url = jsonArray.getJSONObject(i).getString("user_thumbnail");
                                         String comment = jsonArray.getJSONObject(i).getString("comment");
@@ -831,6 +839,34 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                         TextView upload_date_textView = (TextView) comment_container.findViewById(R.id.upload_textView);
                                         ImageView author_thumbnail_imageView = (ImageView) comment_container.findViewById(R.id.author_imageView);
 
+                                        TextView revise_textView = (TextView)comment_container.findViewById(R.id.revise_textView);
+                                        TextView delete_textView = (TextView)comment_container.findViewById(R.id.delete_textView);
+
+                                        if(LoginType.equals(commenter_login_type) && G_user_id.equals(commenter_id)){
+                                            revise_textView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    String message = "해당 댓글을 수정 하시겠습니까?";
+                                                    String pos = "삭제";
+                                                    String neg = "취소";
+                                                    String comment_handle_type  = "comment_revise";
+                                                 //   LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, primary_key);
+                                                }
+                                            });
+                                            delete_textView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    String message = "해당 댓글을 삭제 하시겠습니까?";
+                                                    String pos = "삭제";
+                                                    String neg = "취소";
+                                                    String comment_handle_type  = "comment_delete";
+                                                   // LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, primary_key);
+                                                }
+                                            });
+                                        }else{
+                                            revise_textView.setVisibility(View.GONE);
+                                            delete_textView.setVisibility(View.GONE);
+                                        }
                                         if(author_thumbnail_url.equals("null") || author_thumbnail_url.length()<=0){
                                             //thumnail 이 없을때
                                             author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
@@ -853,17 +889,9 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                 String scrap_count = jsonObject.getString("scrap_count");
                                 String like_count = jsonObject.getString("like_count");
 
-
-
                                  hit_count_textView.setText("조회수 +"+hit_count);
                                  scrap_count_textView.setText("스크랩 +"+scrap_count);
                                  like_count_textView.setText("좋아요 +"+like_count);
-
-
-
-
-
-
 
                             }else if(access_token.equals("invalid")){}else{}
                         } catch (JSONException e) {
@@ -967,6 +995,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+
     public void getUpdatedFlashCard(){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/PassPop/android/server/getSelectedFlashCard.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
@@ -999,7 +1028,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                 fViewPagerAdapter.subject_name = flashcard_subject_name;
                                 fViewPagerAdapter.solo_page = true;
                                 fViewPagerAdapter.flashcard_or_folder = "flashcard";
-
 
 
                                 fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
@@ -1083,7 +1111,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
 //    LAW          LAW           LAW     LAW     LAW
     public void LAW_initializer(Intent intent){
-        String flashcard_primary_key = intent.getStringExtra("primary_key");
+        final String flashcard_primary_key = intent.getStringExtra("primary_key");
         String author_nickname = intent.getStringExtra("author_nickname");
         String title = intent.getStringExtra("title");
         String upload_date = intent.getStringExtra("upload_date");
@@ -1109,15 +1137,45 @@ public class FlashCardViewActivity extends AppCompatActivity {
         flashcard_written_date_textView = (TextView) findViewById(R.id.flashcard_written_date_textView);
         comment_write_textView = (TextView) findViewById(R.id.comment_write_textView);
 
+        like_count_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LAW_update_like_and_comment_whenClick(flashcard_primary_key, UPDATE_LIKE);
+            }
+        });
         comment_write_textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                LAW_update_like_and_comment_whenClick(flashcard_primary_key, WRITE_COMMENT);
             }
         });
 
+
         String type = "selected";
         LAW_connect_to_server(type, flashcard_primary_key);
+    }
+
+    public void LAW_update_like_and_comment_whenClick(String input1, int input2){
+        //input1 은 현재 플래시 카드의 데이터 베이스 table id 를 알려주는 값이다.
+        //input2 은 type 을 말하는것이다. 서버에 어떤 타입을 줘서 어떤 작동을 할지 알려주는...
+        if(LoginType.equals("null") || G_user_id.equals("null")){
+            String message = "로그인 하셔야 사용할수 있는 메뉴 입니다.";
+            String positive_message = "확인";
+            notifier(message, positive_message);
+        }else{
+            if(input2 == UPDATE_LIKE){
+                String type = "update_like";
+                LAW_connect_to_server(type, input1);
+            }else{
+                // input2 == WRITE_COMMENT
+                Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
+                intent.putExtra("type", "flashcard_comment");
+                intent.putExtra("exam_major_type", "lawyer");
+                intent.putExtra("primary_key", input1);
+                startActivityForResult(intent, FLASHCARD_WRITE_COMMENT);//20001 mean flashcard comment change result.
+                slide_left_and_slide_in();
+            }
+        }
     }
 
     public void LAW_connect_to_server(final String type, final String primary_key){
@@ -1132,70 +1190,223 @@ public class FlashCardViewActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
-                                global_flashcard_jsonObject = jsonObject.getJSONObject("response1");
-                                JSONArray response2 =  jsonObject.getJSONArray("response2");
+                                if(type.equals("update_like")){
+                                    // when update_like button clicked
+                                    Log.e("flashcard_response", "update like");
+                                    String response1 = jsonObject.getString("response1");
+                                    String total_like = jsonObject.getString("count_total_like");
+                                    like_count_textView.setText("좋아요 + " + total_like);
+                                }else if(type.equals("selected")){
+                                    global_flashcard_jsonObject = jsonObject.getJSONObject("response1");
+                                    JSONArray response2 = jsonObject.getJSONArray("response2");
+                                    JSONArray response3 = jsonObject.getJSONArray("response3");
 
-                                JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
-                                int count = (jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards").length()*2);//앞뒤가 있기때문에 2장을 만들어야한다.
-
-
-                                String primary_key =jsonObject.getJSONObject("response1").getString("primary_key");
-                                String flashcard_minor_type =jsonObject.getJSONObject("response1").getString("minor_type");
-                                String flashcard_minor_type_kor =jsonObject.getJSONObject("response1").getString("minor_type_kor");
-                                String flashcard_title =jsonObject.getJSONObject("response1").getString("flashcard_title");
-                                String user_login_type =jsonObject.getJSONObject("response1").getString("user_login_type");
-                                String user_id =jsonObject.getJSONObject("response1").getString("user_id");
-                                String user_nickname =jsonObject.getJSONObject("response1").getString("user_nickname");
-                                String user_thumbnail =jsonObject.getJSONObject("response1").getString("user_thumbnail");
-                                String flashcard_hit =jsonObject.getJSONObject("response1").getString("flashcard_hit");
-                                String flashcard_like_count = jsonObject.getJSONObject("response1").getString("flashcard_like_count");
-                                String flashcard_scrapped_count = jsonObject.getJSONObject("response1").getString("flashcard_scrapped_count");
-                                String upload_date =jsonObject.getJSONObject("response1").getString("upload_date");
-                                String upload_time =jsonObject.getJSONObject("response1").getString("upload_time");
+                                    JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
+                                    int count = (jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards").length() * 2);//앞뒤가 있기때문에 2장을 만들어야한다.
 
 
-                                ArrayList<String> flashcards = new ArrayList<>();
-                                for(int i = 0 ; i<flashcard_json.length(); i++){
-                                    flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
-                                    flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
-                                }
+                                    String primary_key = jsonObject.getJSONObject("response1").getString("primary_key");
+                                    String flashcard_minor_type = jsonObject.getJSONObject("response1").getString("minor_type");
+                                    String flashcard_minor_type_kor = jsonObject.getJSONObject("response1").getString("minor_type_kor");
+                                    String flashcard_title = jsonObject.getJSONObject("response1").getString("flashcard_title");
+                                    String user_login_type = jsonObject.getJSONObject("response1").getString("user_login_type");
+                                    String user_id = jsonObject.getJSONObject("response1").getString("user_id");
+                                    String user_nickname = jsonObject.getJSONObject("response1").getString("user_nickname");
+                                    String user_thumbnail = jsonObject.getJSONObject("response1").getString("user_thumbnail");
+                                    String flashcard_hit = jsonObject.getJSONObject("response1").getString("flashcard_hit");
+                                    String flashcard_like_count = jsonObject.getJSONObject("response1").getString("flashcard_like_count");
+                                    String flashcard_scrapped_count = jsonObject.getJSONObject("response1").getString("flashcard_scrapped_count");
+                                    String upload_date = jsonObject.getJSONObject("response1").getString("upload_date");
+                                    String upload_time = jsonObject.getJSONObject("response1").getString("upload_time");
+
+
+                                    ArrayList<String> flashcards = new ArrayList<>();
+                                    for (int i = 0; i < flashcard_json.length(); i++) {
+                                        flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
+                                        flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
+                                    }
 //
-                                fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
-                                fViewPagerAdapter.count = count;
-                                fViewPagerAdapter.flashcard_array = flashcards;
-                                fViewPagerAdapter.exam_name = "변호사시험";
-                                fViewPagerAdapter.subject_name = flashcard_minor_type;
-                                fViewPagerAdapter.solo_page = true;
-                                fViewPagerAdapter.flashcard_or_folder = "flashcard";
+                                    fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
+                                    fViewPagerAdapter.count = count;
+                                    fViewPagerAdapter.flashcard_array = flashcards;
+                                    fViewPagerAdapter.exam_name = "변호사시험";
+                                    fViewPagerAdapter.subject_name = flashcard_minor_type;
+                                    fViewPagerAdapter.solo_page = true;
+                                    fViewPagerAdapter.flashcard_or_folder = "flashcard";
 
-                                fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
-                                fviewPager.setAdapter(fViewPagerAdapter);
-                                fviewPager.setOffscreenPageLimit(count);
+                                    fviewPager = (ViewPager) findViewById(R.id.flashcard_container);
+                                    fviewPager.setAdapter(fViewPagerAdapter);
+                                    fviewPager.setOffscreenPageLimit(count);
 
-                                flashcard_author_textView.setText("작성자 "+user_nickname);
-                                hit_count_textView.setText("조회수 +"+flashcard_hit);
-                                like_count_textView.setText("좋아요 +"+flashcard_like_count);
-                                scrap_count_textView.setText("스크랩 +"+flashcard_scrapped_count);
-                                flashcard_written_date_textView.setText("작성일 "+upload_date);
+                                    flashcard_author_textView.setText("작성자 " + user_nickname);
+                                    hit_count_textView.setText("조회수 +" + flashcard_hit);
+                                    like_count_textView.setText("좋아요 +" + flashcard_like_count);
+                                    scrap_count_textView.setText("스크랩 +" + flashcard_scrapped_count);
+                                    flashcard_written_date_textView.setText("작성일 " + upload_date);
 
-                                for(int i = 0 ; i < response2.length(); i++){
-                                    String folder_code = response2.getJSONObject(i).getString("folder_code");
-                                    String folder_name = response2.getJSONObject(i).getString("folder_name");
-                                    String exam = response2.getJSONObject(i).getString("exam");
-                                    String flashcard_count = response2.getJSONObject(i).getString("count");
+                                    for (int i = 0; i < response2.length(); i++) {
+                                        String folder_code = response2.getJSONObject(i).getString("folder_code");
+                                        String folder_name = response2.getJSONObject(i).getString("folder_name");
+                                        String exam = response2.getJSONObject(i).getString("exam");
+                                        String flashcard_count = response2.getJSONObject(i).getString("count");
 
-                                    View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
-                                    TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
-                                    TextView scrap_count_textView = folder_container.findViewById(R.id.scrap_count_textView);
-                                    TextView exam_textView = folder_container.findViewById(R.id.exam_textView);
+                                        View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
+                                        TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
+                                        TextView scrap_count_textView = folder_container.findViewById(R.id.scrap_count_textView);
+                                        TextView exam_textView = folder_container.findViewById(R.id.exam_textView);
 
-                                    folder_name_textView.setText(folder_name);
-                                    scrap_count_textView.setText(flashcard_count);
-                                    exam_textView.setText(exam);
+                                        folder_name_textView.setText(folder_name);
+                                        scrap_count_textView.setText(flashcard_count);
+                                        exam_textView.setText(exam);
 
-                                    scrap_folder_layout.addView(folder_container);
+                                        scrap_folder_layout.addView(folder_container);
+                                    }
+
+                                    if(response3.length() == 0){
+                                        View comment_container = getLayoutInflater().inflate(R.layout.container_flashcard_comment_empty, null);
+                                        TextView empty_textView = (TextView)comment_container.findViewById(R.id.empty_textView);
+                                        empty_textView.setText("댓글이 존재하지 않습니다");
+                                        comment_layout.addView(comment_container);
+                                    }else{
+                                        for(int i = 0 ; i < response3.length(); i++){
+                                            final String this_comment_table_id = response3.getJSONObject(i).getString("id");
+                                            String flashcard_table_id = response3.getJSONObject(i).getString("flashcard_table_id");
+                                            String commenter_login_type = response3.getJSONObject(i).getString("login_type");
+                                            String commenter_id = response3.getJSONObject(i).getString("user_id");
+                                            String author_nickname = response3.getJSONObject(i).getString("user_nickname");
+                                            String author_thumbnail_url = response3.getJSONObject(i).getString("user_thumbnail");
+                                            String comment = response3.getJSONObject(i).getString("comment");
+                                            final String comment_show = Html.fromHtml(comment).toString().replace("<br>", "\n");
+                                            String r3_upload_date = response3.getJSONObject(i).getString("upload_date");
+
+                                            View comment_container = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+
+                                            TextView author_textView = (TextView) comment_container.findViewById(R.id.comment_author_textView);
+                                            TextView comment_textView = (TextView) comment_container.findViewById(R.id.comment_textView);
+                                            TextView upload_date_textView = (TextView) comment_container.findViewById(R.id.upload_textView);
+                                            ImageView author_thumbnail_imageView = (ImageView) comment_container.findViewById(R.id.author_imageView);
+
+                                            TextView revise_textView = (TextView)comment_container.findViewById(R.id.revise_textView);
+                                            TextView delete_textView = (TextView)comment_container.findViewById(R.id.delete_textView);
+
+                                            if(LoginType.equals(commenter_login_type) && G_user_id.equals(commenter_id)){
+                                                revise_textView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        String message = "해당 댓글을 수정 하시겠습니까?";
+                                                        String pos = "수정";
+                                                        String neg = "취소";
+                                                        String comment_handle_type  = "comment_revise";
+                                                        LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, this_comment_table_id, comment_show);
+                                                    }
+                                                });
+                                                delete_textView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        String message = "해당 댓글을 삭제 하시겠습니까?";
+                                                        String pos = "삭제";
+                                                        String neg = "취소";
+                                                        String comment_handle_type  = "comment_delete";
+                                                        LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, this_comment_table_id, comment_show);
+                                                    }
+                                                });
+                                            }else{
+                                                revise_textView.setVisibility(View.GONE);
+                                                delete_textView.setVisibility(View.GONE);
+                                            }
+
+                                            if(author_thumbnail_url.equals("null") || author_thumbnail_url.length()<=0){
+                                                //thumnail 이 없을때
+                                                author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                                                author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
+                                            }else{
+                                                getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail_url);
+                                            }
+                                            author_textView.setText(author_nickname);
+                                            comment_textView.setText(comment_show);
+                                            upload_date_textView.setText(r3_upload_date);
+
+                                            comment_layout.addView(comment_container);
+                                        }
+                                    }
+
+                                }else if(type.equals("getCommentsAndOthers")){
+                                    // type.equals(getCommentsAndOthers)
+                                    JSONArray response3 = jsonObject.getJSONArray("response3");
+                                    if(response3.length() == 0){
+                                        View comment_container = getLayoutInflater().inflate(R.layout.container_flashcard_comment_empty, null);
+                                        TextView empty_textView = (TextView)comment_container.findViewById(R.id.empty_textView);
+                                        empty_textView.setText("댓글이 존재하지 않습니다");
+                                        comment_layout.addView(comment_container);
+                                    }else{
+                                        for(int i = 0 ; i < response3.length(); i++){
+                                            final String this_comment_table_id = response3.getJSONObject(i).getString("id");
+                                            String flashcard_table_id = response3.getJSONObject(i).getString("flashcard_table_id");
+                                            String commenter_login_type = response3.getJSONObject(i).getString("login_type");
+                                            String commenter_id = response3.getJSONObject(i).getString("user_id");
+                                            String author_nickname = response3.getJSONObject(i).getString("user_nickname");
+                                            String author_thumbnail_url = response3.getJSONObject(i).getString("user_thumbnail");
+                                            final String comment = response3.getJSONObject(i).getString("comment");
+                                            final String comment_show = Html.fromHtml(comment).toString().replace("<br>", "\n");
+                                            String r3_upload_date = response3.getJSONObject(i).getString("upload_date");
+
+                                            View comment_container = getLayoutInflater().inflate(R.layout.container_flashcard_comment, null);
+
+                                            TextView author_textView = (TextView) comment_container.findViewById(R.id.comment_author_textView);
+                                            TextView comment_textView = (TextView) comment_container.findViewById(R.id.comment_textView);
+                                            TextView upload_date_textView = (TextView) comment_container.findViewById(R.id.upload_textView);
+                                            ImageView author_thumbnail_imageView = (ImageView) comment_container.findViewById(R.id.author_imageView);
+
+                                            TextView revise_textView = (TextView)comment_container.findViewById(R.id.revise_textView);
+                                            TextView delete_textView = (TextView)comment_container.findViewById(R.id.delete_textView);
+
+                                            if(LoginType.equals(commenter_login_type) && G_user_id.equals(commenter_id)){
+                                                revise_textView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        String message = "해당 댓글을 수정 하시겠습니까?";
+                                                        String pos = "수정";
+                                                        String neg = "취소";
+                                                        String comment_handle_type  = "comment_revise";
+                                                        LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, this_comment_table_id, comment_show);
+                                                    }
+                                                });
+                                                delete_textView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        String message = "해당 댓글을 삭제 하시겠습니까?";
+                                                        String pos = "삭제";
+                                                        String neg = "취소";
+                                                        String comment_handle_type  = "comment_delete";
+                                                        LAW_comment_revise_and_delete_notifier(message, pos, neg, comment_handle_type, this_comment_table_id, comment_show);
+                                                    }
+                                                });
+                                            }else{
+                                                revise_textView.setVisibility(View.GONE);
+                                                delete_textView.setVisibility(View.GONE);
+                                            }
+
+                                            if(author_thumbnail_url.equals("null") || author_thumbnail_url.length()<=0){
+                                                //thumnail 이 없을때
+                                                author_thumbnail_imageView.setBackground(getResources().getDrawable(R.drawable.thumbnail_outline));
+                                                author_thumbnail_imageView.setImageDrawable(getResources().getDrawable(R.drawable.icon_empty_thumbnail));
+                                            }else{
+                                                getThumbnailImageForAuthor(author_thumbnail_imageView, author_thumbnail_url);
+                                            }
+                                            author_textView.setText(author_nickname);
+                                            comment_textView.setText(comment_show);
+                                            upload_date_textView.setText(r3_upload_date);
+
+                                            comment_layout.addView(comment_container);
+                                        }
+                                    }
+
+                                }else{
+                                    //type.equals("comment_delete");
+                                    comment_layout.removeAllViews();
+                                    String flashcard_table_id = jsonObject.getString("response2");
+                                    LAW_connect_to_server("getCommentsAndOthers", flashcard_table_id);
                                 }
-
                             }else if(access_token.equals("invalid")){
 
                             }else{
@@ -1229,24 +1440,64 @@ public class FlashCardViewActivity extends AppCompatActivity {
         };
         queue.add(stringRequest);
     }
+    public void LAW_comment_revise_and_delete_notifier(String message, String positive_message, String negative_message, final String comment_handle_type, final String primary_key, final String comment){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(comment_handle_type.equals("comment_delete")){
+                            //comment 를 삭제한다
+                            LAW_connect_to_server(comment_handle_type, primary_key);
+                        }else{
+                           //comment_handle_type.equals("comment_revise")
+                           //intent 하여서 수정하는 페이지로 이동시킨다.
+                            Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
+                            intent.putExtra("type", "flashcard_revise_comment");
+                            intent.putExtra("exam_major_type", "lawyer");
+                            intent.putExtra("primary_key", primary_key);
+                            intent.putExtra("comment", comment);
+                            startActivityForResult(intent, FLASHCARD_WRITE_COMMENT);//20001 mean flashcard comment change result.
+                            slide_left_and_slide_in();
+                        }
 
+                    }
+                })
+                .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-
+                    }
+                })
+                .create()
+                .show();
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 20001){
+        if (requestCode == FLASHCARD_WRITE_COMMENT){
             if (resultCode == RESULT_OK) {
-                comment_layout.removeAllViews();
-                getSelectedFlashCardComments_And_Others();
+                if(major_exam_type_code.equals("lawyer")){
+                    comment_layout.removeAllViews();
+                    LAW_connect_to_server("getCommentsAndOthers", data.getStringExtra("primary_key"));
+                    Log.e("lawyer comment write", "return");
+                }else{
+                    comment_layout.removeAllViews();
+                    getSelectedFlashCardComments_And_Others();
+                }
             }else if(resultCode == RESULT_CANCELED){
-
+                Log.e("upload cancel", "result cancel");
+            }else{
+                Log.e("upload else", String.valueOf(resultCode));
             }
         }else if(requestCode == REQUEST_CODE_FLASHCARD_REVISE){
             if(resultCode ==RESULT_OK){
-                getUpdatedFlashCard();
+                if(major_exam_type_code.equals("lawyer")){
 
-                Log.e("revise", "result ok");
+                }else{
+                    getUpdatedFlashCard();
+                    Log.e("revise", "result ok");
+                }
             }else if(resultCode == RESULT_CANCELED){
                 Log.e("revise", "result cancel");
             }else{
