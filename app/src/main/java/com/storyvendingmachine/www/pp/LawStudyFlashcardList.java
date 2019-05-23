@@ -29,6 +29,7 @@ public class LawStudyFlashcardList {
     String folder_code;
     String folder_name;
     String flashcard_length;
+    String folder_major_type;
     public String getMenu_type() {
         return menu_type;
     }
@@ -213,7 +214,15 @@ public class LawStudyFlashcardList {
         this.flashcard_length = flashcard_length;
     }
 
-    public LawStudyFlashcardList(String menu_type, String flashcard_db_id, String major_type, String major_type_kor, String minor_type, String minor_type_kor, String login_type, String user_id, String user_nickname, String user_thumbnail, String upload_date, String upload_time, String scrap_count, String comment_count, String hit_count, String like_count, String title, String flashcard_count, String flashcard_first_term, String folder_code, String folder_name, String flashcard_length) {
+    public String getFolder_major_type() {
+        return folder_major_type;
+    }
+
+    public void setFolder_major_type(String folder_major_type) {
+        this.folder_major_type = folder_major_type;
+    }
+
+    public LawStudyFlashcardList(String menu_type, String flashcard_db_id, String major_type, String major_type_kor, String minor_type, String minor_type_kor, String login_type, String user_id, String user_nickname, String user_thumbnail, String upload_date, String upload_time, String scrap_count, String comment_count, String hit_count, String like_count, String title, String flashcard_count, String flashcard_first_term, String folder_code, String folder_name, String flashcard_length, String folder_major_type) {
         this.menu_type = menu_type;
         this.flashcard_db_id = flashcard_db_id;
         this.major_type = major_type;
@@ -236,5 +245,6 @@ public class LawStudyFlashcardList {
         this.folder_code = folder_code;
         this.folder_name = folder_name;
         this.flashcard_length = flashcard_length;
+        this.folder_major_type = folder_major_type;
     }
 }

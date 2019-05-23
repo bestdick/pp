@@ -96,12 +96,15 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 //type = revise
                 Log.e("enter", "revise");
                 toolbar();
+                LAW_initializer_revise(intent);
+
             }else{
                 //type = new
                 Log.e("enter", "new");
+                flashcard_db_id = "0";
                 toolbar();
                 LAW_initializer();
-                LAW_headerContent();
+                LAW_headerContent("new", null, null, null);
             }
         }else{
             // 산업기사/기사
@@ -146,22 +149,67 @@ public class FlashCardWriteActivity extends AppCompatActivity {
         addFlashCardContainer(); // 첫번째 플래시 카드 만들기;
         uploadButtonProcessDeco("new", "작성");
     }
+    public void LAW_initializer_revise(Intent intent){
+        flashcard_db_id = intent.getStringExtra("flashcard_db_id");
+        law_minor_type = "empty";
 
-    public void LAW_headerContent(){
-        View headerView = getLayoutInflater().inflate(R.layout.law_container_flashcard_write_header, null);
-        flashcard_title_editText = (EditText) headerView.findViewById(R.id.flashcard_write_title_editText);
-        flashcard_select_exam_button = (Button) headerView.findViewById(R.id.flashcard_select_exam_button);
+        header_jsonObject = new JSONObject();
+        jsonObjectTotal = new JSONObject();
 
-        flashcard_select_exam_button.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) findViewById(R.id.flashcardwrite_listView);
+        flashcardwriteList = new ArrayList<FlashCardWriteList>();
+        flashCardWriteListAdapter = new FlashCardWriteListAdapter(this, flashcardwriteList);
+        listView.setAdapter(flashCardWriteListAdapter);
+
+        fab = (FloatingActionButton) findViewById(R.id.floating_action_button);
+        fab.setColorNormal(getResources().getColor(R.color.colorCrimsonRed));
+        fab.setColorPressed(getResources().getColor(R.color.colorCrimsonRed));
+        fab.setColorRipple(getResources().getColor(R.color.colorCrimsonRed));
+        fab.attachToListView(listView);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                subjectSelectDialog(flashcard_select_exam_button);
+                listView.smoothScrollToPosition(0);
             }
         });
-        listView.addHeaderView(headerView);
+
+        LAW_getFlashcard_to_revise();
+        uploadButtonProcessDeco("revise", "작성");
+    }
+    public void LAW_headerContent(String input, String title, String minor_subject, String minor_subject_kor){
+        if(input.equals("new")){
+            View headerView = getLayoutInflater().inflate(R.layout.law_container_flashcard_write_header, null);
+            flashcard_title_editText = (EditText) headerView.findViewById(R.id.flashcard_write_title_editText);
+            flashcard_select_exam_button = (Button) headerView.findViewById(R.id.flashcard_select_exam_button);
+
+            flashcard_select_exam_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    subjectSelectDialog(flashcard_select_exam_button);
+                }
+            });
+            listView.addHeaderView(headerView);
+        }else{
+            //revise 일 경우
+            View headerView = getLayoutInflater().inflate(R.layout.law_container_flashcard_write_header, null);
+            flashcard_title_editText = (EditText) headerView.findViewById(R.id.flashcard_write_title_editText);
+            flashcard_select_exam_button = (Button) headerView.findViewById(R.id.flashcard_select_exam_button);
+
+            flashcard_title_editText.setText(title);
+            flashcard_select_exam_button.setText("#"+minor_subject_kor);
+            law_minor_type = minor_subject;
+
+            flashcard_select_exam_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    subjectSelectDialog(flashcard_select_exam_button);
+                }
+            });
+            listView.addHeaderView(headerView);
+        }
     }
     public void subjectSelectDialog(final Button button){
-        final CharSequence list[] = new CharSequence[]{"전체", "#공법", "#형사법", "#민사법"};
+        final CharSequence list[] = new CharSequence[]{"#전체", "#공법", "#형사법", "#민사법"};
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle("과목 선택");
@@ -190,6 +238,82 @@ public class FlashCardWriteActivity extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+    public void LAW_getFlashcard_to_revise(){
+        String url_getSelectedExam = "http://www.joonandhoon.com/pp/passpop_law/android/server/getFlashcardList.php";
+        RequestQueue queue = Volley.newRequestQueue(FlashCardWriteActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("flashcard_response", response);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String access_token = jsonObject.getString("access");
+                            if(access_token.equals("valid")){
+                                JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
+
+                                String primary_key = jsonObject.getJSONObject("response1").getString("primary_key");
+                                flashcard_db_id = primary_key;
+                                String flashcard_minor_type = jsonObject.getJSONObject("response1").getString("minor_type");
+                                String flashcard_minor_type_kor = jsonObject.getJSONObject("response1").getString("minor_type_kor");
+                                String flashcard_title = jsonObject.getJSONObject("response1").getString("flashcard_title");
+                                String user_login_type = jsonObject.getJSONObject("response1").getString("user_login_type");
+                                String user_id = jsonObject.getJSONObject("response1").getString("user_id");
+
+                                String user_nickname = jsonObject.getJSONObject("response1").getString("user_nickname");
+                                String user_thumbnail = jsonObject.getJSONObject("response1").getString("user_thumbnail");
+                                String flashcard_hit = jsonObject.getJSONObject("response1").getString("flashcard_hit");
+                                String flashcard_like_count = jsonObject.getJSONObject("response1").getString("flashcard_like_count");
+                                String flashcard_scrapped_count = jsonObject.getJSONObject("response1").getString("flashcard_scrapped_count");
+                                String upload_date = jsonObject.getJSONObject("response1").getString("upload_date");
+                                String upload_time = jsonObject.getJSONObject("response1").getString("upload_time");
+
+                                LAW_headerContent("revise", flashcard_title, flashcard_minor_type, flashcard_minor_type_kor);
+
+                                ArrayList<String> flashcards = new ArrayList<>();
+                                for (int i = 0; i < flashcard_json.length(); i++) {
+                                    String term = flashcard_json.getJSONObject(i).getString("term").replace("<br>", "\n");
+                                    String definition = flashcard_json.getJSONObject(i).getString("definition").replace("<br>", "\n");
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
+                                    flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
+
+                                    FlashCardWriteList list = new FlashCardWriteList(term, definition);
+                                    flashcardwriteList.add(list);
+                                }
+                                flashCardWriteListAdapter.notifyDataSetChanged();
+                            }else if(access_token.equals("invalid")){
+
+                            }else{
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("vorry error", error.toString());
+                //                        String message = "인터넷 연결 에러.. 다시 한번 시도해 주세요...ㅠ ㅠ";
+                //                        toast(message);
+                //                        getExamNameAndCode(); // 인터넷 에러가 났을시 다시 한번 시도한다.
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", "passpop");
+                params.put("type", "revise_selected");
+                params.put("primary_key", flashcard_db_id);
+                params.put("login_type", LoginType);
+                params.put("user_id", G_user_id);
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
 
@@ -325,7 +449,6 @@ public class FlashCardWriteActivity extends AppCompatActivity {
         flashCardWriteListAdapter.notifyDataSetChanged();
         listView.smoothScrollToPosition(flashCardWriteListAdapter.getCount());
     }
-
     public void headerContent(){
         View headerView = getLayoutInflater().inflate(R.layout.container_flashcard_write_header, null);
         flashcard_title_editText = (EditText) headerView.findViewById(R.id.flashcard_write_title_editText);
@@ -420,7 +543,7 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                                             notifier_private_public(message, positive_message,
                                                     negative_message, jsonObjectTotal, flashcard_write_type);
 
-                                            Toast.makeText(FlashCardWriteActivity.this, "수정", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(FlashCardWriteActivity.this, "수정", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 } else {
@@ -574,18 +697,21 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             String access_token = jsonObject.getString("access");
                             if(access_token.equals("valid")){
-//                                String upload_result = jsonObject.getString("response");
-//                                if(upload_result.equals("upload_success")){
-//                                    String mes = "플래시 카드를 성공적으로 업로드 하였습니다.";
-//                                    String pos_mes = "확인";
-//                                    notifier_new_revise_confirm(mes, pos_mes);
-//                                }else if(upload_result.equals("update_success")){
-//                                    String mes = "플래시 카드를 성공적으로 업데이트 하였습니다.";
-//                                    String pos_mes = "확인";
-//                                    notifier_new_revise_confirm(mes, pos_mes);
-//                                }else{
-//                                    // upload_ update_ fail
-//                                }
+                                String upload_result = jsonObject.getString("response1");
+                                if(upload_result.equals("upload_success")){
+                                    String mes = "플래시 카드를 성공적으로 업로드 하였습니다.";
+                                    String pos_mes = "확인";
+                                    notifier_new_revise_confirm(mes, pos_mes);
+                                }else if(upload_result.equals("update_success")){
+                                    String mes = "플래시 카드를 성공적으로 업데이트 하였습니다.";
+                                    String pos_mes = "확인";
+                                    notifier_new_revise_confirm(mes, pos_mes);
+                                }else{
+                                    // upload_ update_ fail
+                                    String mes = "실패";
+                                    String pos_mes = "확인";
+                                    notifier_new_revise_confirm(mes, pos_mes);
+                                }
                             }else if(access_token.equals("invalid")){
                                 Toast.makeText(FlashCardWriteActivity.this,"잘못된 접근입니다", Toast.LENGTH_SHORT).show();
                             }else{
@@ -620,6 +746,7 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 params.put("login_type", LoginType);
                 params.put("user_id", G_user_id);
                 params.put("flashcard_data", jsonObject_str);
+                params.put("flashcard_db_id", flashcard_db_id);
                 return params;
             }
         };
@@ -759,7 +886,9 @@ public class FlashCardWriteActivity extends AppCompatActivity {
                 .setPositiveButton(positivie_message, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        setResult(RESULT_OK);
+                        Intent intent = new Intent();
+                        intent.putExtra("primary_key", flashcard_db_id);
+                        setResult(RESULT_OK, intent);
                         finish();
                         overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
                     }

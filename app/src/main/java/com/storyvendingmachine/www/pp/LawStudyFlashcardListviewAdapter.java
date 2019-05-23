@@ -48,13 +48,17 @@ public class LawStudyFlashcardListviewAdapter extends BaseAdapter {
             View v = View.inflate(context, R.layout.law_container_flashcard_my_folder, null);
             TextView folder_name_textView = (TextView) v.findViewById(R.id.folder_name_textView);
             TextView folder_flashcard_length_textView = (TextView) v.findViewById(R.id.folder_flashcard_length_textView);
+            TextView folder_subject_textView = (TextView) v.findViewById(R.id.folder_subject_textView);
 
             String folder_name = list.get(i).getFolder_name();
             String folder_code = list.get(i).getFolder_code();
+            String major_exam_type_in_foder = list.get(i).getFolder_major_type();
             String flashcard_length = list.get(i).getFlashcard_length();
+
 
             folder_name_textView.setText(folder_name);
             folder_flashcard_length_textView.setText("( "+flashcard_length+ " )");
+            folder_subject_textView.setText(major_exam_type_in_foder);
             return  v;
         }else {
             View v = View.inflate(context, R.layout.law_container_flashcard_listview_element, null);

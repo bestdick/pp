@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 import static com.storyvendingmachine.www.pp.FlashCardViewActivity.global_flashcard_jsonObject;
 import static com.storyvendingmachine.www.pp.FlashCardViewActivity.global_flashcard_my_jsonArray;
+import static com.storyvendingmachine.www.pp.MainActivity.major_exam_type_code;
 
 public class FlashcardSoloViewActivity extends AppCompatActivity {
     ViewPager fviewPager;
@@ -34,14 +36,22 @@ public class FlashcardSoloViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         boolean solo_page = intent.getBooleanExtra("solo_page", true);
         String flashcard_or_folder = intent.getStringExtra("flashcard_or_folder");
-
-        if(flashcard_or_folder.equals("flashcard")){
+        if(major_exam_type_code.equals("lawyer")){
+            if(flashcard_or_folder.equals("flashcard")){
+                String flashcard_db_id = intent.getStringExtra("flashcard_db_id");
+                LAW_mkaeFlashCard();
+                Log.e("flashcard id", flashcard_db_id);
+            }else if(flashcard_or_folder.equals("folder")){
+                String flashcard_db_id = intent.getStringExtra("flashcard_db_id");
+                Log.e("flashcard id", flashcard_db_id);
+            }
+        }else{
+            if(flashcard_or_folder.equals("flashcard")){
                 makeFlashCard();
-        }else if(flashcard_or_folder.equals("folder")){
-            makeFolderFlashCard();
-
+            }else if(flashcard_or_folder.equals("folder")){
+                makeFolderFlashCard();
+            }
         }
-
     }
 
     public void makeFolderFlashCard() {
@@ -70,8 +80,6 @@ public class FlashcardSoloViewActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
     public void makeFlashCard(){
         try {
             JSONArray flashcard_json = global_flashcard_jsonObject.getJSONArray("flashcards");
@@ -104,11 +112,42 @@ public class FlashcardSoloViewActivity extends AppCompatActivity {
 
     }
 
+    // below this line the functions are for LAWYER EXAM --------------------------
+    public void LAW_mkaeFlashCard(){
+        try {
+
+
+            JSONArray flashcard_json = global_flashcard_jsonObject.getJSONObject("flashcard_data").getJSONArray("flashcards");
+            String f_subject_name = global_flashcard_jsonObject.getString("minor_type_kor");
+
+            int count = (flashcard_json.length()*2);//앞뒤가 있기때문에 2장을 만들어야한다.
+            ArrayList<String> flashcards = new ArrayList<>();
+            for(int i = 0 ; i<flashcard_json.length(); i++){
+                flashcards.add(flashcard_json.getJSONObject(i).getString("term"));
+                flashcards.add(flashcard_json.getJSONObject(i).getString("definition"));
+            }
+
+            fViewPagerAdapter = new FlashCardViewActivityViewPagerAdapter(getSupportFragmentManager());
+            fViewPagerAdapter.count = count;
+            fViewPagerAdapter.flashcard_array = flashcards;
+            fViewPagerAdapter.exam_name = "변호사시험";
+            fViewPagerAdapter.subject_name = f_subject_name;
+            fViewPagerAdapter.solo_page = false;
+            fViewPagerAdapter.flashcard_or_folder = "flashcard";
+
+
+            fviewPager = (ViewPager) findViewById(R.id.flashcard_solo_container);
+            fviewPager.setAdapter(fViewPagerAdapter);
+            fviewPager.setOffscreenPageLimit(count);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void onBackPressed(){
         super.onBackPressed();
         finish();
         overridePendingTransition(R.anim.slide_right_bit, R.anim.slide_out);// first entering // second exiting
     }
-
 }

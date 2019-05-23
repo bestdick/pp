@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
@@ -13,12 +14,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,14 +84,17 @@ public class LawStudySubClassFragment extends Fragment {
      * @return A new instance of fragment StudySubClassFragment.
      */
     // TODO: Rename and change types and number of parameters
-
     ListView listView;
     LawStudyFlashcardListviewAdapter studyFlashcardListviewAdapter;
     List<LawStudyFlashcardList> studyFlashcardLists;
+    ProgressBar progressBar;
 
     int flashcard_menu;
     int total_list_count;
     int page;
+
+
+    boolean stop;
 
     View footer_view;
     int footer_view_flag;
@@ -108,33 +115,22 @@ public class LawStudySubClassFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         flashcard_menu = 0;
-        total_list_count=0;
+//        total_list_count=0;
         page=0;
 
         footer_view_flag = -1;
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        stop = false;
         // Inflate the layout for this fragment
         View rootview =inflater.inflate(R.layout.fragment_study_sub_class_law, container, false);
         footer_view =getLayoutInflater().inflate(R.layout.law_container_folder_add_footer_view, null);
         initializer(rootview);
-        swiper(rootview);
         return rootview;
-    }
-    public void swiper(View rootview){
-        final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                page=0;
-                studyFlashcardLists.clear();
-                getFlashcardList();
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
     }
 
     public void initializer(View rootview){
@@ -142,11 +138,69 @@ public class LawStudySubClassFragment extends Fragment {
         studyFlashcardLists = new ArrayList<LawStudyFlashcardList>();
         studyFlashcardListviewAdapter= new LawStudyFlashcardListviewAdapter(getActivity(), studyFlashcardLists);
         listView.setAdapter(studyFlashcardListviewAdapter);
+        progressBar = rootview.findViewById(R.id.progress_bar);
 
         getFlashcardList();
         flashcard_list_header();
+            scroll_listener();
+            swiper(rootview);
+
     }
 
+    public void swiper(View rootview){
+        final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) rootview.findViewById(R.id.swiper);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                page=0;
+                stop = false;
+                studyFlashcardLists.clear();
+                progressbar_visible();
+                getFlashcardList();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+    public void scroll_listener(){
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                if(flashcard_menu !=3){
+                    if (listView.getLastVisiblePosition() == listView.getAdapter().getCount() -1 &&
+                            listView.getChildAt(listView.getChildCount() - 1).getBottom() <= listView.getHeight() &&
+                            listView.getAdapter().getCount() >0) {
+                        //It is scrolled all the way down here
+                        Log.e("scroll bottom? ", "true");
+                        if(!stop){
+                            progressbar_visible();
+                            new Handler().postDelayed(new Runnable() {// 1 초 후에 실행
+                                @Override
+                                public void run() {
+                                    seeMoreFooter();
+                                }
+                            }, 500);
+                        }
+                    }
+                }
+            }
+        });
+    }
+    public void seeMoreFooter(){
+        page+=10;
+        if(total_list_count >page){
+            Log.e("scroll see more", "true 일때");
+            getFlashcardList();
+        }else{
+            Log.e("scroll see more ", "false 일때");
+            Toast.makeText(getActivity(), "마지막 페이지 입니다.", Toast.LENGTH_SHORT).show();
+            stop=true;
+            progressbar_invisible();
+        }
+    }
     public void flashcard_list_header(){
         View header_view = getLayoutInflater().inflate(R.layout.law_container_flashcard_listview_header, null);
         final TextView view_category_textView = (TextView) header_view.findViewById(R.id.view_category_textView);
@@ -191,6 +245,7 @@ public class LawStudySubClassFragment extends Fragment {
                 .create()
                 .show();
     }
+
     private void getFlashcardList(){
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = base_url+"getFlashcardList.php";
@@ -204,19 +259,21 @@ public class LawStudySubClassFragment extends Fragment {
                                 JSONObject jsonObject = new JSONObject(response);
                                 String return_menu = jsonObject.getString("menu");
                                 if(return_menu.equals("folder_list")){
-                                    String basic_folder_count = jsonObject.getString("basic_folder_flashcard_count");//기본 폴더
+                                    String basic_folder_count = jsonObject.getJSONObject("basic_folder_flashcard_count").getString("count");//기본 폴더
+                                    String basic_major_exam_in_folder = jsonObject.getJSONObject("basic_folder_flashcard_count").getString("exam_major_name_kor");//기본 폴더
                                     LawStudyFlashcardList basic_item = new LawStudyFlashcardList("folder_list", null,null,null,null,null,null,null,
                                             null,null,null,null,null,null,null,null,null,null,null,
-                                            "0", "기본 폴더", basic_folder_count);
+                                            "0", "기본 폴더", basic_folder_count, basic_major_exam_in_folder);
                                     studyFlashcardLists.add(basic_item);
                                     JSONArray jsonArray = jsonObject.getJSONArray("response1");
                                     for(int i = 0 ; i < jsonArray.length(); i++){
                                         String folder_name = jsonArray.getJSONObject(i).getString("scrap_folder_name");
                                         String folder_code = jsonArray.getJSONObject(i).getString("scrap_folder_code");
+                                        String major_exam_in_folder = jsonArray.getJSONObject(i).getString("exam_major_name_kor");
                                         String total_flashcads_in_folder = jsonArray.getJSONObject(i).getString("total_flashcads_in_folder");
                                         LawStudyFlashcardList item = new LawStudyFlashcardList("folder_list", null,null,null,null,null,null,null,
                                                 null,null,null,null,null,null,null,null,null,null,null,
-                                                folder_code, folder_name, total_flashcads_in_folder);
+                                                folder_code, folder_name, total_flashcads_in_folder,basic_major_exam_in_folder);
                                         studyFlashcardLists.add(item);
                                     }
                                 }else {
@@ -241,7 +298,7 @@ public class LawStudySubClassFragment extends Fragment {
 
                                         LawStudyFlashcardList item = new LawStudyFlashcardList("list", primary_key, major_type, null, minor_type, null,
                                                 login_type, user_id, user_nickname, user_thumbnail, upload_date, upload_time, null, null, flashcard_hit, null,
-                                                title, count, first_term, null, null, null);
+                                                title, count, first_term, null, null, null, null);
                                         studyFlashcardLists.add(item);
                                     }
                                 }
@@ -250,6 +307,7 @@ public class LawStudySubClassFragment extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        progressbar_invisible();
 //
 //                        examlistviewAdapter.notifyDataSetChanged();
                     }},
@@ -292,12 +350,14 @@ public class LawStudySubClassFragment extends Fragment {
                         studyFlashcardLists.clear();
                         flashcard_menu = 0;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         break;
                     case 1:
                         studyFlashcardLists.clear();
                         flashcard_menu = 1;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         view_category_textView.setText(list[1].toString());
                         break;
@@ -321,6 +381,7 @@ public class LawStudySubClassFragment extends Fragment {
                         studyFlashcardLists.clear();
                         flashcard_menu = 0;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         view_category_textView.setText(list[0].toString());
                         break;
@@ -329,6 +390,7 @@ public class LawStudySubClassFragment extends Fragment {
                         studyFlashcardLists.clear();
                         flashcard_menu = 1;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         view_category_textView.setText(list[1].toString());
                         break;
@@ -337,6 +399,7 @@ public class LawStudySubClassFragment extends Fragment {
                         studyFlashcardLists.clear();
                         flashcard_menu = 2;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         view_category_textView.setText(list[2].toString());
                         break;
@@ -345,6 +408,7 @@ public class LawStudySubClassFragment extends Fragment {
                         studyFlashcardLists.clear();
                         flashcard_menu = 3;
                         page=0;
+                        stop= false;
                         getFlashcardList();
                         myFolderListClickControl();
                         view_category_textView.setText(list[3].toString());
@@ -390,6 +454,7 @@ public class LawStudySubClassFragment extends Fragment {
 
             }
         });
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View v, int i, long l) {
@@ -711,5 +776,16 @@ public class LawStudySubClassFragment extends Fragment {
 
     public void slide_left_and_slide_in(){
         getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_left_bit); // 처음이 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+    }
+
+    public void progressbar_visible(){
+        progressBar.setVisibility(View.VISIBLE);
+//        progressBarBackground.setVisibility(View.VISIBLE);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+    public void progressbar_invisible(){
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressBar.setVisibility(View.GONE);
+//        progressBarBackground.setVisibility(View.GONE);
     }
 }

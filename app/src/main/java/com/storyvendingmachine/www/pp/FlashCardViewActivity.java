@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -1046,8 +1047,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
                             }else{
 
                             }
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1112,6 +1111,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
 //    LAW          LAW           LAW     LAW     LAW
     public void LAW_initializer(Intent intent){
         final String flashcard_primary_key = intent.getStringExtra("primary_key");
+        flashcard_db_id = flashcard_primary_key;
         String author_nickname = intent.getStringExtra("author_nickname");
         String title = intent.getStringExtra("title");
         String upload_date = intent.getStringExtra("upload_date");
@@ -1152,9 +1152,8 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
 
         String type = "selected";
-        LAW_connect_to_server(type, flashcard_primary_key);
+        LAW_connect_to_server(type, flashcard_primary_key, "null", null);
     }
-
     public void LAW_update_like_and_comment_whenClick(String input1, int input2){
         //input1 은 현재 플래시 카드의 데이터 베이스 table id 를 알려주는 값이다.
         //input2 은 type 을 말하는것이다. 서버에 어떤 타입을 줘서 어떤 작동을 할지 알려주는...
@@ -1165,7 +1164,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
         }else{
             if(input2 == UPDATE_LIKE){
                 String type = "update_like";
-                LAW_connect_to_server(type, input1);
+                LAW_connect_to_server(type, input1, "null",null);
             }else{
                 // input2 == WRITE_COMMENT
                 Intent intent = new Intent(FlashCardViewActivity.this, ExamNoteWriteActivity.class);
@@ -1177,8 +1176,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
             }
         }
     }
-
-    public void LAW_connect_to_server(final String type, final String primary_key){
+    public void LAW_connect_to_server(final String type, final String primary_key, final String folder_code, final TextView textView){
         String url_getSelectedExam = "http://www.joonandhoon.com/pp/passpop_law/android/server/getFlashcardList.php";
         RequestQueue queue = Volley.newRequestQueue(FlashCardViewActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url_getSelectedExam,
@@ -1204,13 +1202,13 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                     JSONArray flashcard_json = jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards");
                                     int count = (jsonObject.getJSONObject("response1").getJSONObject("flashcard_data").getJSONArray("flashcards").length() * 2);//앞뒤가 있기때문에 2장을 만들어야한다.
 
-
                                     String primary_key = jsonObject.getJSONObject("response1").getString("primary_key");
                                     String flashcard_minor_type = jsonObject.getJSONObject("response1").getString("minor_type");
                                     String flashcard_minor_type_kor = jsonObject.getJSONObject("response1").getString("minor_type_kor");
                                     String flashcard_title = jsonObject.getJSONObject("response1").getString("flashcard_title");
                                     String user_login_type = jsonObject.getJSONObject("response1").getString("user_login_type");
                                     String user_id = jsonObject.getJSONObject("response1").getString("user_id");
+                                    author_of_this_flashcard = user_id;
                                     String user_nickname = jsonObject.getJSONObject("response1").getString("user_nickname");
                                     String user_thumbnail = jsonObject.getJSONObject("response1").getString("user_thumbnail");
                                     String flashcard_hit = jsonObject.getJSONObject("response1").getString("flashcard_hit");
@@ -1244,24 +1242,9 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                     scrap_count_textView.setText("스크랩 +" + flashcard_scrapped_count);
                                     flashcard_written_date_textView.setText("작성일 " + upload_date);
 
-                                    for (int i = 0; i < response2.length(); i++) {
-                                        String folder_code = response2.getJSONObject(i).getString("folder_code");
-                                        String folder_name = response2.getJSONObject(i).getString("folder_name");
-                                        String exam = response2.getJSONObject(i).getString("exam");
-                                        String flashcard_count = response2.getJSONObject(i).getString("count");
-
-                                        View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
-                                        TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
-                                        TextView scrap_count_textView = folder_container.findViewById(R.id.scrap_count_textView);
-                                        TextView exam_textView = folder_container.findViewById(R.id.exam_textView);
-
-                                        folder_name_textView.setText(folder_name);
-                                        scrap_count_textView.setText(flashcard_count);
-                                        exam_textView.setText(exam);
-
-                                        scrap_folder_layout.addView(folder_container);
-                                    }
-
+                                    //사이드 drawer 에 폴더 리스트 생성
+                                    LAW_create_folder_list(primary_key, response2);
+                                    //사이드 drawer 에 폴더 리스트 생성
                                     if(response3.length() == 0){
                                         View comment_container = getLayoutInflater().inflate(R.layout.container_flashcard_comment_empty, null);
                                         TextView empty_textView = (TextView)comment_container.findViewById(R.id.empty_textView);
@@ -1401,11 +1384,32 @@ public class FlashCardViewActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                }else{
+                                }else if(type.equals("comment_delete")){
                                     //type.equals("comment_delete");
                                     comment_layout.removeAllViews();
                                     String flashcard_table_id = jsonObject.getString("response2");
-                                    LAW_connect_to_server("getCommentsAndOthers", flashcard_table_id);
+                                    LAW_connect_to_server("getCommentsAndOthers", flashcard_table_id, "null", null);
+                                }else if(type.equals("flashcard_delete")){
+                                    //type.equals("flashcard_delete");
+                                    finish();
+                                    slide_left_and_slide_in();
+                                }else{
+                                    //type.equals("add_flashcard_to_folder");
+                                    String response1 = jsonObject.getString("response1");
+                                    if(response1.equals("already_exist")){
+                                        String message = "플래시 카드가 해당 폴더에 이미 존재합니다.";
+                                        String pos = "확인";
+                                        notifier(message, pos);
+                                    }else if(response1.equals("upload_fail")){
+                                        String message = "업로드를 실패하였습니다. 다시 시도해주세요.";
+                                        String pos = "확인";
+                                        notifier(message, pos);
+                                    }else{
+                                        String message = "플래시 카드를 해당 폴더에 추가 하였습니다.";
+                                        String pos = "확인";
+                                        notifier(message, pos);
+                                        textView.setText(response1);
+                                    }
                                 }
                             }else if(access_token.equals("invalid")){
 
@@ -1435,11 +1439,58 @@ public class FlashCardViewActivity extends AppCompatActivity {
 
                 params.put("login_type", LoginType);
                 params.put("user_id", G_user_id);
+
+                params.put("folder_code", folder_code);
                 return params;
             }
         };
         queue.add(stringRequest);
     }
+    public void LAW_create_folder_list(final String primary_key, JSONArray response2) throws JSONException {
+        if(LoginType.equals("null") || G_user_id.equals("null")){
+            View folder_container_basic = getLayoutInflater().inflate(R.layout.examview_exam_note_personal_container, null);
+            TextView folder_name_textView_basic = folder_container_basic.findViewById(R.id.user_personal_note_textView);
+
+            folder_name_textView_basic.setText("로그인 하시면 더 많은 기능을 사용 할 수 있습니다");
+            scrap_folder_layout.addView(folder_container_basic);
+        }else{
+            for (int i = 0; i < response2.length(); i++) {
+                final String folder_code = response2.getJSONObject(i).getString("folder_code");
+                final String folder_name = response2.getJSONObject(i).getString("folder_name");
+                final String exam = response2.getJSONObject(i).getString("exam");
+                String exam_major_name_kor = response2.getJSONObject(i).getString("exam_major_name_kor");
+                String flashcard_count = response2.getJSONObject(i).getString("count");
+
+
+                View folder_container = getLayoutInflater().inflate(R.layout.container_flashcard_scrap_folder, null);
+                TextView folder_name_textView = folder_container.findViewById(R.id.scrap_folder_textView);
+                final TextView scrap_count_textView = folder_container.findViewById(R.id.scrap_count_textView);
+                TextView exam_textView = folder_container.findViewById(R.id.exam_textView);
+
+                folder_name_textView.setText(folder_name);
+                scrap_count_textView.setText(flashcard_count);
+                exam_textView.setText(exam_major_name_kor);
+
+                folder_container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // 클리한 폴더 않에 해당 flashcard 를 넣어야하기때문에...
+                        // 플래시카드 table id 와 folder code 와 본인 아이디 및 로그인 타입 입력
+                        Log.e("major exam", major_exam_type_code);
+                        if(exam.equals(major_exam_type_code) || exam.equals("empty")){
+                            LAW_connect_to_server("add_flashcard_to_folder", primary_key, folder_code, scrap_count_textView);
+                        }else{
+                            String message = folder_name+" 폴더에 이미 다른 시험종목의 플래시카드가 저장되어있습니다";
+                            String pos = "확인";
+                            notifier(message, pos);
+                        }
+                    }
+                });
+                scrap_folder_layout.addView(folder_container);
+            }
+        }
+    }
+
     public void LAW_comment_revise_and_delete_notifier(String message, String positive_message, String negative_message, final String comment_handle_type, final String primary_key, final String comment){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
@@ -1448,7 +1499,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(comment_handle_type.equals("comment_delete")){
                             //comment 를 삭제한다
-                            LAW_connect_to_server(comment_handle_type, primary_key);
+                            LAW_connect_to_server(comment_handle_type, primary_key, "null", null);
                         }else{
                            //comment_handle_type.equals("comment_revise")
                            //intent 하여서 수정하는 페이지로 이동시킨다.
@@ -1472,6 +1523,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1479,7 +1531,7 @@ public class FlashCardViewActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 if(major_exam_type_code.equals("lawyer")){
                     comment_layout.removeAllViews();
-                    LAW_connect_to_server("getCommentsAndOthers", data.getStringExtra("primary_key"));
+                    LAW_connect_to_server("getCommentsAndOthers", data.getStringExtra("primary_key"), "null",null);
                     Log.e("lawyer comment write", "return");
                 }else{
                     comment_layout.removeAllViews();
@@ -1493,7 +1545,10 @@ public class FlashCardViewActivity extends AppCompatActivity {
         }else if(requestCode == REQUEST_CODE_FLASHCARD_REVISE){
             if(resultCode ==RESULT_OK){
                 if(major_exam_type_code.equals("lawyer")){
-
+                    comment_layout.removeAllViews();
+                    String type = "selected";
+                    String primary_key = data.getStringExtra("primary_key");
+                    LAW_connect_to_server(type, primary_key, "null",null);
                 }else{
                     getUpdatedFlashCard();
                     Log.e("revise", "result ok");
@@ -1523,18 +1578,19 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, FlashcardSoloViewActivity.class);
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "flashcard");
+                intent.putExtra("flashcard_db_id", flashcard_db_id);
                 startActivity(intent);
                 slide_left_and_slide_in();
             } else {
                 Intent intent = new Intent(this, FlashcardSoloViewActivity.class);
                 intent.putExtra("solo_page", true);
                 intent.putExtra("flashcard_or_folder", "folder");
+                intent.putExtra("flashcard_db_id", flashcard_db_id);
                 startActivity(intent);
                 slide_left_and_slide_in();
             }
-
         }else if(id == R.id.flashcard_more_options){
-
+            // empty
         }else if(id == R.id.delete_flashcard_option){
             if(author_of_this_flashcard.equals(G_user_id)){
                 // the user is the author of this flashcard
@@ -1553,13 +1609,14 @@ public class FlashCardViewActivity extends AppCompatActivity {
             if(author_of_this_flashcard.equals(G_user_id)){
                 // the user is the author of this flashcard
                 // when this click change page to revise
-                Intent intent = new Intent(FlashCardViewActivity.this, FlashCardWriteActivity.class);
-                intent.putExtra("type", "revise");
-                intent.putExtra("flashcard_db_id", flashcard_db_id);
-                startActivityForResult(intent, REQUEST_CODE_FLASHCARD_REVISE);
-//                startActivity(intent);
-                slide_left_and_slide_in();
-                Log.e("who is the author", "im the author");
+                    //일반 기사 산업기사 시험일떄
+                    Intent intent = new Intent(FlashCardViewActivity.this, FlashCardWriteActivity.class);
+                    intent.putExtra("type", "revise");
+                    intent.putExtra("flashcard_db_id", flashcard_db_id);
+                    startActivityForResult(intent, REQUEST_CODE_FLASHCARD_REVISE);
+                    slide_left_and_slide_in();
+                    Log.e("who is the author", "im the author");
+
             }else{
                 String mes = "본인이 작성하신 플래시카드만 수정이 가능합니다";
                 String pos_mes = "확인";
@@ -1586,7 +1643,6 @@ public class FlashCardViewActivity extends AppCompatActivity {
         }else{
             getMenuInflater().inflate(R.menu.flashcard_solo_view, menu);
         }
-
         return super.onCreateOptionsMenu(menu);
     }
     public void toast(String message){
@@ -1620,7 +1676,12 @@ public class FlashCardViewActivity extends AppCompatActivity {
                 .setPositiveButton(positive_message, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        flashcard_delete();
+                        if(major_exam_type_code.equals("lawyer")){
+                            String type = "flashcard_delete";
+                            LAW_connect_to_server(type, flashcard_db_id, "null", null);
+                        }else{
+                            flashcard_delete();
+                        }
                     }
                 })
                 .setNegativeButton(negative_message, new DialogInterface.OnClickListener() {
