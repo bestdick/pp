@@ -33,6 +33,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.storyvendingmachine.www.pp.LoginActivity.callback;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_id;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_level;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_nickname;
+import static com.storyvendingmachine.www.pp.MainActivity.G_user_thumbnail;
+import static com.storyvendingmachine.www.pp.MainActivity.LoginType;
+import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_code;
+import static com.storyvendingmachine.www.pp.MainActivity.exam_selection_name;
 import static com.storyvendingmachine.www.pp.VERSION.THIS_APP_VERSION;
 
 public class EnteranceActivity extends AppCompatActivity {
@@ -74,6 +81,37 @@ public class EnteranceActivity extends AppCompatActivity {
                     } else {
                         // 무조건 재로그인을 시켜야 하는 경우
                         //            Session.getCurrentSession().clearCallbacks();
+                        LoginType = "null";
+
+                        G_user_id = "null";
+                        G_user_level = "null";
+                        G_user_nickname = "null";
+                        G_user_thumbnail = "null";
+
+                        exam_selection_name ="null";
+                        exam_selection_code ="null";
+
+                        login_remember = getSharedPreferences("setting", 0);
+                        editor = login_remember.edit();
+                        editor.putString("login_type", "null");
+                        editor.putBoolean("id_pw_match", false);
+                        editor.putString("user_email", "");
+                        editor.putString("user_password", "");
+                        editor.commit();
+
+                        Session.getCurrentSession().clearCallbacks();
+                        Session.getCurrentSession().close();
+
+                        String str_null = "null";
+                        Intent intent = new Intent(EnteranceActivity.this, MajorExamTypeSelectorActivity.class);
+                        intent.putExtra("login_type", str_null);
+                        intent.putExtra("user_id", str_null);
+                        intent.putExtra("member_level", str_null);
+                        intent.putExtra("user_nickname", str_null);
+                        intent.putExtra("user_thumbnail", str_null);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 처번째가 앞으로 들어올 activity 두번째가 현재 activity 가 할 애니매이션
+                        finish();
                     }
                 //****************kakao login **************************
 
