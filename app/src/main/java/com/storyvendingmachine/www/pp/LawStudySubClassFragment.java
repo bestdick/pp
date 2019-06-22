@@ -273,7 +273,7 @@ public class LawStudySubClassFragment extends Fragment {
                                         String total_flashcads_in_folder = jsonArray.getJSONObject(i).getString("total_flashcads_in_folder");
                                         LawStudyFlashcardList item = new LawStudyFlashcardList("folder_list", null,null,null,null,null,null,null,
                                                 null,null,null,null,null,null,null,null,null,null,null,
-                                                folder_code, folder_name, total_flashcads_in_folder,basic_major_exam_in_folder);
+                                                folder_code, folder_name, total_flashcads_in_folder,major_exam_in_folder);
                                         studyFlashcardLists.add(item);
                                     }
                                 }else {
